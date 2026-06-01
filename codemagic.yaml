@@ -31,7 +31,17 @@ workflows:
         script: npm run build
       - name: Sync web build into the iOS project
         script: npx cap sync ios
-      - name: Fetch signing profiles
+      - name: Set up keychain
+        script: keychain initialize
+      - name: Fetch signing certificate and provisioning profile
+        script: |
+          app-store-connect fetch-signing-files \
+            "com.nconte.yourmentalcoach" \
+            --type IOS_APP_STORE \
+            --create
+      - name: Add certificates to keychain
+        script: keychain add-certificates
+      - name: Apply signing profiles to Xcode project
         script: xcode-project use-profiles
       - name: Set the next TestFlight build number
         script: |
