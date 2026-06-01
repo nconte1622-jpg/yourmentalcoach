@@ -12,6 +12,11 @@ import { loadRoundContext, saveRoundToHistory } from "./roundContext";
 import { extractAndSaveInsights } from "./insightJournal";
 import { saveBack9Pattern } from "./back9Detection";
 import { calculateResilienceScore, saveResilienceScore } from "./resilienceScore";
+import {
+  loadCheckInTimestamps,
+  loadEmotionLog,
+  loadUsedPreShotReset,
+} from "./roundMetrics";
 import { getMoodSummary, getMoodInsight } from "./holeMoods";
 
 /**
@@ -42,9 +47,9 @@ export function extractAndSaveQuickEndData(roundId: string): void {
 
     // 6. Calculate and save resilience score
     try {
-      const emotionLog = JSON.parse(sessionStorage.getItem("round-emotion-log") || "[]");
-      const checkInTimestamps = JSON.parse(sessionStorage.getItem("round-checkin-timestamps") || "[]");
-      const usedPreShotReset = sessionStorage.getItem("round-used-pre-shot-reset") === "true";
+      const emotionLog = loadEmotionLog();
+      const checkInTimestamps = loadCheckInTimestamps();
+      const usedPreShotReset = loadUsedPreShotReset();
       const ctx = loadRoundContext();
       const roundDurationMinutes = ctx?.startedAt
         ? Math.round((Date.now() - new Date(ctx.startedAt).getTime()) / 60000)
@@ -78,20 +83,15 @@ function saveRoundHistory(
     ? truncate(lastAiMessage.content, 120)
     : "Round completed.";
 
-  // Get emotional arc from sessionStorage
+  // Get emotional arc from this round's emotion log
   let emotionalSummary = "";
-  try {
-    const emotionLog = sessionStorage.getItem("round-emotion-log");
-    if (emotionLog) {
-      const taps: { tag: string }[] = JSON.parse(emotionLog);
-      if (taps.length > 0) {
-        const counts: Record<string, number> = {};
-        taps.forEach((t) => { counts[t.tag] = (counts[t.tag] || 0) + 1; });
-        const dominant = Object.entries(counts).sort((a, b) => b[1] - a[1])[0];
-        emotionalSummary = ` Dominant feeling: ${dominant[0]}.`;
-      }
-    }
-  } catch { /* sessionStorage may be unavailable */ }
+  const taps = loadEmotionLog();
+  if (taps.length > 0) {
+    const counts: Record<string, number> = {};
+    taps.forEach((t) => { counts[t.tag] = (counts[t.tag] || 0) + 1; });
+    const dominant = Object.entries(counts).sort((a, b) => b[1] - a[1])[0];
+    emotionalSummary = ` Dominant feeling: ${dominant[0]}.`;
+  }
 
   // Append hole-by-hole mood log if any holes were tracked
   let moodSummaryText = "";

@@ -10,6 +10,7 @@ import {
   buildCourseContextForAI,
 } from "./courseData";
 import { loadGolferProfile } from "./golferProfile";
+import { loadEmotionLog } from "./roundMetrics";
 
 const ROUND_CONTEXT_KEY = "golfer-round-context";
 const ROUND_HISTORY_KEY = "golfer-round-history";
@@ -97,30 +98,23 @@ export function buildRoundContextString(): string | null {
     parts.push(`Round has been going for ${elapsed}.`);
   }
 
-  // Emotion tap history from this round (stored in sessionStorage)
-  try {
-    const emotionLog = sessionStorage.getItem("round-emotion-log");
-    if (emotionLog) {
-      const taps: { tag: string; timestamp: string }[] = JSON.parse(emotionLog);
-      if (taps.length > 0) {
-        // Count emotions
-        const counts: Record<string, number> = {};
-        taps.forEach(t => { counts[t.tag] = (counts[t.tag] || 0) + 1; });
-        
-        const sorted = Object.entries(counts).sort((a, b) => b[1] - a[1]);
-        const dominant = sorted[0];
-        
-        if (taps.length >= 3) {
-          // Build emotional arc narrative
-          const recentTaps = taps.slice(-3).map(t => t.tag);
-          parts.push(`Emotional arc this round: dominant feeling is "${dominant[0]}" (${dominant[1]}x). Recent emotions: ${recentTaps.join(" → ")}.`);
-        } else {
-          parts.push(`They've reported feeling "${dominant[0]}" this round.`);
-        }
-      }
+  // Emotion tap history from this round
+  const taps = loadEmotionLog();
+  if (taps.length > 0) {
+    // Count emotions
+    const counts: Record<string, number> = {};
+    taps.forEach(t => { counts[t.tag] = (counts[t.tag] || 0) + 1; });
+
+    const sorted = Object.entries(counts).sort((a, b) => b[1] - a[1]);
+    const dominant = sorted[0];
+
+    if (taps.length >= 3) {
+      // Build emotional arc narrative
+      const recentTaps = taps.slice(-3).map(t => t.tag);
+      parts.push(`Emotional arc this round: dominant feeling is "${dominant[0]}" (${dominant[1]}x). Recent emotions: ${recentTaps.join(" → ")}.`);
+    } else {
+      parts.push(`They've reported feeling "${dominant[0]}" this round.`);
     }
-  } catch {
-    // sessionStorage may not be available
   }
 
   // Round history context

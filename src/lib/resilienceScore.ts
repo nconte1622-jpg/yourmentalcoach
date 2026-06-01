@@ -6,6 +6,12 @@
  * composure and bounced back from adversity during a round.
  */
 
+import {
+  loadCheckInTimestamps,
+  loadEmotionLog,
+  loadUsedPreShotReset,
+} from "./roundMetrics";
+
 /**
  * Represents a single emotion tap in the emotion log
  */
@@ -210,17 +216,15 @@ export function loadResilienceScores(): ResilienceEntry[] {
  */
 export function getCurrentRoundScore(): number | null {
   try {
-    const emotionLog = sessionStorage.getItem("round-emotion-log");
-    const checkInStr = sessionStorage.getItem("round-checkin-timestamps");
-    const usedPreShotReset =
-      sessionStorage.getItem("round-used-pre-shot-reset") === "true";
+    const emotions = loadEmotionLog();
 
-    if (!emotionLog) {
+    // No emotion data yet → no score to show
+    if (emotions.length === 0) {
       return null;
     }
 
-    const emotions = JSON.parse(emotionLog);
-    const checkIns = checkInStr ? JSON.parse(checkInStr) : [];
+    const checkIns = loadCheckInTimestamps();
+    const usedPreShotReset = loadUsedPreShotReset();
 
     // Calculate round duration from round context (localStorage)
     let roundDuration = 0;

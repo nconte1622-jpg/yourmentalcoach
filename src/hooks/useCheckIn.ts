@@ -9,10 +9,10 @@
 
 import { useState, useEffect, useCallback, useRef } from "react";
 import { loadRoundContext } from "@/lib/roundContext";
+import { loadCheckInTimestamps, recordCheckInTimestamp } from "@/lib/roundMetrics";
 
 const CHECK_IN_INTERVAL_MS = 20 * 60 * 1000; // 20 minutes
 const MIN_ROUND_AGE_MS = 10 * 60 * 1000; // Don't check in before 10 min
-const CHECK_IN_STORAGE_KEY = "round-checkin-timestamps";
 
 export interface CheckInState {
   /** Whether a check-in card should be shown */
@@ -66,13 +66,7 @@ export function useCheckIn(
 
   // Load previous check-in count for this round
   useEffect(() => {
-    try {
-      const stored = sessionStorage.getItem(CHECK_IN_STORAGE_KEY);
-      if (stored) {
-        const timestamps: number[] = JSON.parse(stored);
-        setCheckInCount(timestamps.length);
-      }
-    } catch { /* ignore */ }
+    setCheckInCount(loadCheckInTimestamps().length);
   }, []);
 
   // Stable interval that reads from refs — never recreated
@@ -97,13 +91,7 @@ export function useCheckIn(
       setIsActive(true);
 
       // Record timestamp
-      try {
-        const stored = sessionStorage.getItem(CHECK_IN_STORAGE_KEY);
-        const timestamps: number[] = stored ? JSON.parse(stored) : [];
-        timestamps.push(Date.now());
-        sessionStorage.setItem(CHECK_IN_STORAGE_KEY, JSON.stringify(timestamps));
-        setCheckInCount(timestamps.length);
-      } catch { /* ignore */ }
+      setCheckInCount(recordCheckInTimestamp().length);
     }, CHECK_IN_INTERVAL_MS);
 
     return () => clearInterval(timer);

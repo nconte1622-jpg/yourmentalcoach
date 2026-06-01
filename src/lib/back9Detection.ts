@@ -3,6 +3,7 @@
 // Helps identify when golfers typically start to struggle
 
 import { loadRoundContext } from "@/lib/roundContext";
+import { loadEmotionLog } from "@/lib/roundMetrics";
 
 const BACK9_PATTERNS_KEY = "golfer-back9-patterns";
 const BACK9_THRESHOLD_MINUTES = 90; // 1.5 hours marks transition to back 9
@@ -46,17 +47,7 @@ export function analyzeCurrentRoundTiming(): CurrentRoundAnalysis | null {
     const context = loadRoundContext();
     if (!context) return null;
 
-    const emotionLog = sessionStorage.getItem("round-emotion-log");
-    if (!emotionLog) {
-      return {
-        isBack9: false,
-        negativeRatio: 0,
-        dominantEmotion: null,
-        suggestion: null,
-      };
-    }
-
-    const taps: EmotionTap[] = JSON.parse(emotionLog);
+    const taps = loadEmotionLog();
     if (taps.length === 0) {
       return {
         isBack9: false,
@@ -121,14 +112,11 @@ export function analyzeCurrentRoundTiming(): CurrentRoundAnalysis | null {
  */
 export function saveBack9Pattern(roundId: string): void {
   try {
-    const emotionLog = sessionStorage.getItem("round-emotion-log");
-    if (!emotionLog) return;
+    const taps = loadEmotionLog();
+    if (taps.length === 0) return;
 
     const context = loadRoundContext();
     if (!context) return;
-
-    const taps: EmotionTap[] = JSON.parse(emotionLog);
-    if (taps.length === 0) return;
 
     // Determine split point: first 90 minutes vs after
     const startedAt = new Date(context.startedAt);

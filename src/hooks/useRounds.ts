@@ -10,6 +10,7 @@ import {
   updateActiveRoundSession,
 } from "@/lib/roundSession";
 import { getDailyFocus, setDailyFocus } from "@/lib/dailyFocus";
+import { clearRoundMetrics } from "@/lib/roundMetrics";
 
 export type RoundType = "on-course" | "simulator" | "practice";
 export type RoundEnvironment = "casual" | "competitive" | "scoring";
@@ -192,6 +193,10 @@ export function useRounds() {
     const round = data as Round;
 
     saveActiveRoundSession(buildActiveRoundSnapshot(round));
+
+    // Fresh round → wipe the previous round's within-round metrics so its
+    // emotions never bleed into this one (these keys persist in localStorage).
+    clearRoundMetrics();
 
     const pendingPreGameTalk = consumePendingPreGameTalk();
     if (pendingPreGameTalk) {

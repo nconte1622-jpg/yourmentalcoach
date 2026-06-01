@@ -28,6 +28,7 @@ import { recordCompletedRound } from "@/lib/streakStorage";
 import { loadScorecard } from "@/lib/scorecardStorage";
 import { getCurrentHole, loadCachedCourse } from "@/lib/courseData";
 import { loadRoundContext } from "@/lib/roundContext";
+import { appendEmotionTap, markUsedPreShotReset } from "@/lib/roundMetrics";
 import { useCheckIn } from "@/hooks/useCheckIn";
 import { CheckInCard } from "@/components/CheckInCard";
 import { PreShotReset } from "@/components/PreShotReset";
@@ -311,12 +312,8 @@ const Round = () => {
   const handleEmotionTap = useCallback(async (emotionTag: string) => {
     triggerHaptic("soft");
     
-    // Log emotion to sessionStorage for emotional arc tracking
-    try {
-      const existing = JSON.parse(sessionStorage.getItem("round-emotion-log") || "[]");
-      existing.push({ tag: emotionTag, timestamp: new Date().toISOString() });
-      sessionStorage.setItem("round-emotion-log", JSON.stringify(existing));
-    } catch { /* silent */ }
+    // Log emotion for emotional arc tracking (persists across WebView teardown)
+    appendEmotionTap(emotionTag);
     
     getEmotionCue(emotionTag, isFrustrationMode ? "round-frustrated" : "round");
 
@@ -780,7 +777,7 @@ const Round = () => {
         onClose={() => {
           setPreShotOpen(false);
           // Track usage for resilience scoring
-          try { sessionStorage.setItem("round-used-pre-shot-reset", "true"); } catch { /* silent */ }
+          markUsedPreShotReset();
         }}
       />
 
