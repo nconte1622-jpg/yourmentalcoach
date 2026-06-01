@@ -8,14 +8,20 @@
 #      provisioning profiles and the signing step will silently fail.
 #   2) APP_STORE_APP_ID is already set below (6759075246).
 #
-# TROUBLESHOOTING "No matching profiles found":
-#   This error from xcode-project use-profiles means fetch-signing-files failed upstream.
-#   Check the "Fetch signing certificate and provisioning profile" step log for the real error.
-#   Common causes:
-#     a) API key role is "Developer" instead of "App Manager" → change in App Store Connect
+# TROUBLESHOOTING — check the failing step's log for the real error, not use-profiles:
+#
+#   "Cannot save Signing Certificates without certificate private key"
+#     An iOS Distribution certificate exists in the Developer Portal but its private key
+#     lives on another machine (e.g. the Mac you used to submit manually before).
+#     Fix: revoke that certificate at developer.apple.com → Certificates, Identifiers &
+#     Profiles → Certificates → iOS/Apple Distribution → Revoke. Codemagic's --create
+#     flag will then generate a fresh cert + store its private key for all future builds.
+#
+#   "No matching profiles found" (from xcode-project use-profiles)
+#     Means the fetch step above failed or downloaded nothing. Common causes:
+#     a) API key role is "Developer" instead of "App Manager" → fix in App Store Connect
 #     b) Bundle ID com.nconte.yourmentalcoach not registered in Certificates, IDs & Profiles
-#     c) No active iOS Distribution certificate for team P7N677SK5K
-#     d) "Sign in with Apple" capability not enabled on the App ID in the Developer Portal
+#     c) "Sign in with Apple" capability not enabled on the App ID in the Developer Portal
 
 workflows:
   ios-testflight:
