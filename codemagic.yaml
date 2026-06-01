@@ -1,0 +1,62 @@
+# Codemagic CI/CD — builds "Your Mental Coach" (Capacitor iOS) and ships to TestFlight.
+# This lets you release from your Windows PC: push to GitHub, Codemagic builds on a
+# cloud Mac and uploads to TestFlight automatically.
+#
+# ONE-TIME SETUP in the Codemagic web UI (see CODEMAGIC_SETUP.md for click-by-click):
+#   1) Add an App Store Connect API key, and set its name to match
+#      `integrations.app_store_connect` below.
+#   2) Fill in APP_STORE_APP_ID with your app's numeric Apple ID.
+
+workflows:
+  ios-testflight:
+    name: iOS - TestFlight
+    instance_type: mac_mini_m2
+    max_build_duration: 60
+    integrations:
+      app_store_connect: YMC_ASC_KEY        # <-- must match the API key name you create in Codemagic
+    environment:
+      ios_signing:
+        distribution_type: app_store        # automatic signing via the API key above
+        bundle_identifier: com.nconte.yourmentalcoach
+      vars:
+        XCODE_PROJECT: "ios/App/App.xcodeproj"
+        XCODE_SCHEME: "App"
+        APP_STORE_APP_ID: 0000000000        # <-- fill in your numeric App Store Connect app id
+      node: 22
+      xcode: latest
+    scripts:
+      - name: Install JS dependencies
+        script: npm ci
+      - name: Build web app (Vite)
+        script: npm run build
+      - name: Sync web build into the iOS project
+        script: npx cap sync ios
+      - name: Fetch signing profiles
+        script: xcode-project use-profiles
+      - name: Set the next TestFlight build number
+        script: |
+          set -e
+          LATEST=$(app-store-connect get-latest-testflight-build-number "$APP_STORE_APP_ID" 2>/dev/null || echo "0")
+          NEXT=$(( ${LATEST:-0} + 1 ))
+          echo "Setting build number to $NEXT"
+          cd ios/App
+          agvtool new-version -all "$NEXT"
+      - name: Build signed IPA
+        script: |
+          xcode-project build-ipa \
+            --project "$XCODE_PROJECT" \
+            --scheme "$XCODE_SCHEME"
+    artifacts:
+      - build/ios/ipa/*.ipa
+      - /tmp/xcodebuild_logs/*.log
+    publishing:
+      app_store_connect:
+        auth: integration
+        submit_to_testflight: true
+      # Uncomment to get email notifications on build success/failure:
+      # email:
+      #   recipients:
+      #     - you@example.com
+      #   notify:
+      #     success: true
+      #     failure: true

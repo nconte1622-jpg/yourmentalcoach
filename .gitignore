@@ -1,0 +1,45 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+node_modules
+dist
+dist-ssr
+*.local
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Local env — keep real secrets out of git.
+# NOTE: .env.production IS committed on purpose: it holds only PUBLIC client
+# config (Supabase URL + anon key + worker URL) that ships in the app anyway,
+# and Codemagic needs it to build. Keep the GitHub repo PRIVATE.
+.env
+.env.local
+.env.*.local
+
+# iOS / Xcode build artifacts (Codemagic regenerates these)
+ios/App/build/
+ios/App/DerivedData/
+ios/App/Pods/
+**/xcuserdata/
+*.xcuserstate
+.build/
+ios/App/CapApp-SPM/.build/
+
+# Local AI tooling
+.claude/
+.codex/

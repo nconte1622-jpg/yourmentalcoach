@@ -1,0 +1,19 @@
+# Normalize line endings. Keep shell/build scripts LF so they run on macOS/Codemagic.
+* text=auto eol=lf
+
+*.bat       text eol=crlf
+*.command   text eol=lf
+*.sh        text eol=lf
+*.yaml      text eol=lf
+*.yml       text eol=lf
+
+# Treat these as binary (no EOL conversion)
+*.png   binary
+*.jpg   binary
+*.jpeg  binary
+*.ico   binary
+*.webp  binary
+*.ttf   binary
+*.woff  binary
+*.woff2 binary
+*.lockb binary

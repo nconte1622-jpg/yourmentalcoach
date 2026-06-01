@@ -1,0 +1,645 @@
+import { useNavigate } from "react-router-dom";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { App } from "@capacitor/app";
+import { loadHighlights, loadPreferredWords } from "@/lib/memoryStorage";
+import {
+  Sparkles,
+  Timer,
+  Flag,
+  Target,
+  MessageCircle,
+  ChevronRight,
+  Lock,
+  TrendingUp,
+  Play,
+  Flame,
+  Crosshair,
+  ArrowRight,
+  Video,
+} from "lucide-react";
+import { LRMIndicator } from "@/components/LRMIndicator";
+import { useProStatus } from "@/hooks/useProStatus";
+import { triggerHaptic } from "@/lib/haptics";
+import { GlassCard } from "@/components/ui/glass-card";
+import { PillButton } from "@/components/ui/pill-button";
+import { ModeRow } from "@/components/ui/mode-row";
+import { AppHeader } from "@/components/ui/AppHeader";
+import { AppShell } from "@/components/ui/AppShell";
+import { usePatternInsights } from "@/hooks/usePatternInsights";
+import { ProUpgradeModal } from "@/components/ProUpgradeModal";
+import { useFeatureFlags } from "@/hooks/useFeatureFlags";
+import { isOnboardingComplete } from "@/lib/onboarding";
+import { getDailyFocus, setDailyFocus } from "@/lib/dailyFocus";
+import { useRounds } from "@/hooks/useRounds";
+import { MentalHandicapWidget } from "@/components/MentalHandicapWidget";
+import { toast } from "sonner";
+import { BottomDock } from "@/components/ui/BottomDock";
+import { loadActiveRoundSession } from "@/lib/roundSession";
+import { ActiveRoundResumeChip } from "@/components/ui/ActiveRoundResumeChip";
+import { cn } from "@/lib/utils";
+import { getStreakData, streakLabel, type StreakData } from "@/lib/streakStorage";
+
+const TODAY_FOCUS_TEXT = "One committed decision at a time.";
+const PAGE_LABELS = ["Today", "Play", "Finish"] as const;
+const HOME_TUTORED_KEY = "home-swipe-tutored-v1";
+
+function todayLabel() {
+  return new Date().toLocaleDateString("en-US", {
+    weekday: "short",
+    month: "short",
+    day: "numeric",
+  });
+}
+
+/* ═══════════════════════════════════════════════════════════
+   HOME — 3-page swipeable experience
+   ═══════════════════════════════════════════════════════════ */
+const Home = () => {
+  const navigate = useNavigate();
+  const { isPro } = useProStatus();
+  const { features } = useFeatureFlags();
+  const { summary: patternSummary, eligibleRoundCount, hasPatternAccess } = usePatternInsights();
+  const { getActiveRound, createRoundEvent, attachDailyFocusToActiveRound } = useRounds();
+  const [hasHighlights, setHasHighlights] = useState(false);
+  const [hasLocalMemory, setHasLocalMemory] = useState(false);
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
+  const [dailyFocusLocked, setDailyFocusLocked] = useState(false);
+  const [activePage, setActivePage] = useState(0);
+  const [widgetRefreshKey, setWidgetRefreshKey] = useState(0);
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const [showSwipeTutorial, setShowSwipeTutorial] = useState(false);
+  const [streak, setStreak] = useState<StreakData>(() => getStreakData());
+
+  const [activeRoundSummary, setActiveRoundSummary] = useState<{
+    id: string;
+    roundType: string;
+    environment: string;
+    createdAt: string;
+    goal?: string | null;
+    todayFocus?: string | null;
+  } | null>(null);
+
+  /* ── Scroll tracking for page dots ──────────────────── */
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    const onScroll = () => {
+      const page = Math.round(el.scrollLeft / el.clientWidth);
+      setActivePage(page);
+    };
+    el.addEventListener("scroll", onScroll, { passive: true });
+    return () => el.removeEventListener("scroll", onScroll);
+  }, []);
+
+  /* ── Refresh widget and streak when app resumes ─────── */
+  useEffect(() => {
+    let handle: Awaited<ReturnType<typeof App.addListener>> | null = null;
+    App.addListener("appStateChange", ({ isActive }) => {
+      if (isActive) {
+        setWidgetRefreshKey((k) => k + 1);
+        setStreak(getStreakData());
+      }
+    }).then((h) => { handle = h; });
+    return () => { handle?.remove(); };
+  }, []);
+
+  const scrollToPage = useCallback((i: number) => {
+    scrollRef.current?.scrollTo({ left: i * window.innerWidth, behavior: "smooth" });
+  }, []);
+
+  /* ── Data loading (unchanged logic) ─────────────────── */
+  useEffect(() => {
+    if (!isOnboardingComplete()) {
+      navigate("/onboarding", { replace: true });
+      return;
+    }
+
+    // Show swipe tutorial on first visit
+    try {
+      if (!localStorage.getItem(HOME_TUTORED_KEY)) {
+        setShowSwipeTutorial(true);
+      }
+    } catch { /* silent */ }
+
+    const highlights = loadHighlights();
+    const preferredWords = loadPreferredWords();
+    const savedFocus = getDailyFocus();
+    const persistedRound = loadActiveRoundSession();
+    setHasHighlights(highlights.length > 0);
+    setHasLocalMemory(highlights.length > 0 || preferredWords.length > 0);
+    setDailyFocusLocked(savedFocus?.text === TODAY_FOCUS_TEXT);
+    setActiveRoundSummary(
+      persistedRound
+        ? {
+            id: persistedRound.roundId,
+            roundType: persistedRound.roundType,
+            environment: persistedRound.environment,
+            createdAt: persistedRound.createdAt,
+            goal: persistedRound.goal,
+            todayFocus: persistedRound.todayFocus,
+          }
+        : null
+    );
+
+    let cancelled = false;
+    void getActiveRound().then((round) => {
+      if (cancelled) return;
+      if (!round) {
+        setActiveRoundSummary(null);
+        return;
+      }
+      const currentFocus = getDailyFocus();
+      setActiveRoundSummary({
+        id: round.id,
+        roundType: round.round_type,
+        environment: round.environment,
+        createdAt: round.created_at ?? round.started_at,
+        goal: round.goal,
+        todayFocus: currentFocus?.round_id === round.id ? currentFocus.text : null,
+      });
+    });
+    return () => { cancelled = true; };
+  }, [navigate]);
+
+  const activeRoundMeta = useMemo(() => {
+    if (!activeRoundSummary) return null;
+    const startedAt = new Date(activeRoundSummary.createdAt);
+    const elapsedMinutes = Math.max(1, Math.round((Date.now() - startedAt.getTime()) / 60000));
+    const durationLabel =
+      elapsedMinutes >= 60
+        ? `${Math.floor(elapsedMinutes / 60)}h ${elapsedMinutes % 60}m`
+        : `${elapsedMinutes}m`;
+    return {
+      roundType: activeRoundSummary.roundType.replace("-", " "),
+      environment: activeRoundSummary.environment,
+      durationLabel,
+    };
+  }, [activeRoundSummary]);
+
+  const withTap = (to: string) => {
+    triggerHaptic("soft");
+    navigate(to);
+  };
+
+  const handleLockTodayFocus = async () => {
+    triggerHaptic("medium");
+    const activeRound = await attachDailyFocusToActiveRound(TODAY_FOCUS_TEXT);
+    const nextFocus = {
+      text: TODAY_FOCUS_TEXT,
+      saved_at: new Date().toISOString(),
+      round_id: activeRound?.id,
+    };
+    setDailyFocus(nextFocus);
+    if (activeRound?.id) {
+      try {
+        await createRoundEvent({
+          round_id: activeRound.id,
+          event_type: "note",
+          label: "daily_focus",
+          notes: JSON.stringify(nextFocus),
+        });
+      } catch {}
+    }
+    setDailyFocusLocked(true);
+    if (activeRound?.id) {
+      setActiveRoundSummary((c) =>
+        c && c.id === activeRound.id ? { ...c, todayFocus: TODAY_FOCUS_TEXT } : c
+      );
+    }
+    toast.success("Today's focus locked in");
+  };
+
+  /* ══════════════════════════════════════════════════════
+     RENDER
+     ══════════════════════════════════════════════════════ */
+  return (
+    <main className="relative h-[100dvh] overflow-hidden bg-[var(--bg-0)]">
+
+      {/* ── Horizontal swipe container ──────────────────── */}
+      <div
+        ref={scrollRef}
+        className="flex h-full snap-x snap-mandatory overflow-x-auto scrollbar-hide"
+      >
+
+        {/* ════════════════════════════════════════════════
+            SLIDE 1 — TODAY  (Dashboard)
+            ════════════════════════════════════════════════ */}
+        <section className="relative h-full w-screen shrink-0 snap-center">
+          <div className="calm-pro-bg absolute inset-0" />
+          <AppShell
+            className="relative z-10 mx-auto w-full max-w-3xl"
+            header={
+              <AppHeader
+                className="calm-pro-mount"
+                left={<div className="tap-44" />}
+                center={
+                  <div>
+                    <h1 className="truncate font-serif text-[23px] leading-tight tracking-wide text-[var(--text-0)]">
+                      Your Mental Coach
+                    </h1>
+                    <p className="truncate text-[11px] uppercase tracking-[0.14em] text-[var(--text-1)]">
+                      Focus · Commit · Trust
+                    </p>
+                  </div>
+                }
+                right={
+                  <div className="tap-44 flex items-center justify-end">
+                    <LRMIndicator ambient memoryActive={isPro && hasLocalMemory} />
+                  </div>
+                }
+                subrow={
+                  <div className="flex items-center gap-2">
+                    <div className="inline-flex min-h-11 items-center gap-1.5 rounded-full border border-[rgba(203,184,146,0.18)] bg-[rgba(203,184,146,0.1)] px-3.5 py-1 text-xs font-medium text-[var(--sand-0)]">
+                      <span className="inline-block h-1.5 w-1.5 rounded-full bg-[var(--sand-0)] opacity-70" />
+                      {todayLabel()}
+                    </div>
+                    {streak.currentStreak >= 2 && (
+                      <div className="inline-flex min-h-11 items-center gap-1 rounded-full border border-[rgba(255,160,50,0.3)] bg-[rgba(255,120,20,0.12)] px-3 py-1 text-xs font-medium text-[rgba(255,160,80,0.9)]">
+                        <Flame className="h-3 w-3" />
+                        {streakLabel(streak)}
+                      </div>
+                    )}
+                  </div>
+                }
+              />
+            }
+          >
+            <div className="with-bottom-dock space-y-4 overflow-y-auto px-5 pb-8 pt-5">
+
+              {/* Active Round */}
+              {activeRoundSummary && activeRoundMeta && (
+                <GlassCard variant="sand" className="calm-pro-mount p-5">
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-2">
+                        <span className="relative flex h-2.5 w-2.5 shrink-0">
+                          <span className="absolute h-2.5 w-2.5 animate-ping rounded-full bg-[rgba(31,180,100,0.5)]" />
+                          <span className="h-2 w-2 rounded-full bg-[rgba(31,180,100,0.9)]" />
+                        </span>
+                        <p className="text-sm font-medium tracking-wide text-[var(--sand-0)]">
+                          Round in Progress
+                        </p>
+                      </div>
+                      <p className="text-base capitalize text-[var(--text-0)]">
+                        {activeRoundMeta.roundType} · {activeRoundMeta.environment}
+                      </p>
+                      <p className="text-sm text-[var(--text-1)]">{activeRoundMeta.durationLabel} active</p>
+                    </div>
+                    <PillButton
+                      tone="green"
+                      onClick={() => withTap(`/round?roundId=${activeRoundSummary.id}`)}
+                    >
+                      Resume →
+                    </PillButton>
+                  </div>
+                </GlassCard>
+              )}
+
+              {/* Mental Handicap */}
+              <MentalHandicapWidget refreshKey={widgetRefreshKey} />
+
+              {/* Today's Focus */}
+              <GlassCard glow className="calm-pro-mount p-5">
+                <div className="space-y-4">
+                  <div className="flex items-center gap-2">
+                    <Sparkles className="h-3.5 w-3.5 text-[var(--sand-0)]" />
+                    <p className="text-xs font-medium uppercase tracking-[0.18em] text-[var(--sand-0)]">
+                      Today&apos;s Focus
+                    </p>
+                  </div>
+                  <p className="font-serif text-2xl leading-8 text-[var(--text-0)]">
+                    {TODAY_FOCUS_TEXT}
+                  </p>
+                  <p className="text-sm text-[var(--text-1)]">
+                    Keep your process quiet and clear before every shot.
+                  </p>
+                  <PillButton
+                    tone={dailyFocusLocked ? "green" : "sand"}
+                    onClick={handleLockTodayFocus}
+                    disabled={dailyFocusLocked}
+                  >
+                    {dailyFocusLocked ? "✓ Focus locked" : "Make it my focus"}
+                  </PillButton>
+                </div>
+              </GlassCard>
+
+              {/* Pattern Insight */}
+              <GlassCard className="calm-pro-mount p-5">
+                {hasPatternAccess && patternSummary ? (
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-2">
+                      <TrendingUp className="h-3.5 w-3.5 text-[var(--sand-0)]" />
+                      <p className="text-xs font-medium uppercase tracking-[0.18em] text-[var(--sand-0)]">
+                        Pattern Insight
+                      </p>
+                    </div>
+                    <p className="text-sm leading-6 text-[var(--text-0)]">{patternSummary?.struggle_summary}</p>
+                    <p className="text-sm leading-6 text-[var(--text-1)]">{patternSummary?.best_summary}</p>
+                    <PillButton tone="sand" onClick={() => withTap("/insights")}>
+                      Open Insights
+                    </PillButton>
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-2">
+                      <TrendingUp className="h-3.5 w-3.5 text-[var(--sand-0)]" />
+                      <p className="text-xs font-medium uppercase tracking-[0.18em] text-[var(--sand-0)]">
+                        Pattern Insight
+                      </p>
+                    </div>
+                    <p className="text-sm text-[var(--text-1)]">
+                      Complete <span className="text-[var(--text-0)]">{Math.max(0, 3 - eligibleRoundCount)} more structured round{Math.max(0, 3 - eligibleRoundCount) !== 1 ? "s" : ""}</span> to unlock — free.
+                    </p>
+                    <div className="h-1 w-full overflow-hidden rounded-full bg-[rgba(255,255,255,0.06)]">
+                      <div
+                        className="h-full rounded-full bg-[rgba(203,184,146,0.5)] transition-all"
+                        style={{ width: `${Math.min(100, (eligibleRoundCount / 3) * 100)}%` }}
+                      />
+                    </div>
+                    <p className="text-xs text-[var(--text-1)]">{eligibleRoundCount} / 3 rounds</p>
+                  </div>
+                )}
+              </GlassCard>
+
+              {/* Quick Coach */}
+              <button
+                onClick={() => withTap("/round")}
+                className="calm-pro-focus calm-pro-press calm-pro-mount group block w-full"
+              >
+                <GlassCard className="min-h-11 p-5">
+                  <div className="flex items-center gap-3.5">
+                    <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border border-[var(--border)] bg-[rgba(18,64,47,0.6)] text-[var(--sand-0)]">
+                      <MessageCircle className="h-5 w-5" />
+                    </div>
+                    <div className="min-w-0 flex-1 text-left">
+                      <p className="font-serif text-xl text-[var(--text-0)]">Quick Coach</p>
+                      <p className="text-sm text-[var(--text-1)]">Jump in for a live cue.</p>
+                    </div>
+                    <ChevronRight className="h-5 w-5 text-[var(--sand-0)] opacity-70" />
+                  </div>
+                </GlassCard>
+              </button>
+
+              {/* Swing Analysis */}
+              <button
+                onClick={() => withTap("/swing-analysis")}
+                className="calm-pro-focus calm-pro-press calm-pro-mount group block w-full"
+              >
+                <GlassCard className="min-h-11 p-5">
+                  <div className="flex items-center gap-3.5">
+                    <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border border-[var(--border)] bg-[rgba(18,64,47,0.6)] text-[var(--sand-0)]">
+                      <Video className="h-5 w-5" />
+                    </div>
+                    <div className="min-w-0 flex-1 text-left">
+                      <p className="font-serif text-xl text-[var(--text-0)]">Swing Analysis</p>
+                      <p className="text-sm text-[var(--text-1)]">Video mental coaching.</p>
+                    </div>
+                    <ChevronRight className="h-5 w-5 text-[var(--sand-0)] opacity-70" />
+                  </div>
+                </GlassCard>
+              </button>
+
+              {/* Swipe hint */}
+              <div className="flex items-center justify-center gap-2 pt-2 text-[var(--text-1)] opacity-50">
+                <p className="text-xs tracking-wide">Swipe for modes</p>
+                <ArrowRight className="h-3 w-3" />
+              </div>
+            </div>
+          </AppShell>
+        </section>
+
+        {/* ════════════════════════════════════════════════
+            SLIDE 2 — PLAY  (Start Round)
+            ════════════════════════════════════════════════ */}
+        <section className="relative h-full w-screen shrink-0 snap-center overflow-hidden">
+          {/* Liquid background */}
+          <div className="liquid-bg-round absolute inset-0">
+            {/* Floating liquid orbs */}
+            <div className="absolute -left-24 -top-24 h-[420px] w-[420px] rounded-full bg-[rgba(31,106,74,0.45)] blur-[100px] animate-liquid-1" />
+            <div className="absolute -right-16 bottom-[30%] h-[320px] w-[320px] rounded-full bg-[rgba(18,64,47,0.4)] blur-[90px] animate-liquid-2" />
+            <div className="absolute left-[30%] top-[55%] h-[250px] w-[250px] rounded-full bg-[rgba(31,180,100,0.18)] blur-[80px] animate-liquid-3" />
+            {/* Subtle grain */}
+            <div className="absolute inset-0 opacity-[0.08]" style={{
+              backgroundImage: "radial-gradient(rgba(255,255,255,0.06) 0.5px, transparent 0.5px)",
+              backgroundSize: "20px 20px",
+            }} />
+          </div>
+
+          {/* Content */}
+          <div className="relative z-10 flex h-full flex-col items-center justify-center px-8">
+            {/* Top label */}
+            <div className="absolute left-0 right-0 top-[max(60px,env(safe-area-inset-top))] flex justify-center">
+              <span className="text-[10px] uppercase tracking-[0.3em] text-[var(--sand-0)] opacity-60">
+                Your Mental Coach
+              </span>
+            </div>
+
+            {/* Main title */}
+            <div className="text-center space-y-4 mb-12">
+              <div className="inline-flex items-center justify-center h-16 w-16 rounded-3xl border border-[rgba(31,106,74,0.5)] bg-[rgba(18,64,47,0.5)] mx-auto mb-4">
+                <Play className="h-7 w-7 text-[rgba(31,180,100,0.8)] ml-0.5" />
+              </div>
+              <h2 className="font-serif text-[42px] leading-[1.1] tracking-wide text-[var(--text-0)]">
+                Start Your<br />Round
+              </h2>
+              <p className="text-base leading-relaxed text-[var(--text-1)] max-w-[260px] mx-auto">
+                Step onto the course with clarity and intention.
+              </p>
+            </div>
+
+            {/* Action cards */}
+            <div className="w-full max-w-sm space-y-3">
+              <button
+                onClick={() => withTap("/pre-game")}
+                className="calm-pro-press group flex w-full items-center gap-4 rounded-[20px] border border-[var(--border)] bg-[rgba(14,42,31,0.5)] p-4 backdrop-blur-md transition-all hover:bg-[rgba(14,42,31,0.7)]"
+              >
+                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-[rgba(31,106,74,0.5)] text-[var(--sand-0)]">
+                  <Timer className="h-5 w-5" />
+                </div>
+                <div className="flex-1 text-left">
+                  <p className="font-serif text-lg text-[var(--text-0)]">Pre-Game Talk</p>
+                  <p className="text-xs text-[var(--text-1)]">Calm nerves · Set intention</p>
+                </div>
+                <ChevronRight className="h-4 w-4 text-[var(--sand-0)] opacity-50 transition-transform group-hover:translate-x-0.5" />
+              </button>
+
+              <button
+                onClick={() => withTap("/round-setup")}
+                className="calm-pro-press group flex w-full items-center gap-4 rounded-[20px] border border-[rgba(31,106,74,0.35)] bg-[rgba(18,64,47,0.45)] p-4 backdrop-blur-md transition-all hover:bg-[rgba(18,64,47,0.65)]"
+              >
+                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-[rgba(31,180,100,0.2)] text-[rgba(31,180,100,0.9)]">
+                  <Flag className="h-5 w-5" />
+                </div>
+                <div className="flex-1 text-left">
+                  <p className="font-serif text-lg text-[var(--text-0)]">Full Round</p>
+                  <p className="text-xs text-[var(--text-1)]">Setup · Track · Reflect after</p>
+                </div>
+                <ChevronRight className="h-4 w-4 text-[var(--sand-0)] opacity-50 transition-transform group-hover:translate-x-0.5" />
+              </button>
+            </div>
+
+            {/* Swipe hint */}
+            <div className="absolute bottom-[calc(100px+env(safe-area-inset-bottom))] left-0 right-0 flex items-center justify-center gap-2 text-[var(--text-1)] opacity-40">
+              <p className="text-xs tracking-wide">Swipe for Close Strong</p>
+              <ArrowRight className="h-3 w-3" />
+            </div>
+          </div>
+        </section>
+
+        {/* ════════════════════════════════════════════════
+            SLIDE 3 — FINISH  (Close Strong)
+            ════════════════════════════════════════════════ */}
+        <section className="relative h-full w-screen shrink-0 snap-center overflow-hidden">
+          {/* Dramatic background */}
+          <div className="liquid-bg-close absolute inset-0">
+            {/* Gold/amber orbs */}
+            <div className="absolute -left-20 top-[15%] h-[380px] w-[380px] rounded-full bg-[rgba(180,140,50,0.25)] blur-[100px] animate-liquid-4" />
+            <div className="absolute -right-20 bottom-[25%] h-[300px] w-[300px] rounded-full bg-[rgba(160,120,40,0.2)] blur-[90px] animate-liquid-1" />
+            <div className="absolute left-[40%] top-[60%] h-[200px] w-[200px] rounded-full bg-[rgba(203,184,146,0.12)] blur-[70px] animate-liquid-2" />
+            {/* Light sweep */}
+            <div className="absolute inset-0 overflow-hidden pointer-events-none">
+              <div className="absolute -left-[50%] top-0 h-full w-[200%] bg-gradient-to-r from-transparent via-[rgba(203,184,146,0.04)] to-transparent animate-light-sweep" />
+            </div>
+            {/* Grain */}
+            <div className="absolute inset-0 opacity-[0.06]" style={{
+              backgroundImage: "radial-gradient(rgba(203,184,146,0.08) 0.5px, transparent 0.5px)",
+              backgroundSize: "18px 18px",
+            }} />
+          </div>
+
+          {/* Content */}
+          <div className="relative z-10 flex h-full flex-col items-center justify-center px-8">
+            {/* Top label */}
+            <div className="absolute left-0 right-0 top-[max(60px,env(safe-area-inset-top))] flex justify-center">
+              <span className="text-[10px] uppercase tracking-[0.3em] text-[var(--sand-0)] opacity-60">
+                Your Mental Coach
+              </span>
+            </div>
+
+            {/* Main title */}
+            <div className="text-center space-y-4 mb-12">
+              <div className="inline-flex items-center justify-center h-16 w-16 rounded-3xl border border-[rgba(180,140,50,0.4)] bg-[rgba(160,120,40,0.25)] mx-auto mb-4">
+                <Crosshair className="h-7 w-7 text-[var(--sand-0)]" />
+              </div>
+              <h2 className="font-serif text-[44px] leading-[1.05] tracking-[0.04em] text-[var(--text-0)]">
+                Close<br />Strong
+              </h2>
+              <p className="text-base leading-relaxed text-[var(--text-1)] max-w-[280px] mx-auto">
+                Lock in. Execute when it matters most. No thinking — just trust.
+              </p>
+            </div>
+
+            {/* CTA */}
+            <div className="w-full max-w-sm space-y-4">
+              <button
+                onClick={() => {
+                  if (!isPro) {
+                    setShowUpgradeModal(true);
+                    return;
+                  }
+                  withTap("/round/close-strong");
+                }}
+                className="calm-pro-press group relative w-full overflow-hidden rounded-2xl border border-[rgba(203,184,146,0.25)] bg-[rgba(180,140,50,0.18)] px-6 py-5 text-center backdrop-blur-md transition-all hover:bg-[rgba(180,140,50,0.28)]"
+              >
+                {/* Shimmer effect */}
+                <span className="absolute inset-0 bg-gradient-to-r from-transparent via-[rgba(203,184,146,0.08)] to-transparent animate-light-sweep pointer-events-none" />
+                <span className="relative flex items-center justify-center gap-3">
+                  <Flame className="h-5 w-5 text-[var(--sand-0)]" />
+                  <span className="font-serif text-xl tracking-wide text-[var(--text-0)]">
+                    Enter Close Strong
+                  </span>
+                </span>
+                {!isPro && (
+                  <span className="absolute top-3 right-3 rounded-full border border-[rgba(203,184,146,0.4)] bg-[rgba(203,184,146,0.15)] px-2 py-0.5 text-[9px] font-bold uppercase tracking-[0.14em] text-[var(--sand-0)]">
+                    Pro
+                  </span>
+                )}
+              </button>
+
+              {/* Micro-message */}
+              <p className="text-center text-xs text-[var(--text-1)] opacity-50 italic">
+                "The last three holes define the round."
+              </p>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      {/* ── Page indicator dots ──────────────────────────── */}
+      <div className="fixed bottom-[calc(var(--bottom-dock-h)+var(--sab)+16px)] left-0 right-0 z-30 flex items-center justify-center gap-3 pointer-events-none">
+        <div className="pointer-events-auto flex items-center gap-2 rounded-full border border-[var(--border)] bg-[rgba(5,8,7,0.7)] px-3 py-1.5 backdrop-blur-md">
+          {PAGE_LABELS.map((label, i) => (
+            <button
+              key={label}
+              onClick={() => scrollToPage(i)}
+              className={cn(
+                "flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-medium uppercase tracking-[0.12em] transition-all duration-300",
+                activePage === i
+                  ? "bg-[rgba(203,184,146,0.18)] text-[var(--sand-0)]"
+                  : "text-[var(--text-1)] opacity-50 hover:opacity-80"
+              )}
+            >
+              <span
+                className={cn(
+                  "h-1.5 w-1.5 rounded-full transition-all duration-300",
+                  activePage === i ? "bg-[var(--sand-0)]" : "bg-[var(--text-1)]"
+                )}
+              />
+              {label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <ActiveRoundResumeChip />
+      <BottomDock highlightDot={hasHighlights} />
+      <ProUpgradeModal open={showUpgradeModal} onOpenChange={setShowUpgradeModal} />
+
+      {/* ── First-visit swipe tutorial ───────────────────── */}
+      {showSwipeTutorial && (
+        <div
+          className="fixed inset-0 z-50 flex flex-col items-center justify-end pb-[calc(var(--bottom-dock-h)+var(--sab)+80px)] pointer-events-none"
+          style={{ background: "rgba(3,8,6,0.72)" }}
+        >
+          <div
+            className="pointer-events-auto mx-4 w-full max-w-sm rounded-3xl border border-[rgba(203,184,146,0.2)] bg-[rgba(9,19,15,0.96)] p-6 backdrop-blur-xl animate-slide-up"
+          >
+            <p className="text-[10px] uppercase tracking-[0.22em] text-[var(--sand-0)] opacity-60 mb-3">
+              Quick tour
+            </p>
+            <h2 className="font-serif text-xl text-[var(--text-0)] mb-2">
+              Three pages, one swipe away
+            </h2>
+            <div className="space-y-3 mt-4">
+              {[
+                { dot: "bg-[var(--sand-0)]", label: "Today", desc: "Your dashboard — focus, patterns, quick coach" },
+                { dot: "bg-[rgba(31,180,100,0.85)]", label: "Play", desc: "Start a full round or pre-game talk" },
+                { dot: "bg-[rgba(203,184,146,0.55)]", label: "Finish", desc: "Enter Close Strong for your last 3 holes" },
+              ].map(({ dot, label, desc }) => (
+                <div key={label} className="flex items-start gap-3">
+                  <div className={`mt-1.5 h-2 w-2 shrink-0 rounded-full ${dot}`} />
+                  <div>
+                    <span className="text-sm font-medium text-[var(--text-0)]">{label}</span>
+                    <span className="text-sm text-[var(--text-1)]"> — {desc}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+            <button
+              type="button"
+              onClick={() => {
+                setShowSwipeTutorial(false);
+                try { localStorage.setItem(HOME_TUTORED_KEY, "1"); } catch { /* silent */ }
+              }}
+              className="mt-6 w-full rounded-2xl border border-[rgba(203,184,146,0.2)] bg-[rgba(203,184,146,0.1)] py-3.5 text-sm font-medium tracking-wide text-[var(--sand-0)] transition-all hover:bg-[rgba(203,184,146,0.18)]"
+            >
+              Got it →
+            </button>
+          </div>
+        </div>
+      )}
+    </main>
+  );
+};
+
+export default Home;

@@ -1,0 +1,87 @@
+/**
+ * scroll-fixes.css
+ * ----------------
+ * Targeted overrides loaded AFTER index.css to fix two iOS issues:
+ *
+ * 1. Loading spinner: resolved in JS — entitlements no longer gate the router.
+ *
+ * 2. Scroll / overflow-off-screen:
+ *    The app shell must be EXACTLY viewport-height (not min-height) so that
+ *    flex children using `flex-1 min-h-0 overflow-y-auto` get a real upper
+ *    bound and can scroll instead of growing off-screen.
+ *
+ *    We also lock the document-level scroll so iOS doesn't rubber-band the
+ *    outer page — all real scrolling happens inside .app-shell-content.
+ */
+
+/* ── 1. Lock the document so only inner containers scroll ─────────── */
+html,
+body {
+  height: 100%;
+  /* Prevent the outer document from scrolling on iOS (rubber-band / bounce) */
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+
+#root {
+  height: 100%;
+  overflow: hidden;
+}
+
+/* ── 2. App shell: exact viewport height, flex column ─────────────── */
+.app-shell {
+  /* dvh shrinks when the iOS keyboard appears — content stays above it */
+  height: 100dvh;
+  /* Fallback for browsers that don't support dvh */
+  height: 100vh; /* stylelint-disable-line declaration-block-no-duplicate-properties */
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  position: relative;
+}
+
+/* Header region must never grow/shrink */
+.app-shell-header {
+  flex: 0 0 auto;
+}
+
+/* ── 3. Content area: fill remaining height, scroll smoothly ──────── */
+.app-shell-content {
+  flex: 1 1 0%;
+  /* CRITICAL: min-height: 0 lets flex children shrink below their intrinsic
+     height, which is required for overflow-y-auto to engage */
+  min-height: 0;
+  overflow-y: auto;
+  /* Smooth momentum scrolling on iOS */
+  -webkit-overflow-scrolling: touch;
+  /* Prevent scroll from propagating to the document */
+  overscroll-behavior-y: contain;
+  /* GPU-composite this layer so iOS doesn't repaint on scroll */
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+  will-change: scroll-position;
+}
+
+/* ── 4. Chat composer dock: always pinned above the keyboard ──────── */
+.chat-composer-dock {
+  flex: 0 0 auto;
+  /* Keep above keyboard; padding handled by --sab variable */
+  position: relative;
+  z-index: 10;
+}
+
+/* ── 5. Bottom dock: fixed to viewport, never scrolls ────────────── */
+.bottom-dock-region {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 40;
+}
+
+/* ── 6. Prevent horizontal overflow that causes side-scroll glitches  */
+.app-shell,
+.app-shell-content {
+  max-width: 100vw;
+  overflow-x: hidden;
+}
