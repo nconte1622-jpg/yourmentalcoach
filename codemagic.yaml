@@ -3,9 +3,19 @@
 # cloud Mac and uploads to TestFlight automatically.
 #
 # ONE-TIME SETUP in the Codemagic web UI (see CODEMAGIC_SETUP.md for click-by-click):
-#   1) Add an App Store Connect API key, and set its name to match
-#      `integrations.app_store_connect` below.
-#   2) Fill in APP_STORE_APP_ID with your app's numeric Apple ID.
+#   1) Add an App Store Connect API key named YMC_ASC_KEY.
+#      REQUIRED ROLE: "App Manager" (or Admin) — lesser roles cannot create/fetch
+#      provisioning profiles and the signing step will silently fail.
+#   2) APP_STORE_APP_ID is already set below (6759075246).
+#
+# TROUBLESHOOTING "No matching profiles found":
+#   This error from xcode-project use-profiles means fetch-signing-files failed upstream.
+#   Check the "Fetch signing certificate and provisioning profile" step log for the real error.
+#   Common causes:
+#     a) API key role is "Developer" instead of "App Manager" → change in App Store Connect
+#     b) Bundle ID com.nconte.yourmentalcoach not registered in Certificates, IDs & Profiles
+#     c) No active iOS Distribution certificate for team P7N677SK5K
+#     d) "Sign in with Apple" capability not enabled on the App ID in the Developer Portal
 
 workflows:
   ios-testflight:
@@ -13,11 +23,12 @@ workflows:
     instance_type: mac_mini_m2
     max_build_duration: 60
     integrations:
-      app_store_connect: YMC_ASC_KEY        # <-- must match the API key name you create in Codemagic
+      app_store_connect: YMC_ASC_KEY        # must match the API key name in Codemagic; needs App Manager role
     environment:
-      ios_signing:
-        distribution_type: app_store        # automatic signing via the API key above
-        bundle_identifier: com.nconte.yourmentalcoach
+      # NOTE: ios_signing block is intentionally absent.
+      # Mixing ios_signing with manual fetch-signing-files scripts causes a conflict —
+      # Codemagic treats them as two separate signing mechanisms and they fight each other.
+      # Signing is handled entirely by the scripts below using the app_store_connect integration.
       vars:
         XCODE_PROJECT: "ios/App/App.xcodeproj"
         XCODE_SCHEME: "App"
@@ -35,10 +46,14 @@ workflows:
         script: keychain initialize
       - name: Fetch signing certificate and provisioning profile
         script: |
+          set -e
           app-store-connect fetch-signing-files \
             "com.nconte.yourmentalcoach" \
             --type IOS_APP_STORE \
             --create
+          echo "=== Provisioning profiles downloaded to ~/Library/MobileDevice/Provisioning Profiles/ ==="
+          ls -1 "$HOME/Library/MobileDevice/Provisioning Profiles/"*.mobileprovision 2>/dev/null \
+            || { echo "ERROR: No .mobileprovision files found — fetch-signing-files did not download any profiles."; exit 1; }
       - name: Add certificates to keychain
         script: keychain add-certificates
       - name: Apply signing profiles to Xcode project
