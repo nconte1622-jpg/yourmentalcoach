@@ -255,13 +255,37 @@ export function useRounds() {
       return null;
     }
 
-    const { data, error } = await supabase
+    let { data, error } = await supabase
       .from("rounds")
       .update(input)
       .eq("id", id)
       .eq("user_id", user.id)
       .select()
       .single();
+
+    // Some production databases predate the migration that added the `status`
+    // column (20260311120000_round_session_status). createRound() already
+    // tolerates this; mirror it here so ending/completing a round still works
+    // when `status` is absent. `ended_at` is what actually marks a round
+    // inactive (getActiveRound filters on `ended_at IS NULL`), so dropping
+    // `status` preserves the intended behavior.
+    if (error && isSchemaMismatch(error) && "status" in input) {
+      console.warn("[updateRound] schema mismatch — retrying without `status`", { error });
+      const fallbackInput: UpdateRoundInput = { ...input };
+      delete fallbackInput.status;
+
+      if (Object.keys(fallbackInput).length > 0) {
+        const retry = await supabase
+          .from("rounds")
+          .update(fallbackInput)
+          .eq("id", id)
+          .eq("user_id", user.id)
+          .select()
+          .single();
+        data = retry.data;
+        error = retry.error;
+      }
+    }
 
     if (error) {
       console.error("Failed to update round:", error);
