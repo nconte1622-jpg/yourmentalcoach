@@ -2,26 +2,26 @@
 # This lets you release from your Windows PC: push to GitHub, Codemagic builds on a
 # cloud Mac and uploads to TestFlight automatically.
 #
-# ONE-TIME SETUP in the Codemagic web UI (see CODEMAGIC_SETUP.md for click-by-click):
-#   1) Add an App Store Connect API key named YMC_ASC_KEY.
-#      REQUIRED ROLE: "App Manager" (or Admin) — lesser roles cannot create/fetch
-#      provisioning profiles and the signing step will silently fail.
-#   2) APP_STORE_APP_ID is already set below (6759075246).
+# ONE-TIME SETUP (already done — documented here for reproducibility):
+#   1) App Store Connect API key named YMC_ASC_KEY, role "App Manager", added in Codemagic.
+#   2) CERTIFICATE_PRIVATE_KEY secret (RSA private key, PKCS#1 PEM) in variable group
+#      "ios-signing". fetch-signing-files uses it to create a signable distribution cert.
+#   3) APP_STORE_APP_ID set below (6759075246).
 #
-# TROUBLESHOOTING — check the failing step's log for the real error, not use-profiles:
+# HOW SIGNING WORKS HERE (manual flow, fully automatic once the secrets above exist):
+#   keychain initialize → fetch-signing-files --create (makes cert + app_store profile)
+#   → keychain add-certificates → xcode-project use-profiles.
+#   The CLI saves files under ~/Library/Developer/Xcode/UserData/, NOT the old
+#   ~/Library/MobileDevice/ path — do not "verify" against the old path.
 #
+# TROUBLESHOOTING — always open the failing STEP's log, not the build summary toast:
 #   "Cannot save Signing Certificates without certificate private key"
-#     An iOS Distribution certificate exists in the Developer Portal but its private key
-#     lives on another machine (e.g. the Mac you used to submit manually before).
-#     Fix: revoke that certificate at developer.apple.com → Certificates, Identifiers &
-#     Profiles → Certificates → iOS/Apple Distribution → Revoke. Codemagic's --create
-#     flag will then generate a fresh cert + store its private key for all future builds.
-#
-#   "No matching profiles found" (from xcode-project use-profiles)
-#     Means the fetch step above failed or downloaded nothing. Common causes:
-#     a) API key role is "Developer" instead of "App Manager" → fix in App Store Connect
-#     b) Bundle ID com.nconte.yourmentalcoach not registered in Certificates, IDs & Profiles
-#     c) "Sign in with Apple" capability not enabled on the App ID in the Developer Portal
+#     → CERTIFICATE_PRIVATE_KEY missing/empty, or in the wrong format. It must be a
+#       PKCS#1 RSA key: generate with `openssl genrsa 2048` (header BEGIN RSA PRIVATE KEY).
+#   "No matching profiles found for bundle identifier ... app_store"
+#     → fetch-signing-files did not actually create a profile. Check the fetch output
+#       above it: the bundle id must exist as an Identifier and the API key needs
+#       App Manager role. (NOT a use-profiles path issue — paths are handled below.)
 
 workflows:
   ios-testflight:
@@ -50,31 +50,52 @@ workflows:
         script: npm run build
       - name: Sync web build into the iOS project
         script: npx cap sync ios
-      - name: Set up keychain
-        script: keychain initialize
-      - name: Fetch signing certificate and provisioning profile
+      - name: Set up iOS code signing
         script: |
           set -e
-          # Verify the key env var is actually set
+
+          # 1) The distribution certificate's private key is stored as a Codemagic
+          #    secret (group: ios-signing). fetch-signing-files uses it to create and
+          #    download a distribution cert it can actually sign with.
           if [ -z "$CERTIFICATE_PRIVATE_KEY" ]; then
-            echo "ERROR: CERTIFICATE_PRIVATE_KEY is empty — check that the ios-signing group is loaded"
+            echo "ERROR: CERTIFICATE_PRIVATE_KEY is empty — is the 'ios-signing' variable group loaded?"
             exit 1
           fi
-          echo "Key length: ${#CERTIFICATE_PRIVATE_KEY} chars — OK"
-          # Write key to file (more reliable than passing via @env: directly)
-          echo "$CERTIFICATE_PRIVATE_KEY" > /tmp/cert_key.pem
+          echo "Certificate private key present (${#CERTIFICATE_PRIVATE_KEY} chars)."
+
+          # 2) Prepare a clean keychain for the freshly-fetched certificate.
+          keychain initialize
+
+          # 3) Create (if missing) + download the distribution certificate and an
+          #    app_store provisioning profile for the bundle id. The CLI saves them
+          #    under ~/Library/Developer/Xcode/UserData/{Certificates,Provisioning Profiles}/.
+          KEY_FILE="$(mktemp)"
+          printf '%s' "$CERTIFICATE_PRIVATE_KEY" > "$KEY_FILE"
           app-store-connect fetch-signing-files \
             "com.nconte.yourmentalcoach" \
             --type IOS_APP_STORE \
-            --certificate-key "@file:/tmp/cert_key.pem" \
+            --certificate-key "@file:$KEY_FILE" \
             --create
-          echo "=== Provisioning profiles downloaded ==="
-          ls -1 "$HOME/Library/MobileDevice/Provisioning Profiles/"*.mobileprovision 2>/dev/null \
-            || { echo "ERROR: No .mobileprovision files found — fetch-signing-files did not download any profiles."; exit 1; }
-      - name: Add certificates to keychain
-        script: keychain add-certificates
-      - name: Apply signing profiles to Xcode project
-        script: xcode-project use-profiles
+          rm -f "$KEY_FILE"
+
+          # 4) Mirror profiles into the legacy location too, so xcode-project
+          #    use-profiles finds them regardless of which default path it uses.
+          SRC="$HOME/Library/Developer/Xcode/UserData/Provisioning Profiles"
+          DST="$HOME/Library/MobileDevice/Provisioning Profiles"
+          mkdir -p "$DST"
+          cp -f "$SRC/"*.mobileprovision "$DST/" 2>/dev/null || true
+
+          # 5) Confirm at least one profile actually landed (correct paths this time).
+          if ! ls "$SRC/"*.mobileprovision >/dev/null 2>&1 && ! ls "$DST/"*.mobileprovision >/dev/null 2>&1; then
+            echo "ERROR: fetch-signing-files produced no .mobileprovision files."
+            exit 1
+          fi
+          echo "Provisioning profile(s) ready."
+
+          # 6) Import the distribution certificate into the keychain and wire the
+          #    downloaded profile(s) into the Xcode project.
+          keychain add-certificates
+          xcode-project use-profiles
       - name: Set the next TestFlight build number
         script: |
           set -e
