@@ -35,6 +35,8 @@ workflows:
       # Mixing ios_signing with manual fetch-signing-files scripts causes a conflict —
       # Codemagic treats them as two separate signing mechanisms and they fight each other.
       # Signing is handled entirely by the scripts below using the app_store_connect integration.
+      groups:
+        - ios-signing              # provides CERTIFICATE_PRIVATE_KEY
       vars:
         XCODE_PROJECT: "ios/App/App.xcodeproj"
         XCODE_SCHEME: "App"
