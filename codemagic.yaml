@@ -55,13 +55,18 @@ workflows:
       - name: Fetch signing certificate and provisioning profile
         script: |
           set -e
-          # CERTIFICATE_PRIVATE_KEY must be set as a Codemagic environment variable.
-          # Generate it once with: openssl genrsa 2048
-          # Add the full PEM output as CERTIFICATE_PRIVATE_KEY in Codemagic app settings → Environment variables.
+          # Verify the key env var is actually set
+          if [ -z "$CERTIFICATE_PRIVATE_KEY" ]; then
+            echo "ERROR: CERTIFICATE_PRIVATE_KEY is empty — check that the ios-signing group is loaded"
+            exit 1
+          fi
+          echo "Key length: ${#CERTIFICATE_PRIVATE_KEY} chars — OK"
+          # Write key to file (more reliable than passing via @env: directly)
+          echo "$CERTIFICATE_PRIVATE_KEY" > /tmp/cert_key.pem
           app-store-connect fetch-signing-files \
             "com.nconte.yourmentalcoach" \
             --type IOS_APP_STORE \
-            --certificate-key @env:CERTIFICATE_PRIVATE_KEY \
+            --certificate-key "@file:/tmp/cert_key.pem" \
             --create
           echo "=== Provisioning profiles downloaded ==="
           ls -1 "$HOME/Library/MobileDevice/Provisioning Profiles/"*.mobileprovision 2>/dev/null \
