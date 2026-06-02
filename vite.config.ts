@@ -10,6 +10,9 @@ export default defineConfig(({ mode }) => ({
   server: {
     host: "::",
     port: 8080,
+    // Allow Cloudflare quick-tunnel hostnames so the app can be previewed on a
+    // phone via `phone-preview.bat`. Dev-server only — has no effect on builds.
+    allowedHosts: [".trycloudflare.com"],
     hmr: {
       overlay: false,
     },
