@@ -10,7 +10,9 @@ export type FeatureFlags = {
 };
 
 export const FREE_AI_MESSAGES_PER_ROUND = 8;
-export const FREE_PATTERN_DETECTION_ROUNDS = 3;
+// After 1 completed round, free users see basic patterns. This gives weekend
+// warriors a "your coach sees you" moment on day one rather than waiting months.
+export const FREE_PATTERN_DETECTION_ROUNDS = 1;
 
 export function useFeatureFlags() {
   const { isPro, entitlements, isLoading } = useEntitlements();
