@@ -1,9 +1,10 @@
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useLocation, useNavigate } from "react-router-dom";
+import { recordRouteForResume, getResumeTarget, isWarmReload } from "@/lib/sessionResume";
 import { SplashScreen } from "@/components/SplashScreen";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { AppErrorBoundary } from "@/components/AppErrorBoundary";
@@ -53,26 +54,53 @@ function AppLoadingScreen() {
   );
 }
 
+/**
+ * Persists the current route and, on a warm WebView reload, restores the user
+ * to where they were instead of dumping them on Home. Lives inside the router.
+ */
+function RouteResume() {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const hasRestored = useRef(false);
+
+  // One-time restore on boot: if iOS reloaded the WebView while the user was
+  // mid-session, jump them back to their last route.
+  useEffect(() => {
+    if (hasRestored.current) return;
+    hasRestored.current = true;
+    const target = getResumeTarget();
+    if (target && target !== location.pathname) {
+      navigate(target, { replace: true });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Keep the resume target current as the user navigates.
+  useEffect(() => {
+    recordRouteForResume(location.pathname);
+  }, [location.pathname]);
+
+  return null;
+}
+
 function AppRoutes({ showSplash, onSplashComplete }: { showSplash: boolean; onSplashComplete: () => void }) {
   const { isLoading: authLoading } = useAuth();
   // Entitlements load in the background — don't block the router on them.
   // The app shows as soon as auth resolves; isPro/features update reactively.
-  const isBootstrapReady = !authLoading;
-
-  if (!isBootstrapReady) {
-    return (
-      <>
-        {showSplash && <SplashScreen onComplete={onSplashComplete} duration={1800} />}
-        {!showSplash && <AppLoadingScreen />}
-      </>
-    );
-  }
-
+  //
+  // The router is mounted UNCONDITIONALLY so its in-memory history survives
+  // auth re-renders (e.g. token refresh on resume). The loading screen renders
+  // *inside* the router as content, never replacing it — replacing the router
+  // would reset the user's route back to "/".
   return (
     <>
       {showSplash && <SplashScreen onComplete={onSplashComplete} duration={1800} />}
       <BrowserRouter>
         <ScrollToTop />
+        <RouteResume />
+        {authLoading ? (
+          <AppLoadingScreen />
+        ) : (
         <Routes>
           <Route path="/login" element={<Login />} />
           <Route path="/auth/callback" element={<AuthCallback />} />
@@ -100,13 +128,16 @@ function AppRoutes({ showSplash, onSplashComplete }: { showSplash: boolean; onSp
           <Route path="/upgrade-success" element={<ProtectedRoute><UpgradeSuccess /></ProtectedRoute>} />
           <Route path="*" element={<NotFound />} />
         </Routes>
+        )}
       </BrowserRouter>
     </>
   );
 }
 
 const App = () => {
-  const [showSplash, setShowSplash] = useState(true);
+  // On a warm WebView reload (iOS recycled the web process mid-session), skip
+  // the splash entirely — RouteResume will put the user back where they were.
+  const [showSplash, setShowSplash] = useState(() => !isWarmReload());
 
   const handleSplashComplete = useCallback(() => {
     setShowSplash(false);

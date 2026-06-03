@@ -61,9 +61,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (!isMounted) return;
       setState((current) => {
         const next = applySession(session);
+        // Ignore pure token refreshes. iOS fires TOKEN_REFRESHED on every
+        // resume; the access_token changes by definition, but the signed-in
+        // user does not. Re-rendering the whole app on each refresh adds churn
+        // on resume for no benefit — API calls read a fresh token via
+        // supabase.auth.getSession(), not from this context. Only re-render
+        // when the actual identity or loading state changes.
         if (
           current.user?.id === next.user?.id &&
-          current.session?.access_token === next.session?.access_token &&
+          !!current.session === !!next.session &&
           current.isLoading === next.isLoading
         ) {
           return current;
