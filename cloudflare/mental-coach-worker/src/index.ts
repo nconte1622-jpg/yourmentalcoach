@@ -19,7 +19,12 @@ type ChatMessage = {
    THE BRAIN — System prompts that define coaching personality
    ═══════════════════════════════════════════════════════════════ */
 
-const BASE_SYSTEM_PROMPT = `You are this golfer's personal coach. You know their game, their tendencies, their mindset. You talk like a real person — a trusted friend who also happens to be an elite mental performance coach.
+const BASE_SYSTEM_PROMPT = `You are Your Mental Coach — this golfer's personal mental performance coach. You know their game, their tendencies, their mindset. You talk like a real person — a trusted friend who also happens to be an elite mental performance coach.
+
+BOUNDARIES (quietly held — never lecture about them):
+- You coach golf and the mind around golf. If they steer way off-topic, warmly bring it back to their game.
+- You're a performance coach, not a therapist or doctor. You don't diagnose or give medical, legal, or financial advice.
+- If someone signals real crisis or thoughts of self-harm, drop the coaching act. Be a human for a second: tell them plainly this is bigger than golf and you want them to talk to someone who can really help — in the US they can call or text 988, anytime. Keep it short, warm, no judgment.
 
 HOW YOU TALK:
 - Like a real human. Conversational, warm, occasionally funny. If they're vibing, vibe with them. If they're hurting, be steady.
@@ -60,6 +65,22 @@ Keep it to 2-3 sentences. Give them ONE thing to focus on today. If you know the
   "close-strong": `Last few holes. This is where rounds are made.
 3 sentences max. Quieter, more intense. Every word matters. Simplify everything down to: one target, one committed swing. If they're ahead, keep them in the process. If they're behind, free them up to just play. Their cue word works like a mantra here. This isn't the time for conversation — it's the time for precision.`,
 };
+
+/* Per-mode sampling. Lower temperature = steadier, on-brand voice; tighter
+   max_tokens enforces the brevity the prompts ask for (and caps cost). The
+   high-pressure modes (frustrated, reset, close-strong) are kept short and
+   low-variance on purpose — that's when a calm, precise voice matters most. */
+type Sampling = { temperature: number; max_tokens: number };
+const SAMPLING_BY_CONTEXT: Record<string, Sampling> = {
+  "pre-game": { temperature: 0.7, max_tokens: 170 },
+  "round": { temperature: 0.7, max_tokens: 200 },
+  "round-frustrated": { temperature: 0.4, max_tokens: 90 },
+  "locker-room": { temperature: 0.7, max_tokens: 240 },
+  "coach": { temperature: 0.7, max_tokens: 260 },
+  "reset": { temperature: 0.45, max_tokens: 110 },
+  "close-strong": { temperature: 0.5, max_tokens: 150 },
+};
+const DEFAULT_SAMPLING: Sampling = { temperature: 0.7, max_tokens: 200 };
 
 /* ═══════════════════════════════════════════════════════════════
    INFRASTRUCTURE — Auth, CORS, routing (unchanged)
@@ -244,7 +265,9 @@ export default {
       ? `${BASE_SYSTEM_PROMPT}\n\n--- CURRENT MODE ---\n${contextPrompt}\n\n${extraContext}`
       : `${BASE_SYSTEM_PROMPT}\n\n--- CURRENT MODE ---\n${contextPrompt}`;
 
-    console.log(`mental-coach request_id=${requestId} context=${context} model=${env.OPENAI_MODEL || "gpt-4.1-mini"}`);
+    const sampling = SAMPLING_BY_CONTEXT[context] || DEFAULT_SAMPLING;
+
+    console.log(`mental-coach request_id=${requestId} context=${context} model=${env.OPENAI_MODEL || "gpt-4.1-mini"} temp=${sampling.temperature}`);
 
     const upstream = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
@@ -255,6 +278,8 @@ export default {
       body: JSON.stringify({
         model: env.OPENAI_MODEL || "gpt-4.1-mini",
         stream: true,
+        temperature: sampling.temperature,
+        max_tokens: sampling.max_tokens,
         messages: [{ role: "system", content: systemPrompt }, ...messages],
       }),
     });
