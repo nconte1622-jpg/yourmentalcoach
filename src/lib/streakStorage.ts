@@ -76,6 +76,18 @@ export function recordCompletedRound(): StreakData {
   return updated;
 }
 
+/**
+ * Whole days since the golfer's last completed round, or null if they've never
+ * played. Used to drive the "keep your streak going" re-engagement nudge.
+ */
+export function daysSinceLastRound(data: StreakData = getStreakData()): number | null {
+  if (!data.lastRoundDate) return null;
+  const last = new Date(data.lastRoundDate + "T12:00:00Z").getTime();
+  if (Number.isNaN(last)) return null;
+  const today = new Date(new Date().toISOString().split("T")[0] + "T12:00:00Z").getTime();
+  return Math.max(0, Math.floor((today - last) / (1000 * 60 * 60 * 24)));
+}
+
 /** Human-readable label for streak display, e.g. "3 round streak 🔥" */
 export function streakLabel(data: StreakData): string {
   if (data.currentStreak <= 0) return "";

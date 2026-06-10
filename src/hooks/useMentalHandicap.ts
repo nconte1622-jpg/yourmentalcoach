@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -92,6 +92,10 @@ export function useMentalHandicap(refreshKey?: number): MentalHandicapResult {
     roundsThisMonth: 0,
     loading: true,
   });
+  // Stale-while-revalidate: only show the loading/skeleton state on the very
+  // first fetch. Background refreshes (app resume, refreshKey bumps) keep the
+  // last good numbers on screen so the widget never flickers.
+  const hasLoadedOnce = useRef(false);
 
   useEffect(() => {
     if (!user?.id) {
@@ -99,7 +103,9 @@ export function useMentalHandicap(refreshKey?: number): MentalHandicapResult {
       return;
     }
 
-    setResult((r) => ({ ...r, loading: true }));
+    if (!hasLoadedOnce.current) {
+      setResult((r) => ({ ...r, loading: true }));
+    }
     let cancelled = false;
 
     async function load() {
@@ -110,6 +116,7 @@ export function useMentalHandicap(refreshKey?: number): MentalHandicapResult {
         .order("started_at", { ascending: false });
 
       if (cancelled) return;
+      hasLoadedOnce.current = true;
       if (error) {
         console.error("[useMentalHandicap] fetch error", error);
         setResult((r) => ({ ...r, loading: false }));

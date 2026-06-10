@@ -104,7 +104,7 @@
 }
 
 .calm-pro-press:active {
-  transform: scale(0.985);
+  transform: scale(0.97);
 }
 
 .calm-pro-focus:focus-visible {
@@ -158,6 +158,63 @@
 @keyframes lrm-dot-pulse {
   0%, 100% { transform: scale(1); opacity: 0.85; }
   50% { transform: scale(1.08); opacity: 1; }
+}
+
+/* ── Premium shimmer skeleton (dark-green / sand palette) ──────────
+   A moving sand-tinted sheen across loading placeholders. Feels far more
+   premium than a flat opacity pulse. Apply `.caddie-shimmer` to a block. */
+.caddie-shimmer {
+  position: relative;
+  overflow: hidden;
+  background: rgba(203, 184, 146, 0.06);
+}
+
+.caddie-shimmer::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(203, 184, 146, 0.04) 35%,
+    rgba(203, 184, 146, 0.14) 50%,
+    rgba(203, 184, 146, 0.04) 65%,
+    transparent 100%
+  );
+  animation: caddie-shimmer-sweep 1.6s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes caddie-shimmer-sweep {
+  100% { transform: translateX(100%); }
+}
+
+/* ── Round-word reveal — gold glow fade + scale 0.8 → 1.0 ────────── */
+.round-word-reveal {
+  animation: round-word-in 900ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes round-word-in {
+  0% {
+    opacity: 0;
+    transform: scale(0.8);
+    text-shadow: 0 0 0 rgba(203, 184, 146, 0);
+  }
+  60% {
+    opacity: 1;
+    text-shadow: 0 0 38px rgba(203, 184, 146, 0.55);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+    text-shadow: 0 0 22px rgba(203, 184, 146, 0.32);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .caddie-shimmer::after { animation: none; }
+  .round-word-reveal { animation: none; }
 }
 
 @media (prefers-reduced-motion: reduce) {

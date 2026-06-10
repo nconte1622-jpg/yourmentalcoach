@@ -12,7 +12,6 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { trackEvent } from "@/lib/analytics";
-import { toast } from "sonner";
 
 export interface Entitlements {
   plan: "free" | "pro";
@@ -140,19 +139,14 @@ export function EntitlementsProvider({ children }: { children: ReactNode }) {
       setIsAdmin(adminData?.isAdmin === true);
       return normalized;
     } catch (err) {
-      // Timeout or network error — use cached plan if available so Pro users
-      // aren't silently downgraded; warn them but don't crash the app.
+      // Timeout or network error — silently fall back to the last known plan so
+      // Pro users aren't downgraded. This is a background refresh; surfacing a
+      // toast on every transient edge-function hiccup is noise the user can't act
+      // on, so we keep it to the console only.
       console.warn("Entitlements fetch failed or timed out:", err);
       const fallback = cached.current ?? DEFAULT_ENTITLEMENTS;
       setEntitlements(fallback);
       setIsAdmin(false);
-      if (hasLoadedOnce.current) {
-        // Only show toast on subsequent failures, not on first cold load
-        toast.warning("Couldn't verify your plan. Using last known status.", {
-          duration: 4000,
-          id: "entitlements-fallback",
-        });
-      }
       return fallback;
     } finally {
       hasLoadedOnce.current = true;

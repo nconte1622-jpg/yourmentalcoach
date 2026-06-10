@@ -1,3 +1,4 @@
+import { useCallback, useMemo } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
@@ -129,7 +130,7 @@ function buildRoundCreationError(
 export function useRounds() {
   const { user } = useAuth();
 
-  const createRound = async (input: CreateRoundInput): Promise<Round | null> => {
+  const createRound = useCallback(async (input: CreateRoundInput): Promise<Round | null> => {
     if (!user?.id) {
       console.warn("Cannot create round: no authenticated user");
       return null;
@@ -247,9 +248,9 @@ export function useRounds() {
     }
 
     return round;
-  };
+  }, [user?.id]);
 
-  const updateRound = async (id: string, input: UpdateRoundInput): Promise<Round | null> => {
+  const updateRound = useCallback(async (id: string, input: UpdateRoundInput): Promise<Round | null> => {
     if (!user?.id) {
       console.warn("Cannot update round: no authenticated user");
       return null;
@@ -304,9 +305,9 @@ export function useRounds() {
     }
 
     return round;
-  };
+  }, [user?.id]);
 
-  const getRound = async (id: string): Promise<Round | null> => {
+  const getRound = useCallback(async (id: string): Promise<Round | null> => {
     if (!user?.id) return null;
 
     const { data, error } = await supabase
@@ -322,9 +323,9 @@ export function useRounds() {
     }
 
     return data as Round;
-  };
+  }, [user?.id]);
 
-  const getActiveRound = async (): Promise<Round | null> => {
+  const getActiveRound = useCallback(async (): Promise<Round | null> => {
     if (!user?.id) return null;
 
     const persisted = loadActiveRoundSession();
@@ -356,9 +357,9 @@ export function useRounds() {
     }
 
     return round;
-  };
+  }, [user?.id, getRound]);
 
-  const getRecentRounds = async (limit = 10): Promise<Round[]> => {
+  const getRecentRounds = useCallback(async (limit = 10): Promise<Round[]> => {
     if (!user?.id) return [];
 
     const { data, error } = await supabase
@@ -374,9 +375,9 @@ export function useRounds() {
     }
 
     return (data as Round[]) ?? [];
-  };
+  }, [user?.id]);
 
-  const createRoundEvent = async (input: CreateRoundEventInput): Promise<RoundEvent | null> => {
+  const createRoundEvent = useCallback(async (input: CreateRoundEventInput): Promise<RoundEvent | null> => {
     if (!user?.id) {
       console.warn("Cannot create round event: no authenticated user");
       return null;
@@ -400,9 +401,9 @@ export function useRounds() {
     }
 
     return data as RoundEvent;
-  };
+  }, [user?.id]);
 
-  const getRoundEvents = async (roundId: string): Promise<RoundEvent[]> => {
+  const getRoundEvents = useCallback(async (roundId: string): Promise<RoundEvent[]> => {
     if (!user?.id) return [];
 
     const { data, error } = await supabase
@@ -418,9 +419,9 @@ export function useRounds() {
     }
 
     return (data as RoundEvent[]) ?? [];
-  };
+  }, [user?.id]);
 
-  const discardRound = async (id: string): Promise<Round | null> => {
+  const discardRound = useCallback(async (id: string): Promise<Round | null> => {
     const round = await updateRound(id, {
       ended_at: new Date().toISOString(),
       status: "abandoned",
@@ -438,17 +439,17 @@ export function useRounds() {
     }
 
     return round;
-  };
+  }, [updateRound]);
 
-  const hydrateActiveRoundSession = async () => {
+  const hydrateActiveRoundSession = useCallback(async () => {
     const round = await getActiveRound();
     if (!round) return null;
     const snapshot = buildActiveRoundSnapshot(round);
     saveActiveRoundSession(snapshot);
     return snapshot;
-  };
+  }, [getActiveRound]);
 
-  const attachDailyFocusToActiveRound = async (focusText: string) => {
+  const attachDailyFocusToActiveRound = useCallback(async (focusText: string) => {
     const persisted = loadActiveRoundSession();
     const round = persisted?.roundId ? await getRound(persisted.roundId) : await getActiveRound();
     if (!round) return null;
@@ -457,18 +458,32 @@ export function useRounds() {
       todayFocus: focusText,
     });
     return round;
-  };
+  }, [getRound, getActiveRound]);
 
-  return {
-    createRound,
-    updateRound,
-    getRound,
-    getActiveRound,
-    getRecentRounds,
-    createRoundEvent,
-    getRoundEvents,
-    discardRound,
-    hydrateActiveRoundSession,
-    attachDailyFocusToActiveRound,
-  };
+  return useMemo(
+    () => ({
+      createRound,
+      updateRound,
+      getRound,
+      getActiveRound,
+      getRecentRounds,
+      createRoundEvent,
+      getRoundEvents,
+      discardRound,
+      hydrateActiveRoundSession,
+      attachDailyFocusToActiveRound,
+    }),
+    [
+      createRound,
+      updateRound,
+      getRound,
+      getActiveRound,
+      getRecentRounds,
+      createRoundEvent,
+      getRoundEvents,
+      discardRound,
+      hydrateActiveRoundSession,
+      attachDailyFocusToActiveRound,
+    ]
+  );
 }

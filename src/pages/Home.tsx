@@ -38,7 +38,8 @@ import { BottomDock } from "@/components/ui/BottomDock";
 import { loadActiveRoundSession } from "@/lib/roundSession";
 import { ActiveRoundResumeChip } from "@/components/ui/ActiveRoundResumeChip";
 import { cn } from "@/lib/utils";
-import { getStreakData, streakLabel, type StreakData } from "@/lib/streakStorage";
+import { getStreakData, streakLabel, daysSinceLastRound, type StreakData } from "@/lib/streakStorage";
+import { formatRoundDuration } from "@/lib/roundTime";
 import { DailyCheckIn } from "@/components/DailyCheckIn";
 import { loadPreferredWords as loadCueWords } from "@/lib/memoryStorage";
 
@@ -212,18 +213,23 @@ const Home = () => {
 
   const activeRoundMeta = useMemo(() => {
     if (!activeRoundSummary) return null;
-    const startedAt = new Date(activeRoundSummary.createdAt);
-    const elapsedMinutes = Math.max(1, Math.round((Date.now() - startedAt.getTime()) / 60000));
-    const durationLabel =
-      elapsedMinutes >= 60
-        ? `${Math.floor(elapsedMinutes / 60)}h ${elapsedMinutes % 60}m`
-        : `${elapsedMinutes}m`;
+    const duration = formatRoundDuration(activeRoundSummary.createdAt);
     return {
       roundType: activeRoundSummary.roundType.replace("-", " "),
       environment: activeRoundSummary.environment,
-      durationLabel,
+      // When the round is stale (e.g. a session left open overnight) we drop the
+      // misleading counter and prompt the user to resume or wrap it up instead.
+      durationLabel: duration.stale ? "Still open — resume to finish" : `${duration.label} active`,
     };
   }, [activeRoundSummary]);
+
+  // Re-engagement nudge: if it's been a few days since the last round (and one
+  // isn't already in progress), gently pull the golfer back to keep the habit alive.
+  const reEngageDays = useMemo(() => {
+    if (activeRoundSummary) return null;
+    const days = daysSinceLastRound(streak);
+    return days !== null && days >= 3 ? days : null;
+  }, [activeRoundSummary, streak]);
 
   const withTap = (to: string) => {
     triggerHaptic("soft");
@@ -332,7 +338,7 @@ const Home = () => {
                       <p className="text-base capitalize text-[var(--text-0)]">
                         {activeRoundMeta.roundType} · {activeRoundMeta.environment}
                       </p>
-                      <p className="text-sm text-[var(--text-1)]">{activeRoundMeta.durationLabel} active</p>
+                      <p className="text-sm text-[var(--text-1)]">{activeRoundMeta.durationLabel}</p>
                     </div>
                     <PillButton
                       tone="green"
@@ -342,6 +348,33 @@ const Home = () => {
                     </PillButton>
                   </div>
                 </GlassCard>
+              )}
+
+              {/* Re-engagement nudge — keep the habit loop alive */}
+              {reEngageDays !== null && (
+                <button
+                  onClick={() => withTap("/round-setup")}
+                  className="calm-pro-focus calm-pro-press calm-pro-mount group block w-full text-left"
+                >
+                  <GlassCard variant="sand" className="p-5">
+                    <div className="flex items-center gap-3.5">
+                      <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border border-[rgba(255,160,50,0.3)] bg-[rgba(255,120,20,0.12)] text-[rgba(255,160,80,0.95)]">
+                        <Flame className="h-5 w-5" />
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <p className="font-serif text-lg text-[var(--text-0)]">
+                          {reEngageDays} days since your last round
+                        </p>
+                        <p className="text-sm text-[var(--sand-0)] opacity-80">
+                          {streak.currentStreak >= 2
+                            ? "Keep your streak alive — play before it resets."
+                            : "Step back on the course and keep the momentum going."}
+                        </p>
+                      </div>
+                      <ChevronRight className="h-5 w-5 text-[var(--sand-0)] opacity-70 transition-transform group-hover:translate-x-0.5" />
+                    </div>
+                  </GlassCard>
+                </button>
               )}
 
               {/* Mental Handicap */}

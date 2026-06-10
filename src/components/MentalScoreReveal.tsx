@@ -633,7 +633,7 @@ export function MentalScoreReveal({ moods, onContinue }: MentalScoreRevealProps)
             transition:    "opacity 500ms ease 350ms",
           }}
         >
-          YOUR MENTAL COACH
+          THE CADDIE
         </p>
       </div>
     </div>

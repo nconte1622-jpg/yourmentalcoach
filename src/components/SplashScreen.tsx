@@ -34,7 +34,9 @@ export const SplashScreen = ({ onComplete, duration = 1800 }: SplashScreenProps)
   return (
     <div
       className={cn(
-        "fixed inset-0 z-50 flex flex-col items-center justify-center",
+        // z-index must sit above all app chrome (the active-round chip is z-65,
+        // toasts/modals up to z-70) so nothing pokes through during boot.
+        "fixed inset-0 z-[120] flex flex-col items-center justify-center",
         "bg-gradient-to-b from-[#050c08] via-[#080f0b] to-[#040705]",
         "transition-opacity duration-500 ease-out",
         phase === "exit" && "opacity-0 pointer-events-none"

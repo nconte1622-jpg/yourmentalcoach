@@ -1,6 +1,7 @@
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Lock, Sparkles, TrendingUp, BarChart3, Activity, MessageSquare, Info } from "lucide-react";
+import { ArrowLeft, Lock, Sparkles, TrendingUp, BarChart3, Activity, MessageSquare } from "lucide-react";
+import { InfoHint } from "@/components/ui/InfoHint";
 import { PageShell } from "@/components/PageShell";
 import { AppShell } from "@/components/ui/AppShell";
 import { AppHeader } from "@/components/ui/AppHeader";
@@ -16,33 +17,13 @@ import { MentalHandicapChart } from "@/components/MentalHandicapChart";
 
 /** Small tap-to-reveal tooltip for section headers */
 function SectionTooltip({ text }: { text: string }) {
-  const [open, setOpen] = useState(false);
   return (
-    <div className="relative inline-flex">
-      <button
-        type="button"
-        onClick={() => setOpen((v) => !v)}
-        className="ml-1 inline-flex h-4 w-4 items-center justify-center rounded-full text-[var(--muted-ink)] hover:text-[var(--text-1)] transition-colors"
-        aria-label="What is this?"
-      >
-        <Info className="h-3 w-3" />
-      </button>
-      {open && (
-        <>
-          <div className="fixed inset-0 z-[60]" onClick={() => setOpen(false)} />
-          <div className="absolute left-1/2 top-full z-[70] mt-2 w-[220px] -translate-x-1/2 rounded-2xl border border-[rgba(203,184,146,0.18)] bg-[rgba(9,19,15,0.97)] p-3.5 shadow-[0_12px_36px_rgba(0,0,0,0.5)] backdrop-blur-xl animate-fade-in">
-            <p className="text-xs leading-5 text-[var(--text-1)]">{text}</p>
-            <button
-              type="button"
-              onClick={() => setOpen(false)}
-              className="mt-2 w-full rounded-xl bg-white/6 py-1.5 text-xs text-[var(--text-1)] hover:bg-white/10 transition-colors"
-            >
-              Got it
-            </button>
-          </div>
-        </>
-      )}
-    </div>
+    <InfoHint
+      label="What is this?"
+      className="ml-1 inline-flex h-4 w-4 items-center justify-center rounded-full text-[var(--muted-ink)] transition-colors hover:text-[var(--text-1)]"
+    >
+      {text}
+    </InfoHint>
   );
 }
 

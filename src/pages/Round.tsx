@@ -22,7 +22,7 @@ import { AppShell } from "@/components/ui/AppShell";
 import { Lock, Wind, ClipboardList, Flag, Zap } from "lucide-react";
 import { ProUpgradeModal } from "@/components/ProUpgradeModal";
 import { useFeatureFlags } from "@/hooks/useFeatureFlags";
-import { loadActiveRoundSession } from "@/lib/roundSession";
+import { loadActiveRoundSession, clearActiveRoundSession, clearRoundMessages } from "@/lib/roundSession";
 import { extractAndSaveQuickEndData } from "@/lib/quickEndRound";
 import { recordCompletedRound } from "@/lib/streakStorage";
 import { loadScorecard } from "@/lib/scorecardStorage";
@@ -260,51 +260,59 @@ const Round = () => {
       return;
     }
 
+    setIsEndingRound(true);
+
+    // Capture moods BEFORE clearing storage (reveal card needs them)
+    const capturedMoods = getHoleMoods(activeRoundId);
+    const capturedRoundId = activeRoundId;
+
+    // Everything below is local-first: extract chat data, record the streak,
+    // and remember the moods. None of this depends on the network, so the round
+    // always completes for the user even if Supabase is slow or offline.
+    extractAndSaveQuickEndData(activeRoundId);
+    recordCompletedRound();
+
+    // Post-round feeling is non-critical telemetry — fire and forget so it can
+    // never block (or hang) the "End Round" flow.
+    if (postRoundFeeling !== null) {
+      void createRoundEvent({
+        round_id: activeRoundId,
+        event_type: "note",
+        label: "post_round_feeling",
+        notes: JSON.stringify({
+          feeling_score: postRoundFeeling,
+          timestamp: new Date().toISOString(),
+        }),
+      }).catch(() => { /* non-critical */ });
+    }
+
+    // Persist the closed round to the DB, but never let a slow/failed request
+    // trap the user behind an "Ending..." spinner. Race against a hard timeout;
+    // whatever happens, we complete the round locally and show the reveal.
+    const ENDED_TIMEOUT_MS = 6000;
     try {
-      setIsEndingRound(true);
-
-      // Capture moods BEFORE clearing storage (reveal card needs them)
-      const capturedMoods = getHoleMoods(activeRoundId);
-      const capturedRoundId = activeRoundId;
-
-      // Extract and save data from chat BEFORE the round closes and clears storage
-      extractAndSaveQuickEndData(activeRoundId);
-
-      // Record round completion for streak tracking
-      recordCompletedRound();
-
-      // Only log post-round feeling if the user actually chose a rating
-      if (postRoundFeeling !== null) {
-        await createRoundEvent({
-          round_id: activeRoundId,
-          event_type: "note",
-          label: "post_round_feeling",
-          notes: JSON.stringify({
-            feeling_score: postRoundFeeling,
-            timestamp: new Date().toISOString(),
-          }),
-        });
-      }
-
-      const ended = await updateRound(activeRoundId, {
-        ended_at: new Date().toISOString(),
-        status: "completed",
-      });
-      if (ended) {
-        setEndRoundDialogOpen(false);
-        setEndRoundStep("actions");
-        setPostRoundFeeling(null);
-        // Show the Mental Score reveal card instead of navigating immediately
-        setRevealData({ moods: capturedMoods, roundId: capturedRoundId });
-      } else {
-        toast.error("Unable to end round");
-      }
+      await Promise.race([
+        updateRound(activeRoundId, {
+          ended_at: new Date().toISOString(),
+          status: "completed",
+        }),
+        new Promise((resolve) => setTimeout(resolve, ENDED_TIMEOUT_MS)),
+      ]);
     } catch (error) {
       console.error("Failed to end active round:", error);
-      toast.error("Unable to end round");
-    } finally {
-      setIsEndingRound(false);
     }
+
+    // Guarantee the round is gone from the local "active" state regardless of
+    // whether the DB write landed, so the home screen / resume chip clear.
+    clearActiveRoundSession();
+    clearRoundMessages(capturedRoundId);
+
+    setIsEndingRound(false);
+    setEndRoundDialogOpen(false);
+    setEndRoundStep("actions");
+    setPostRoundFeeling(null);
+    // Show the Mental Score reveal card instead of navigating immediately
+    setRevealData({ moods: capturedMoods, roundId: capturedRoundId });
   }, [activeRoundId, createRoundEvent, postRoundFeeling, updateRound]);
 
   const handleRevealContinue = useCallback(() => {
