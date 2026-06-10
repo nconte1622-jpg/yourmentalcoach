@@ -1,27 +1,27 @@
-# Codemagic CI/CD — builds "Your Mental Coach" (Capacitor iOS) and ships to TestFlight.
+# Codemagic CI/CD â builds "Your Mental Coach" (Capacitor iOS) and ships to TestFlight.
 # This lets you release from your Windows PC: push to GitHub, Codemagic builds on a
 # cloud Mac and uploads to TestFlight automatically.
 #
-# ONE-TIME SETUP (already done — documented here for reproducibility):
+# ONE-TIME SETUP (already done â documented here for reproducibility):
 #   1) App Store Connect API key named YMC_ASC_KEY, role "App Manager", added in Codemagic.
 #   2) CERTIFICATE_PRIVATE_KEY secret (RSA private key, PKCS#1 PEM) in variable group
 #      "ios-signing". fetch-signing-files uses it to create a signable distribution cert.
 #   3) APP_STORE_APP_ID set below (6759075246).
 #
 # HOW SIGNING WORKS HERE (manual flow, fully automatic once the secrets above exist):
-#   keychain initialize → fetch-signing-files --create (makes cert + app_store profile)
-#   → keychain add-certificates → xcode-project use-profiles.
+#   keychain initialize â fetch-signing-files --create (makes cert + app_store profile)
+#   â keychain add-certificates â xcode-project use-profiles.
 #   The CLI saves files under ~/Library/Developer/Xcode/UserData/, NOT the old
-#   ~/Library/MobileDevice/ path — do not "verify" against the old path.
+#   ~/Library/MobileDevice/ path â do not "verify" against the old path.
 #
-# TROUBLESHOOTING — always open the failing STEP's log, not the build summary toast:
+# TROUBLESHOOTING â always open the failing STEP's log, not the build summary toast:
 #   "Cannot save Signing Certificates without certificate private key"
-#     → CERTIFICATE_PRIVATE_KEY missing/empty, or in the wrong format. It must be a
+#     â CERTIFICATE_PRIVATE_KEY missing/empty, or in the wrong format. It must be a
 #       PKCS#1 RSA key: generate with `openssl genrsa 2048` (header BEGIN RSA PRIVATE KEY).
 #   "No matching profiles found for bundle identifier ... app_store"
-#     → fetch-signing-files did not actually create a profile. Check the fetch output
+#     â fetch-signing-files did not actually create a profile. Check the fetch output
 #       above it: the bundle id must exist as an Identifier and the API key needs
-#       App Manager role. (NOT a use-profiles path issue — paths are handled below.)
+#       App Manager role. (NOT a use-profiles path issue â paths are handled below.)
 
 workflows:
   ios-testflight:
@@ -43,7 +43,7 @@ workflows:
       app_store_connect: YMC_ASC_KEY        # must match the API key name in Codemagic; needs App Manager role
     environment:
       # NOTE: ios_signing block is intentionally absent.
-      # Mixing ios_signing with manual fetch-signing-files scripts causes a conflict —
+      # Mixing ios_signing with manual fetch-signing-files scripts causes a conflict â
       # Codemagic treats them as two separate signing mechanisms and they fight each other.
       # Signing is handled entirely by the scripts below using the app_store_connect integration.
       groups:
@@ -69,7 +69,7 @@ workflows:
           #    secret (group: ios-signing). fetch-signing-files uses it to create and
           #    download a distribution cert it can actually sign with.
           if [ -z "$CERTIFICATE_PRIVATE_KEY" ]; then
-            echo "ERROR: CERTIFICATE_PRIVATE_KEY is empty — is the 'ios-signing' variable group loaded?"
+            echo "ERROR: CERTIFICATE_PRIVATE_KEY is empty â is the 'ios-signing' variable group loaded?"
             exit 1
           fi
           echo "Certificate private key present (${#CERTIFICATE_PRIVATE_KEY} chars)."
@@ -120,6 +120,44 @@ workflows:
           xcode-project build-ipa \
             --project "$XCODE_PROJECT" \
             --scheme "$XCODE_SCHEME"
+      - name: Set TestFlight beta review info
+        script: |
+          set -e
+          echo "Setting TestFlight beta contact/feedback info..."
+
+          # Set reviewer contact info (required for external testing)
+          app-store-connect beta-app-review-details update \
+            "$APP_STORE_APP_ID" \
+            --contact-first-name "Nico" \
+            --contact-last-name "Conte" \
+            --contact-phone "+19173620236" \
+            --contact-email "nconte22@icloud.com" \
+            --demo-account-required false \
+            || echo "Warning: beta-app-review-details update skipped (may already be set)"
+
+          # Set feedback email for the en-US localization
+          EXISTING_LOC_ID=$(app-store-connect beta-app-localizations list \
+            --app-id "$APP_STORE_APP_ID" \
+            --locale "en-US" \
+            --json 2>/dev/null \
+            | python3 -c "import sys,json; d=json.load(sys.stdin); print(d['data'][0]['id'] if d.get('data') else '')" 2>/dev/null || echo "")
+
+          if [ -n "$EXISTING_LOC_ID" ]; then
+            echo "Updating existing en-US localization: $EXISTING_LOC_ID"
+            app-store-connect beta-app-localizations update \
+              "$EXISTING_LOC_ID" \
+              --feedback-email "nconte22@icloud.com" \
+              || echo "Warning: feedback-email update skipped"
+          else
+            echo "Creating en-US localization with feedback email..."
+            app-store-connect beta-app-localizations create \
+              --app-id "$APP_STORE_APP_ID" \
+              --locale "en-US" \
+              --feedback-email "nconte22@icloud.com" \
+              || echo "Warning: beta-app-localizations create skipped"
+          fi
+
+          echo "Beta review info step complete."
     artifacts:
       - build/ios/ipa/*.ipa
       - /tmp/xcodebuild_logs/*.log
