@@ -51,7 +51,7 @@ workflows:
       vars:
         XCODE_PROJECT: "ios/App/App.xcodeproj"
         XCODE_SCHEME: "App"
-        APP_STORE_APP_ID: 6759075246
+        APP_STORE_APP_ID: "6759075246"
       node: 22
       xcode: latest
     scripts:
