@@ -38,20 +38,20 @@ const TermsOfService = () => {
             </div>
             <h1 className="legal-hero-title text-4xl md:text-5xl">Terms of Service</h1>
             <p className="legal-subtitle max-w-2xl">
-              The rules and responsibilities for using Your Mental Coach.
+              The rules and responsibilities for using The Caddie.
             </p>
           </div>
 
           <FrostedSandCard className="space-y-8 p-6 md:p-8">
             <div className="space-y-3">
               <p className="legal-body font-medium">Last updated: {LEGAL_LAST_UPDATED}</p>
-              <p className="legal-body">By using Your Mental Coach, you agree to the following terms.</p>
+              <p className="legal-body">By using The Caddie, you agree to the following terms.</p>
             </div>
 
             <section className="space-y-3">
               <h2 className="legal-section-title">1. Purpose of the App</h2>
               <p className="legal-body">
-                Your Mental Coach is a mental-performance tool for golfers. It is not medical care, therapy, crisis support, or emergency guidance.
+                The Caddie is a mental-performance tool for golfers. It is not medical care, therapy, crisis support, or emergency guidance.
               </p>
             </section>
 
@@ -94,7 +94,7 @@ const TermsOfService = () => {
             <section className="space-y-3">
               <h2 className="legal-section-title">7. Limitation of Liability</h2>
               <p className="legal-body">
-                Your Mental Coach is provided as a performance-support tool. We are not responsible for golf results, decisions made during play, or misuse of the app.
+                The Caddie is provided as a performance-support tool. We are not responsible for golf results, decisions made during play, or misuse of the app.
               </p>
             </section>
 

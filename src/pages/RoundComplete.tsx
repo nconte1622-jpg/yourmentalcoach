@@ -1,14 +1,55 @@
-import { useEffect, useState, useMemo } from "react";
+import { useCallback, useEffect, useState, useMemo, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { PageShell } from "@/components/PageShell";
 import { loadRoundContext, clearRoundContext } from "@/lib/roundContext";
-import { loadHighlights } from "@/lib/memoryStorage";
+import { loadHighlights, loadPreferredWords } from "@/lib/memoryStorage";
+import { getStreakData } from "@/lib/streakStorage";
+import { ShareRoundCard } from "@/components/ShareRoundCard";
+import { loadResilienceScores } from "@/lib/resilienceScore";
+import { schedulePostRoundPrompt } from "@/lib/notifications";
+import { generateRoundWord, loadRoundWord, clearRoundWord } from "@/lib/roundWord";
 
 const RoundComplete = () => {
   const navigate = useNavigate();
   const [fadeOut, setFadeOut] = useState(false);
+  const [dismissed, setDismissed] = useState(false);
+  const [roundWord, setRoundWord] = useState<string | null>(() => loadRoundWord()?.word ?? null);
+  // Cancel auto-redirect timers when user taps the manual button
+  const fadeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const redirectTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const handleGoHome = useCallback(() => {
+    if (fadeTimerRef.current) clearTimeout(fadeTimerRef.current);
+    if (redirectTimerRef.current) clearTimeout(redirectTimerRef.current);
+    setDismissed(true);
+    clearRoundContext();
+    navigate("/");
+  }, [navigate]);
 
   const roundContext = useMemo(() => loadRoundContext(), []);
+  const latestScore = useMemo(() => {
+    const scores = loadResilienceScores();
+    return scores.length > 0 ? scores[scores.length - 1].score : 50;
+  }, []);
+  const cueWord = useMemo(() => {
+    try { return loadPreferredWords()[0] ?? null; } catch { return null; }
+  }, []);
+  const streak = useMemo(() => getStreakData().currentStreak, []);
+
+  // Schedule a post-round reflection nudge for next app open
+  useEffect(() => { schedulePostRoundPrompt(); }, []);
+
+  // Generate AI round word on mount (non-blocking)
+  useEffect(() => {
+    if (roundWord) return; // Already generated (e.g. from prior load)
+    clearRoundWord();
+    generateRoundWord().then((word) => {
+      setRoundWord(word);
+    }).catch(() => {
+      // Silently ignore — share card still works without word
+    });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   
   // Get highlights from today's round
   const todaysHighlights = useMemo(() => {
@@ -48,22 +89,24 @@ const RoundComplete = () => {
     return bullets;
   }, [roundContext, todaysHighlights]);
 
-  // Auto-redirect to Home after delay
+  // Auto-redirect to Home after delay (cancelled if user taps button)
   useEffect(() => {
-    const fadeTimer = setTimeout(() => {
+    if (dismissed) return;
+
+    fadeTimerRef.current = setTimeout(() => {
       setFadeOut(true);
     }, 3500);
 
-    const redirectTimer = setTimeout(() => {
+    redirectTimerRef.current = setTimeout(() => {
       clearRoundContext();
       navigate("/");
     }, 4500);
 
     return () => {
-      clearTimeout(fadeTimer);
-      clearTimeout(redirectTimer);
+      if (fadeTimerRef.current) clearTimeout(fadeTimerRef.current);
+      if (redirectTimerRef.current) clearTimeout(redirectTimerRef.current);
     };
-  }, [navigate]);
+  }, [dismissed, navigate]);
 
   return (
     <PageShell backgroundVariant="default">
@@ -116,10 +159,28 @@ const RoundComplete = () => {
               ))}
             </div>
 
-            {/* Subtle return indicator */}
-            <div className="pt-6 text-center">
-              <p className="text-xs text-muted-foreground/40 tracking-wide">
-                Returning home...
+            {/* Share card — organic social growth */}
+            <div className="w-full max-w-xs">
+              <ShareRoundCard
+                score={latestScore}
+                cueWord={cueWord}
+                streak={streak}
+                roundWord={roundWord}
+                onDismiss={handleGoHome}
+              />
+            </div>
+
+            {/* Manual continue button + subtle auto-return indicator */}
+            <div className="pt-2 flex flex-col items-center gap-3">
+              <button
+                type="button"
+                onClick={handleGoHome}
+                className="min-h-[44px] w-full max-w-xs rounded-2xl border border-foreground/12 bg-foreground/5 px-6 py-3 text-sm font-medium text-muted-foreground/70 transition-all duration-200 hover:bg-foreground/8 hover:text-foreground/90 active:scale-[0.97]"
+              >
+                Go Home
+              </button>
+              <p className="text-xs text-muted-foreground/35 tracking-wide">
+                Auto-returning in a moment…
               </p>
             </div>
           </div>

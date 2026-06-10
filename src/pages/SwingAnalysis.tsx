@@ -1,6 +1,6 @@
 import { useState, useRef, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Upload, Loader2, Zap } from "lucide-react";
+import { ArrowLeft, Upload, Loader2, Eye } from "lucide-react";
 import { PageShell } from "@/components/PageShell";
 import { AppShell } from "@/components/ui/AppShell";
 import { AppHeader } from "@/components/ui/AppHeader";
@@ -10,28 +10,22 @@ import { streamCoachResponse, type ChatMessage } from "@/lib/mentalCoachApi";
 import { triggerHaptic } from "@/lib/haptics";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
-import { Capacitor, CameraResultType, CameraSource } from "@capacitor/core";
 
-type AnalysisStatus = "idle" | "video-selected" | "analyzing" | "complete" | "error";
+// "Swing Breakdown" — honest version.
+// The AI is NOT doing vision analysis. It reads the golfer's own text description
+// and gives mental coaching back. The video upload is purely for the golfer's
+// own reference while they write their observations.
 
-interface AnalysisResult {
-  tempo: string;
-  preShot: string;
-  bodyLanguage: string;
-  confidence: string;
-  postShot: string;
-}
+type BreakdownStatus = "idle" | "video-selected" | "analyzing" | "complete" | "error";
 
 const SwingAnalysis = () => {
   const navigate = useNavigate();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const videoPreviewRef = useRef<HTMLVideoElement>(null);
 
-  const [status, setStatus] = useState<AnalysisStatus>("idle");
-  const [videoFile, setVideoFile] = useState<File | null>(null);
+  const [status, setStatus] = useState<BreakdownStatus>("idle");
   const [videoPreviewUrl, setVideoPreviewUrl] = useState<string | null>(null);
   const [userObservations, setUserObservations] = useState("");
-  const [analysisResult, setAnalysisResult] = useState<AnalysisResult | null>(null);
   const [streamingText, setStreamingText] = useState("");
   const currentAbortController = useRef<AbortController | null>(null);
 
@@ -40,37 +34,8 @@ const SwingAnalysis = () => {
     currentAbortController.current = null;
   }, []);
 
-  const handleVideoCapture = async () => {
+  const handleVideoCapture = () => {
     triggerHaptic("medium");
-
-    // Try native camera first on iOS/Android
-    if (Capacitor.isNativePlatform()) {
-      try {
-        const Camera = (
-          (Capacitor as unknown as { Plugins?: Record<string, unknown> }).Plugins
-            ?.Camera as
-          | {
-              getPhoto?: (options: {
-                quality: number;
-                resultType: CameraResultType;
-                source: CameraSource;
-              }) => Promise<{ webPath?: string; path?: string }>;
-            }
-          | undefined
-        );
-
-        if (Camera?.getPhoto) {
-          // For native, show file picker or camera options
-          // For simplicity, falling back to file input
-          fileInputRef.current?.click();
-          return;
-        }
-      } catch {
-        // fallback to file input below
-      }
-    }
-
-    // Fall back to file input on web
     fileInputRef.current?.click();
   };
 
@@ -78,61 +43,58 @@ const SwingAnalysis = () => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    // Validate file type
     if (!file.type.startsWith("video/")) {
       toast.error("Please select a video file");
       return;
     }
 
     triggerHaptic("soft");
-    setVideoFile(file);
     setStatus("video-selected");
     setStreamingText("");
-    setAnalysisResult(null);
 
-    // Create preview URL
     const url = URL.createObjectURL(file);
     setVideoPreviewUrl(url);
   };
 
-  const handleAnalyzeSwing = async () => {
+  const handleGetCoaching = async () => {
     if (!userObservations.trim()) {
-      toast.error("Please describe what you notice about your swing");
+      // Scroll the textarea into view and focus it
+      const textarea = document.getElementById("swing-observations-textarea");
+      if (textarea) {
+        textarea.scrollIntoView({ behavior: "smooth", block: "center" });
+        (textarea as HTMLTextAreaElement).focus();
+      }
+      toast.error("Describe what you noticed — even a few words helps");
       return;
     }
 
     triggerHaptic("medium");
     setStatus("analyzing");
     setStreamingText("");
-    setAnalysisResult(null);
 
-    const prompt = `You are an expert mental golf coach analyzing a golfer's swing video. Based on the golfer's observations below, provide detailed mental coaching feedback. Focus ONLY on mental aspects - NOT mechanics:
+    const prompt = `You are an expert mental golf coach. A golfer has just watched their swing and described what they observed. Based on their description, provide detailed mental coaching feedback — focused ONLY on the mental side, not swing mechanics.
 
+Cover these areas based on what they described:
 - Tempo & Rhythm (rushed vs smooth, controlled pace)
 - Pre-Shot Routine (consistency, ritual quality, routine stability)
-- Body Language & Tension (visible tension, confidence in posture, relaxation cues)
+- Body Language & Tension (tension patterns, confidence in posture, relaxation cues)
 - Setup Confidence (trust at address, commitment level, focus quality)
-- Post-Shot Reaction (acceptance vs frustration, composure, moving forward mentally)
+- Post-Shot Reaction (acceptance vs frustration, composure, moving forward)
 
-The golfer reports:
+The golfer described:
 "${userObservations}"
 
-Provide coaching insights for each area. Format your response with these headers:
+Format your response with these exact headers:
 **Tempo & Rhythm:**
 **Pre-Shot Routine:**
 **Body Language & Tension:**
 **Setup Confidence:**
 **Post-Shot Reaction:**
-**Mental Coaching Tip:**
+**Key Mental Focus:**
 
-Be specific, actionable, and encouraging.`;
+Be specific, actionable, and grounded in what they described. Don't invent details they didn't mention.`;
 
-    const messages: ChatMessage[] = [
-      {
-        role: "user",
-        content: prompt,
-      },
-    ];
+    const messages: ChatMessage[] = [{ role: "user", content: prompt }];
 
     currentAbortController.current = new AbortController();
 
@@ -146,13 +108,12 @@ Be specific, actionable, and encouraging.`;
       onDone: () => {
         setStatus("complete");
         currentAbortController.current = null;
-        toast.success("Analysis complete");
+        toast.success("Coaching ready");
       },
       onError: (error) => {
         setStatus("error");
         currentAbortController.current = null;
-        toast.error(error || "Failed to analyze swing");
-        console.error("Analysis error:", error);
+        toast.error(error || "Something went wrong — try again");
       },
     });
   };
@@ -162,17 +123,19 @@ Be specific, actionable, and encouraging.`;
     navigate("/");
   };
 
-  const resetAnalysis = () => {
+  const resetBreakdown = () => {
     triggerHaptic("soft");
-    setVideoFile(null);
     setVideoPreviewUrl(null);
     setUserObservations("");
-    setAnalysisResult(null);
     setStreamingText("");
     setStatus("idle");
-    if (fileInputRef.current) {
-      fileInputRef.current.value = "";
-    }
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  };
+
+  // Allow coaching without a video upload — text-only path
+  const handleSkipVideo = () => {
+    triggerHaptic("soft");
+    setStatus("video-selected");
   };
 
   return (
@@ -192,7 +155,7 @@ Be specific, actionable, and encouraging.`;
             center={
               <div>
                 <h1 className="font-serif text-[23px] leading-tight tracking-wide text-[var(--text-0)]">
-                  Swing Analysis
+                  Swing Breakdown
                 </h1>
                 <p className="truncate text-[11px] uppercase tracking-[0.14em] text-[var(--text-1)]">
                   Mental coaching
@@ -207,20 +170,19 @@ Be specific, actionable, and encouraging.`;
           {/* Info Card */}
           <GlassCard className="p-4">
             <div className="flex gap-3">
-              <Zap className="h-5 w-5 shrink-0 text-[var(--sand-0)]" />
+              <Eye className="h-5 w-5 shrink-0 text-[var(--sand-0)]" />
               <div className="space-y-1">
                 <p className="text-sm font-medium text-[var(--text-0)]">
-                  Mental Swing Analysis
+                  Describe your swing. Get mental coaching.
                 </p>
                 <p className="text-xs text-[var(--text-1)]">
-                  We analyze tempo, routine, body language, confidence, and composure — not
-                  mechanics.
+                  Watch your swing, note what you observe — tempo, routine, tension, commitment — then your coach gives you mental feedback based on your description.
                 </p>
               </div>
             </div>
           </GlassCard>
 
-          {/* Video Upload Section */}
+          {/* Video Upload Section (optional) */}
           {status === "idle" && (
             <div className="space-y-4">
               <button
@@ -231,10 +193,10 @@ Be specific, actionable, and encouraging.`;
                   <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[rgba(203,184,146,0.2)]">
                     <Upload className="h-6 w-6 text-[var(--sand-0)]" />
                   </div>
-                  <div className="space-y-1">
-                    <p className="font-medium text-[var(--text-0)]">Upload or record a swing</p>
+                  <div className="space-y-1 text-center">
+                    <p className="font-medium text-[var(--text-0)]">Upload a swing video to review</p>
                     <p className="text-xs text-[var(--text-1)]">
-                      Select from camera roll or record a new video
+                      Watch it back, then describe what you notice below
                     </p>
                   </div>
                 </div>
@@ -248,13 +210,22 @@ Be specific, actionable, and encouraging.`;
                 className="hidden"
               />
 
-              <p className="text-center text-xs text-[var(--text-1)] opacity-60">
-                Video should be 15–60 seconds and show your full swing from address to finish
-              </p>
+              <div className="flex items-center gap-3">
+                <div className="flex-1 border-t border-[rgba(255,255,255,0.08)]" />
+                <p className="text-xs text-[var(--text-1)] opacity-50">or</p>
+                <div className="flex-1 border-t border-[rgba(255,255,255,0.08)]" />
+              </div>
+
+              <button
+                onClick={handleSkipVideo}
+                className="calm-pro-press w-full rounded-2xl border border-[rgba(203,184,146,0.15)] bg-[rgba(203,184,146,0.05)] px-5 py-4 text-center text-sm text-[var(--text-1)] transition-all hover:bg-[rgba(203,184,146,0.08)]"
+              >
+                Skip video — describe from memory
+              </button>
             </div>
           )}
 
-          {/* Video Selected & Analysis Form */}
+          {/* Observation form + results */}
           {(status === "video-selected" || status === "analyzing" || status === "complete") && (
             <div className="space-y-5">
               {/* Video Preview */}
@@ -267,6 +238,9 @@ Be specific, actionable, and encouraging.`;
                     className="w-full rounded-2xl bg-black"
                     style={{ maxHeight: "300px" }}
                   />
+                  <p className="px-4 py-2 text-center text-[10px] uppercase tracking-[0.14em] text-[var(--text-1)] opacity-50">
+                    Watch your swing, then describe what you notice below
+                  </p>
                 </GlassCard>
               )}
 
@@ -274,16 +248,16 @@ Be specific, actionable, and encouraging.`;
               {status !== "complete" && (
                 <div className="space-y-3">
                   <label className="block text-sm font-medium text-[var(--text-0)]">
-                    What do you notice about your swing?
+                    What did you notice?
                   </label>
                   <p className="text-xs text-[var(--text-1)]">
-                    Describe your observations: Did the tempo feel rushed or smooth? Was your
-                    routine consistent? Notice any tension? Did you trust your setup?
+                    Focus on feel and mental state, not mechanics. Did the tempo feel rushed? Was your routine consistent? Did you trust the shot? Any tension in your setup?
                   </p>
                   <textarea
+                    id="swing-observations-textarea"
                     value={userObservations}
                     onChange={(e) => setUserObservations(e.target.value)}
-                    placeholder="I felt rushed on my takeaway but stayed committed to my target..."
+                    placeholder="I felt rushed on my takeaway, didn't fully commit to the target, felt a little tight in my shoulders..."
                     disabled={status === "analyzing"}
                     className={cn(
                       "w-full rounded-xl border border-[rgba(203,184,146,0.2)] bg-[rgba(5,8,7,0.5)] p-3 text-sm text-[var(--text-0)] placeholder-[var(--text-1)] focus:outline-none focus:ring-2 focus:ring-[var(--sand-0)]",
@@ -294,14 +268,14 @@ Be specific, actionable, and encouraging.`;
                 </div>
               )}
 
-              {/* Analysis Results */}
+              {/* Streaming Results */}
               {status === "complete" && streamingText && (
                 <GlassCard className="space-y-4 p-5">
                   <div className="space-y-3 whitespace-pre-wrap text-sm leading-6 text-[var(--text-0)]">
                     {streamingText.split("\n").map((line, idx) => (
                       <div key={idx}>
                         {line.startsWith("**") && line.endsWith("**") ? (
-                          <p className="font-semibold text-[var(--sand-0)]">{line}</p>
+                          <p className="font-semibold text-[var(--sand-0)]">{line.replaceAll("**", "")}</p>
                         ) : (
                           <p>{line}</p>
                         )}
@@ -311,11 +285,11 @@ Be specific, actionable, and encouraging.`;
                 </GlassCard>
               )}
 
-              {/* Loading State */}
+              {/* Loading */}
               {status === "analyzing" && (
                 <GlassCard className="flex flex-col items-center gap-3 p-6">
                   <Loader2 className="h-5 w-5 animate-spin text-[var(--sand-0)]" />
-                  <p className="text-sm text-[var(--text-1)]">Analyzing your swing…</p>
+                  <p className="text-sm text-[var(--text-1)]">Writing your coaching…</p>
                 </GlassCard>
               )}
 
@@ -331,38 +305,42 @@ Be specific, actionable, and encouraging.`;
                   <>
                     <PillButton
                       tone="green"
-                      onClick={handleAnalyzeSwing}
+                      onClick={handleGetCoaching}
                       className="w-full"
                       disabled={!userObservations.trim()}
                     >
-                      Analyze My Swing
+                      Get Mental Coaching
                     </PillButton>
-                    <PillButton tone="sand" onClick={resetAnalysis} className="w-full">
-                      Choose Different Video
-                    </PillButton>
+                    {videoPreviewUrl && (
+                      <PillButton tone="sand" onClick={resetBreakdown} className="w-full">
+                        Choose Different Video
+                      </PillButton>
+                    )}
                   </>
                 )}
 
                 {status === "complete" && (
                   <>
-                    <PillButton
-                      tone="green"
-                      onClick={resetAnalysis}
-                      className="w-full"
-                    >
-                      Analyze Another Swing
+                    <PillButton tone="green" onClick={resetBreakdown} className="w-full">
+                      New Breakdown
                     </PillButton>
-                    <PillButton
-                      tone="sand"
-                      onClick={handleBackClick}
-                      className="w-full"
-                    >
+                    <PillButton tone="sand" onClick={handleBackClick} className="w-full">
                       Back to Home
                     </PillButton>
                   </>
                 )}
               </div>
             </div>
+          )}
+
+          {/* Error state */}
+          {status === "error" && (
+            <GlassCard className="flex flex-col items-center gap-3 p-6 text-center">
+              <p className="text-sm text-[var(--text-0)]">Something went wrong. Your description is still there.</p>
+              <PillButton tone="green" onClick={handleGetCoaching} className="w-full">
+                Try Again
+              </PillButton>
+            </GlassCard>
           )}
         </div>
       </AppShell>

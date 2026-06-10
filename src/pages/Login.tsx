@@ -185,7 +185,7 @@ const Login = () => {
             className="text-2xl md:text-3xl font-serif text-white tracking-wide mb-1 text-center animate-fade-in"
             style={{ animationDelay: "100ms" }}
           >
-            Your Mental Coach
+            The Caddie
           </h1>
 
           {/* Credibility tagline */}

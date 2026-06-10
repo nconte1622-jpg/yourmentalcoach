@@ -2,6 +2,43 @@ import { useEffect, useRef, useState } from "react";
 import { GlassCard } from "@/components/ui/glass-card";
 import { useMentalHandicap } from "@/hooks/useMentalHandicap";
 import { cn } from "@/lib/utils";
+import { Info } from "lucide-react";
+import { MentalHandicapBadge } from "@/components/MentalHandicapBadge";
+
+/** Tap-to-reveal tooltip explaining the Mental Handicap score */
+function MentalHandicapTooltip() {
+  const [open, setOpen] = useState(false);
+  return (
+    <div className="relative inline-flex">
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        className="ml-1 inline-flex h-4 w-4 items-center justify-center rounded-full text-[var(--text-1)] opacity-50 hover:opacity-90 transition-opacity"
+        aria-label="What is the Mental Handicap?"
+      >
+        <Info className="h-3 w-3" />
+      </button>
+      {open && (
+        <>
+          <div className="fixed inset-0 z-[60]" onClick={() => setOpen(false)} />
+          <div className="absolute bottom-full left-1/2 z-[70] mb-2 w-[230px] -translate-x-1/2 rounded-2xl border border-[rgba(203,184,146,0.18)] bg-[rgba(9,19,15,0.97)] p-3.5 shadow-[0_12px_36px_rgba(0,0,0,0.5)] backdrop-blur-xl animate-fade-in">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--sand-0)] mb-2">Mental Handicap</p>
+            <p className="text-xs leading-5 text-[var(--text-1)]">
+              A score from 0–100 measuring your mental consistency across rounds. Higher is better. It grows as you complete more rounds, use emotion check-ins, and practice resets. Strong = 75+, Building = 50–74.
+            </p>
+            <button
+              type="button"
+              onClick={() => setOpen(false)}
+              className="mt-2 w-full rounded-xl bg-white/6 py-1.5 text-xs text-[var(--text-1)] hover:bg-white/10 transition-colors"
+            >
+              Got it
+            </button>
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
 
 function TrendArrow({ trend }: { trend: "up" | "down" | "neutral" }) {
   if (trend === "up") {
@@ -87,29 +124,19 @@ export function MentalHandicapWidget({ refreshKey }: { refreshKey?: number } = {
         </div>
       ) : !loading ? (
         <div className="flex items-center gap-5">
-          {/* Score display */}
-          <div className="relative flex flex-col items-center justify-center">
-            {/* Subtle ring */}
-            <div className="absolute inset-0 -m-1 rounded-2xl border border-[rgba(203,184,146,0.12)]" />
-            <div className="flex h-[60px] w-[60px] flex-col items-center justify-center rounded-2xl bg-[rgba(18,64,47,0.55)]">
-              <span
-                className={cn(
-                  "font-serif text-[28px] leading-none tracking-tight text-[var(--text-0)]",
-                  "tabular-nums"
-                )}
-              >
-                <AnimatedNumber target={score} loading={loading} />
-              </span>
-            </div>
+          {/* Score badge — Whoop-style ring with progress arc */}
+          <div className="relative shrink-0">
+            <MentalHandicapBadge score={loading ? 0 : score} size={64} variant="score" />
           </div>
 
           {/* Labels */}
           <div className="flex flex-1 flex-col gap-1">
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1.5">
               <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[var(--sand-0)]">
                 Mental Handicap
               </p>
               <TrendArrow trend={trend} />
+              <MentalHandicapTooltip />
             </div>
             <div className="flex items-baseline gap-1">
               <span className="font-serif text-[15px] text-[var(--text-0)]">{score}</span>

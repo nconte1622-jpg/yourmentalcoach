@@ -32,6 +32,8 @@ import { appendEmotionTap, markUsedPreShotReset } from "@/lib/roundMetrics";
 import { useCheckIn } from "@/hooks/useCheckIn";
 import { CheckInCard } from "@/components/CheckInCard";
 import { PreShotReset } from "@/components/PreShotReset";
+import { GpsHoleCheckIn } from "@/components/GpsHoleCheckIn";
+import { startGpsTracking, stopGpsTracking, resetGpsTracking } from "@/lib/gpsRoundTracker";
 import { RoundBriefingCard } from "@/components/RoundBriefingCard";
 import { HoleMoodTracker } from "@/components/HoleMoodTracker";
 import { clearHoleMoods, getHoleMoods, type HoleMood } from "@/lib/holeMoods";
@@ -87,6 +89,12 @@ const Round = () => {
   const [holeTipInfo, setHoleTipInfo] = useState<{ hole: number; course: string } | null>(null);
   const [preShotOpen, setPreShotOpen] = useState(false);
   const [revealData, setRevealData] = useState<{ moods: HoleMood[]; roundId: string } | null>(null);
+  // GPS Smart Round Mode
+  const [gpsEnabled] = useState<boolean>(() => {
+    try { return localStorage.getItem("caddie-gps-mode") === "true"; } catch { return false; }
+  });
+  const [gpsCheckInVisible, setGpsCheckInVisible] = useState(false);
+  const [gpsHoleNumber, setGpsHoleNumber] = useState(1);
   const backendLabel = getAiBackendLabel();
   const showBackendLabel = showAiBackendIndicator();
   const coachEnabled = Boolean(import.meta.env.VITE_COACH_API_URL);
@@ -226,6 +234,24 @@ const Round = () => {
       cancelled = true;
     };
   }, []);
+
+  // GPS Smart Round Mode — start/stop tracking lifecycle
+  useEffect(() => {
+    if (!gpsEnabled) return;
+
+    resetGpsTracking();
+    startGpsTracking({
+      onHoleTransition: (estimatedHole) => {
+        setGpsHoleNumber(estimatedHole);
+        setGpsCheckInVisible(true);
+        triggerHaptic("medium");
+      },
+    });
+
+    return () => {
+      stopGpsTracking();
+    };
+  }, [gpsEnabled]);
 
   const finalizeEndRound = useCallback(async () => {
     if (!activeRoundId) {
@@ -638,7 +664,11 @@ const Round = () => {
             </div>
           )}
           
-          <LRMModesModal open={lrmModalOpen} onOpenChange={setLrmModalOpen} />
+          <LRMModesModal
+            open={lrmModalOpen}
+            onOpenChange={setLrmModalOpen}
+            onCloseStrongUpgrade={() => setShowUpgradeModal(true)}
+          />
           
           <ChatInput
             onSend={handleSendMessage}
@@ -788,6 +818,13 @@ const Round = () => {
           onContinue={handleRevealContinue}
         />
       )}
+
+      {/* GPS Smart Round Mode — hole transition check-in */}
+      <GpsHoleCheckIn
+        holeNumber={gpsHoleNumber}
+        visible={gpsCheckInVisible}
+        onDismiss={() => setGpsCheckInVisible(false)}
+      />
       </div>
     </PageShell>
   );

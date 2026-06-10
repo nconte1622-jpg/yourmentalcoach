@@ -43,7 +43,9 @@ const Onboarding = () => {
       return;
     }
     completeOnboarding();
-    navigate("/round-setup");
+    // Send new users to Master Quiz first so the AI has real context from round 1.
+    // Pass state so MasterQuiz knows to redirect to /round-setup after saving.
+    navigate("/master-quiz", { state: { fromOnboarding: true } });
   };
 
   return (
@@ -94,7 +96,7 @@ const Onboarding = () => {
                 </p>
               </div>
               <Button onClick={handleNext} className="min-h-11 w-full rounded-2xl">
-                {stepIndex === STEPS.length - 1 ? "Start first round" : "Continue"}
+                {stepIndex === STEPS.length - 1 ? "Set Up Your Profile" : "Continue"}
               </Button>
             </FrostedSandCard>
           </div>

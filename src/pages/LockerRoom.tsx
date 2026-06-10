@@ -82,14 +82,40 @@ const LockerRoomPage = () => {
     // Extract the single emphasized cue word
     const cueWords = extractCueWords(reflection);
     const cueWord = cueWords[0] || "focus";
-    
+
     // Infer context tag from the moment description
     const contextTag = inferContextTag(momentInput);
-    
-    // Create a forward-looking mental rule from the cue word
-    // This transforms the insight into actionable, future-facing language
-    const mentalRule = `Next time: ${cueWord}.`;
-    
+
+    // Build a meaningful mental rule from the full reflection text.
+    // Strip cue-word syntax tags, grab the most useful sentence (the
+    // REFRAME or NEXT ACTION line), and make it forward-facing.
+    // Falls back to a cue-based rule if parsing fails.
+    let mentalRule = `When it matters, ${cueWord}.`;
+    try {
+      // Remove {{focus:word}} / {{calm:word}} markup for plain text
+      const plainReflection = reflection.replace(/{{(?:focus|calm):([^}]+)}}/g, "$1");
+      const sentences = plainReflection
+        .split(/[.!?\n]+/)
+        .map((s) => s.trim())
+        .filter((s) => s.length > 20 && s.length < 180);
+
+      // Prefer the last substantive sentence — it's usually the ACTION line
+      if (sentences.length > 0) {
+        const candidate = sentences[sentences.length - 1];
+        // Make it forward-facing if it isn't already
+        if (/^(next|for|when|before|after|on|keep|stay|use|pick|trust|commit|breathe|reset|let|see|slow|be)/i.test(candidate)) {
+          mentalRule = candidate.endsWith(".") ? candidate : candidate + ".";
+        } else if (sentences.length > 1) {
+          const secondLast = sentences[sentences.length - 2];
+          mentalRule = secondLast.endsWith(".") ? secondLast : secondLast + ".";
+        } else {
+          mentalRule = candidate.endsWith(".") ? candidate : candidate + ".";
+        }
+      }
+    } catch {
+      /* silent — fall back to cue-based rule */
+    }
+
     return { cueWord, mentalRule, contextTag };
   }, [reflection, momentInput]);
 

@@ -2,6 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { App } from "@capacitor/app";
 import { loadHighlights, loadPreferredWords } from "@/lib/memoryStorage";
+import { loadGolferProfile } from "@/lib/golferProfile";
 import {
   Sparkles,
   Timer,
@@ -38,8 +39,52 @@ import { loadActiveRoundSession } from "@/lib/roundSession";
 import { ActiveRoundResumeChip } from "@/components/ui/ActiveRoundResumeChip";
 import { cn } from "@/lib/utils";
 import { getStreakData, streakLabel, type StreakData } from "@/lib/streakStorage";
+import { DailyCheckIn } from "@/components/DailyCheckIn";
+import { loadPreferredWords as loadCueWords } from "@/lib/memoryStorage";
 
-const TODAY_FOCUS_TEXT = "One committed decision at a time.";
+// Daily focus rotates through a curated 30-item library keyed to day-of-year.
+// This keeps the habit loop alive — same phrase every day kills engagement.
+const DAILY_FOCUSES = [
+  "One committed decision at a time.",
+  "Pick the target. Trust the swing. Accept the result.",
+  "Stay in the present shot. Nothing before it matters.",
+  "Breathe once before every swing. Then commit.",
+  "Your job is process, not outcome.",
+  "Quiet mind, clear target, full swing.",
+  "Let the last shot go. This one is all that exists.",
+  "Slow down the walk. Speed up the commitment.",
+  "Play the course, not the scoreboard.",
+  "Grip soft. Swing free. Trust it.",
+  "One cue word. One target. One swing.",
+  "Reset after every hole. Start clean.",
+  "Energy follows attention. Point it forward.",
+  "See the shot before you hit it.",
+  "Confidence is a choice you make before the swing.",
+  "Be aggressive to the target, not to the result.",
+  "Fairway or rough — you recover the same way.",
+  "Nerves mean you care. Channel that.",
+  "Walk slower. Think less. Commit more.",
+  "Shoulders down. Target in. Let it go.",
+  "The score will take care of itself. Focus on the process.",
+  "Every hole is a fresh start. Use it.",
+  "Stay curious about the challenge, not afraid of it.",
+  "One deep breath is the most powerful reset.",
+  "Trust what you've built in practice.",
+  "Make a decision and commit fully. Doubt costs strokes.",
+  "Simple swing thought. One target. No hesitation.",
+  "Play within yourself. That's where the good shots live.",
+  "The only shot you control is the next one.",
+  "When it gets hard, get quieter.",
+] as const;
+
+function getDailyFocusText(): string {
+  const dayOfYear = Math.floor(
+    (Date.now() - new Date(new Date().getFullYear(), 0, 0).getTime()) / 86400000
+  );
+  return DAILY_FOCUSES[dayOfYear % DAILY_FOCUSES.length];
+}
+
+const TODAY_FOCUS_TEXT = getDailyFocusText();
 const PAGE_LABELS = ["Today", "Play", "Finish"] as const;
 const HOME_TUTORED_KEY = "home-swipe-tutored-v1";
 
@@ -64,6 +109,7 @@ const Home = () => {
   const [hasLocalMemory, setHasLocalMemory] = useState(false);
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   const [dailyFocusLocked, setDailyFocusLocked] = useState(false);
+  const [hasGolferProfile, setHasGolferProfile] = useState(true); // optimistic
   const [activePage, setActivePage] = useState(0);
   const [widgetRefreshKey, setWidgetRefreshKey] = useState(0);
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -125,9 +171,12 @@ const Home = () => {
     const preferredWords = loadPreferredWords();
     const savedFocus = getDailyFocus();
     const persistedRound = loadActiveRoundSession();
+    const golferProfile = loadGolferProfile();
     setHasHighlights(highlights.length > 0);
     setHasLocalMemory(highlights.length > 0 || preferredWords.length > 0);
     setDailyFocusLocked(savedFocus?.text === TODAY_FOCUS_TEXT);
+    // Show profile CTA if the golfer hasn't completed the Master Quiz
+    setHasGolferProfile(Boolean(golferProfile?.firstName?.trim()));
     setActiveRoundSummary(
       persistedRound
         ? {
@@ -235,7 +284,7 @@ const Home = () => {
                 center={
                   <div>
                     <h1 className="truncate font-serif text-[23px] leading-tight tracking-wide text-[var(--text-0)]">
-                      Your Mental Coach
+                      The Caddie
                     </h1>
                     <p className="truncate text-[11px] uppercase tracking-[0.14em] text-[var(--text-1)]">
                       Focus · Commit · Trust
@@ -323,6 +372,13 @@ const Home = () => {
                 </div>
               </GlassCard>
 
+              {/* Daily Check-In — 30-second mental ritual, drives daily opens */}
+              <DailyCheckIn
+                savedCueWord={(() => {
+                  try { return loadCueWords()[0] ?? null; } catch { return null; }
+                })()}
+              />
+
               {/* Pattern Insight */}
               <GlassCard className="calm-pro-mount p-5">
                 {hasPatternAccess && patternSummary ? (
@@ -360,6 +416,27 @@ const Home = () => {
                   </div>
                 )}
               </GlassCard>
+
+              {/* Master Quiz CTA — only shown when golfer profile is not set up */}
+              {!hasGolferProfile && (
+                <button
+                  onClick={() => withTap("/master-quiz")}
+                  className="calm-pro-focus calm-pro-press calm-pro-mount group block w-full"
+                >
+                  <GlassCard className="min-h-11 p-5 border-[rgba(203,184,146,0.25)]">
+                    <div className="flex items-center gap-3.5">
+                      <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border border-[rgba(203,184,146,0.3)] bg-[rgba(203,184,146,0.12)] text-[var(--sand-0)]">
+                        <Target className="h-5 w-5" />
+                      </div>
+                      <div className="min-w-0 flex-1 text-left">
+                        <p className="font-serif text-xl text-[var(--text-0)]">Set Up Your Profile</p>
+                        <p className="text-sm text-[var(--sand-0)] opacity-80">Tell your coach about your game — personalizes every response.</p>
+                      </div>
+                      <ChevronRight className="h-5 w-5 text-[var(--sand-0)] opacity-70" />
+                    </div>
+                  </GlassCard>
+                </button>
+              )}
 
               {/* Quick Coach */}
               <button
@@ -430,7 +507,7 @@ const Home = () => {
             {/* Top label */}
             <div className="absolute left-0 right-0 top-[max(60px,env(safe-area-inset-top))] flex justify-center">
               <span className="text-[10px] uppercase tracking-[0.3em] text-[var(--sand-0)] opacity-60">
-                Your Mental Coach
+                The Caddie
               </span>
             </div>
 
@@ -512,7 +589,7 @@ const Home = () => {
             {/* Top label */}
             <div className="absolute left-0 right-0 top-[max(60px,env(safe-area-inset-top))] flex justify-center">
               <span className="text-[10px] uppercase tracking-[0.3em] text-[var(--sand-0)] opacity-60">
-                Your Mental Coach
+                The Caddie
               </span>
             </div>
 

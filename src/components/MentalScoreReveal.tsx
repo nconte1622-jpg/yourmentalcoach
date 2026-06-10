@@ -191,7 +191,7 @@ export function MentalScoreReveal({ moods, onContinue }: MentalScoreRevealProps)
       total > 0 ? `Locked in for ${locked} of ${total} holes.` : "",
       insight1,
       "",
-      "Tracked with Your Mental Coach.",
+      "Tracked with The Caddie.",
     ].filter(Boolean).join("\n");
 
     if (typeof navigator !== "undefined" && navigator.share) {

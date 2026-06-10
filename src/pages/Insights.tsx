@@ -12,6 +12,7 @@ import { ActiveRoundResumeChip } from "@/components/ui/ActiveRoundResumeChip";
 import { ResilienceTrendChart } from "@/components/ResilienceTrendChart";
 import { MentalCoachRatingCard } from "@/components/MentalCoachRatingCard";
 import { loadResilienceScores } from "@/lib/resilienceScore";
+import { MentalHandicapChart } from "@/components/MentalHandicapChart";
 
 /** Small tap-to-reveal tooltip for section headers */
 function SectionTooltip({ text }: { text: string }) {
@@ -90,28 +91,42 @@ const Insights = () => {
                 <p className="text-xs uppercase tracking-[0.18em] text-primary/70">Pattern Intelligence</p>
                 <SectionTooltip text="Pattern Intelligence reads across all your rounds to find your emotional triggers, what cue words work best for you, and how you typically recover from setbacks." />
               </div>
-              <p className="text-sm readable-on-sand">
-                Complete <span className="font-medium">{Math.max(0, 3 - eligibleRoundCount)} more structured round{Math.max(0, 3 - eligibleRoundCount) !== 1 ? "s" : ""}</span> to unlock your personal pattern analysis — free.
-              </p>
-              <p className="text-xs" style={{ color: "var(--muted-ink)" }}>
-                After 3 rounds with post-round reflections, you'll see your emotional triggers, recovery patterns, and most effective mental cues.
-              </p>
-              <div className="flex items-center gap-2 pt-1">
-                {[0, 1, 2].map((i) => (
-                  <div
-                    key={i}
-                    className="h-2 flex-1 rounded-full transition-all duration-300"
-                    style={{
-                      background: i < eligibleRoundCount
-                        ? "rgba(132,204,22,0.7)"
-                        : "rgba(132,204,22,0.12)",
-                    }}
-                  />
-                ))}
-                <span className="text-xs text-[var(--text-1)] opacity-50 ml-1">
-                  {eligibleRoundCount}/3
-                </span>
-              </div>
+              {isPro ? (
+                <>
+                  <p className="text-sm readable-on-sand">
+                    Complete <span className="font-medium">{Math.max(0, 3 - eligibleRoundCount)} more round{Math.max(0, 3 - eligibleRoundCount) !== 1 ? "s" : ""} with post-round reflections</span> to unlock your personal pattern analysis.
+                  </p>
+                  <p className="text-xs" style={{ color: "var(--muted-ink)" }}>
+                    After 3 structured rounds, you'll see your emotional triggers, recovery patterns, and most effective mental cues.
+                  </p>
+                  <div className="flex items-center gap-2 pt-1">
+                    {[0, 1, 2].map((i) => (
+                      <div
+                        key={i}
+                        className="h-2 flex-1 rounded-full transition-all duration-300"
+                        style={{
+                          background: i < eligibleRoundCount
+                            ? "rgba(132,204,22,0.7)"
+                            : "rgba(132,204,22,0.12)",
+                        }}
+                      />
+                    ))}
+                    <span className="text-xs text-[var(--text-1)] opacity-50 ml-1">
+                      {eligibleRoundCount}/3
+                    </span>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <p className="text-sm readable-on-sand">
+                    Pattern Intelligence is a <span className="font-medium">Pro feature</span>. Upgrade to unlock emotional trigger detection, recovery patterns, and your most effective mental cues — built from your real rounds.
+                  </p>
+                  <Button variant="outline" className="mt-1 rounded-2xl" onClick={() => navigate("/upgrade")}>
+                    <Sparkles className="mr-2 h-4 w-4" />
+                    Unlock Pro
+                  </Button>
+                </>
+              )}
             </FrostedSandCard>
           )}
 
@@ -120,6 +135,9 @@ const Insights = () => {
               <p className="text-sm" style={{ color: "var(--ink-1)" }}>Analyzing your rounds...</p>
             </FrostedSandCard>
           )}
+
+          {/* Mental Handicap Progress Chart — visible to all, motivates upgrades */}
+          <MentalHandicapChart maxRounds={20} />
 
           {/* Mental Coach Rating — Pro only */}
           {isPro && (

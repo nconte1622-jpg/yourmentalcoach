@@ -9,7 +9,7 @@ export type FeatureFlags = {
   unlimited_ai: boolean;
 };
 
-export const FREE_AI_MESSAGES_PER_ROUND = 8;
+export const FREE_AI_MESSAGES_PER_ROUND = 15;
 export const FREE_PATTERN_DETECTION_ROUNDS = 3;
 
 export function useFeatureFlags() {

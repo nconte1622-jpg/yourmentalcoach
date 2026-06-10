@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { ArrowLeft, ArrowRight, Check, Target, Brain, Flame, Trophy } from "lucide-react";
 import { PageShell } from "@/components/PageShell";
 import { triggerHaptic } from "@/lib/haptics";
@@ -165,6 +165,10 @@ function TextInput({
    ═════════════════════════════════════════════ */
 export default function MasterQuiz() {
   const navigate = useNavigate();
+  const location = useLocation();
+  // If we came here from onboarding, go to round-setup after saving so the
+  // user immediately starts their first round with a fully-populated profile.
+  const fromOnboarding = (location.state as { fromOnboarding?: boolean } | null)?.fromOnboarding === true;
   const [currentStep, setCurrentStep] = useState(0);
   const [profile, setProfile] = useState<GolferProfile>({ ...DEFAULT_PROFILE });
   const [heightFeet, setHeightFeet] = useState<number | null>(null);
@@ -192,7 +196,8 @@ export default function MasterQuiz() {
       finalProfile.quizVersion = 1;
       saveGolferProfile(finalProfile);
       toast.success("Profile saved! Your coach now knows you.");
-      navigate("/", { replace: true });
+      // From onboarding → go start the first round. Otherwise go home.
+      navigate(fromOnboarding ? "/round-setup" : "/", { replace: true });
     }
   };
 

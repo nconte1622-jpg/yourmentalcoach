@@ -3,21 +3,34 @@ import { useNavigate } from "react-router-dom";
 import { Dialog, DialogContent, DialogOverlay } from "@/components/ui/dialog";
 import { triggerHaptic } from "@/lib/haptics";
 import { cn } from "@/lib/utils";
+import { useProStatus } from "@/hooks/useProStatus";
 
 interface LRMModesModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  /** Called when the user taps Close Strong but isn't Pro — lets the parent show the upgrade modal */
+  onCloseStrongUpgrade?: () => void;
 }
 
 type SelectedMode = "coach" | "reset" | "close-strong" | null;
 
-export function LRMModesModal({ open, onOpenChange }: LRMModesModalProps) {
+export function LRMModesModal({ open, onOpenChange, onCloseStrongUpgrade }: LRMModesModalProps) {
   const navigate = useNavigate();
+  const { isPro } = useProStatus();
   const [selectedMode, setSelectedMode] = useState<SelectedMode>(null);
   const [isTransitioning, setIsTransitioning] = useState(false);
 
   const handleModeSelect = useCallback((mode: SelectedMode) => {
     if (!mode) return;
+
+    // Close Strong is Pro-only — gate it consistently here too
+    if (mode === "close-strong" && !isPro) {
+      triggerHaptic("soft");
+      onOpenChange(false);
+      onCloseStrongUpgrade?.();
+      return;
+    }
+
     triggerHaptic("medium");
     setSelectedMode(mode);
     setIsTransitioning(true);
@@ -32,7 +45,7 @@ export function LRMModesModal({ open, onOpenChange }: LRMModesModalProps) {
         setIsTransitioning(false);
       }, 100);
     }, 500);
-  }, [navigate, onOpenChange]);
+  }, [isPro, navigate, onCloseStrongUpgrade, onOpenChange]);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -166,8 +179,16 @@ export function LRMModesModal({ open, onOpenChange }: LRMModesModalProps) {
                 </p>
               </div>
             </div>
-            <div className="absolute right-6 top-1/2 -translate-y-1/2 text-white/25 group-hover:text-white/40 transition-colors">
-              →
+            {!isPro && (
+              <span className="absolute top-3 right-3 rounded-full border border-[rgba(203,184,146,0.4)] bg-[rgba(203,184,146,0.12)] px-2 py-0.5 text-[9px] font-bold uppercase tracking-[0.14em] text-[rgba(203,184,146,0.85)]">
+                Pro
+              </span>
+            )}
+            <div className={cn(
+              "absolute right-6 top-1/2 -translate-y-1/2 transition-colors",
+              isPro ? "text-white/25 group-hover:text-white/40" : "text-white/15"
+            )}>
+              {isPro ? "→" : "🔒"}
             </div>
           </button>
 

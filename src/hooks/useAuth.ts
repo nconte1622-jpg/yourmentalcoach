@@ -114,7 +114,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         provider,
         options: {
           // Deep-link scheme so iOS can return to the app after OAuth
-          redirectTo: "com.nconte.yourmentalcoach://auth/callback",
+          redirectTo: "com.nconte.thecaddie://auth/callback",
           skipBrowserRedirect: true,
         },
       });

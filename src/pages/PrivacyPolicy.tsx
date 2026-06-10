@@ -38,7 +38,7 @@ const PrivacyPolicy = () => {
             </div>
             <h1 className="legal-hero-title text-4xl md:text-5xl">Privacy Policy</h1>
             <p className="legal-subtitle max-w-2xl">
-              How Your Mental Coach uses and protects your information.
+              How The Caddie uses and protects your information.
             </p>
           </div>
 
@@ -46,7 +46,7 @@ const PrivacyPolicy = () => {
             <div className="space-y-3">
               <p className="legal-body font-medium">Last updated: {LEGAL_LAST_UPDATED}</p>
               <p className="legal-body">
-                Your Mental Coach (&ldquo;we&rdquo;, &ldquo;our&rdquo;, or &ldquo;us&rdquo;) provides a mental-performance coaching app for golfers.
+                The Caddie (&ldquo;we&rdquo;, &ldquo;our&rdquo;, or &ldquo;us&rdquo;) provides a mental-performance coaching app for golfers.
               </p>
             </div>
 
@@ -103,12 +103,12 @@ const PrivacyPolicy = () => {
                 <li>Cancel subscriptions through your Apple account</li>
                 <li>Request account deletion by contacting support</li>
               </ul>
-              <p className="legal-body">Support contact: support@yourmentalcoach.com</p>
+              <p className="legal-body">Support contact: support@thecaddie.app</p>
             </section>
 
             <section className="space-y-3">
               <h2 className="legal-section-title">7. Children</h2>
-              <p className="legal-body">Your Mental Coach is not intended for children under 13.</p>
+              <p className="legal-body">The Caddie is not intended for children under 13.</p>
             </section>
 
             <section className="space-y-3">

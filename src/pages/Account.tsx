@@ -72,7 +72,7 @@ const Account = () => {
     }
     setIsConfirmingDelete(false);
     window.location.href =
-      "mailto:support@yourmentalcoach.com?subject=Delete%20Account%20Request&body=Please%20delete%20my%20account%20and%20associated%20data.";
+      "mailto:support@thecaddie.app?subject=Delete%20Account%20Request&body=Please%20delete%20my%20account%20and%20associated%20data.";
   }, [isConfirmingDelete]);
 
   const handleOpenPrivacy = useCallback(async () => {
@@ -482,7 +482,7 @@ const Account = () => {
 
             <div className="text-center pt-4">
               <p className="text-xs text-muted-foreground/50">
-                Need help? Contact support@yourmentalcoach.com
+                Need help? Contact support@thecaddie.app
               </p>
             </div>
           </div>

@@ -34,6 +34,8 @@ import AuthCallback from "./pages/AuthCallback";
 import MasterQuiz from "./pages/MasterQuiz";
 import SwingAnalysis from "./pages/SwingAnalysis";
 import Scorecard from "./pages/Scorecard";
+import Terms from "./pages/TermsOfService";
+import Privacy from "./pages/PrivacyPolicy";
 import { ScrollToTop } from "./components/ScrollToTop";
 import NotFound from "./pages/NotFound";
 
@@ -98,6 +100,8 @@ function AppRoutes({ showSplash, onSplashComplete }: { showSplash: boolean; onSp
           <Route path="/swing-analysis" element={<ProtectedRoute><SwingAnalysis /></ProtectedRoute>} />
           <Route path="/upgrade" element={<ProtectedRoute><Upgrade /></ProtectedRoute>} />
           <Route path="/upgrade-success" element={<ProtectedRoute><UpgradeSuccess /></ProtectedRoute>} />
+          <Route path="/terms" element={<Terms />} />
+          <Route path="/privacy" element={<Privacy />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
@@ -129,6 +133,8 @@ const App = () => {
 
     void configureStatusBar();
     import("./lib/capacitorDeepLink").then((m) => m.initCapacitorDeepLinks());
+    // Check streak / welcome-back / other notification conditions on every boot
+    import("./lib/notifications").then((m) => m.initNotifications());
     const cleanupSafeArea = initSafeAreaInsets();
     return cleanupSafeArea;
   }, []);

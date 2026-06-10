@@ -31,6 +31,9 @@ const RoundSetup = () => {
     goal: string | null;
   } | null>(null);
   const [dailyFocusText, setDailyFocusText] = useState<string | null>(null);
+  const [gpsMode, setGpsMode] = useState<boolean>(() => {
+    try { return localStorage.getItem("caddie-gps-mode") === "true"; } catch { return false; }
+  });
   const [isDiscarding, setIsDiscarding] = useState(false);
   const [isConfirmingDiscard, setIsConfirmingDiscard] = useState(false);
   const [showBeginnerGuide, setShowBeginnerGuide] = useState(false);
@@ -468,6 +471,51 @@ const RoundSetup = () => {
                 className="w-full p-4 rounded-2xl bg-white/90 border border-foreground/12 shadow-inner shadow-foreground/5 text-foreground placeholder:text-foreground/45 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/40 focus:bg-white/95 focus:shadow-md focus:scale-[1.01] origin-center transition-all duration-300 tracking-wide disabled:bg-white/50 disabled:text-foreground/40 hover:bg-white/95 hover:border-foreground/18"
               />
             </div>
+
+            {/* GPS Smart Round Mode toggle — on-course only */}
+            {roundType === "on-course" && (
+              <div className="space-y-3">
+                <button
+                  type="button"
+                  onClick={() => {
+                    triggerHaptic("soft");
+                    const next = !gpsMode;
+                    setGpsMode(next);
+                    try { localStorage.setItem("caddie-gps-mode", String(next)); } catch { /* silent */ }
+                  }}
+                  className={`w-full flex items-center justify-between gap-3 rounded-2xl border px-4 py-4 transition-all duration-200 active:scale-[0.98] ${
+                    gpsMode
+                      ? "border-[rgba(203,184,146,0.35)] bg-[rgba(203,184,146,0.1)]"
+                      : "border-white/10 bg-white/5"
+                  }`}
+                >
+                  <div className="flex items-center gap-3">
+                    <span className="text-lg">📍</span>
+                    <div className="text-left">
+                      <p className={`text-sm font-medium ${gpsMode ? "text-[var(--sand-0)]" : "text-[var(--text-1)]"}`}>
+                        GPS Smart Mode
+                      </p>
+                      <p className="text-xs text-[var(--text-2)] mt-0.5">
+                        {gpsMode
+                          ? "On — your caddie will check in hole by hole"
+                          : "Detects hole transitions, asks how each hole went"}
+                      </p>
+                    </div>
+                  </div>
+                  <div
+                    className={`relative h-6 w-11 rounded-full transition-all duration-200 ${
+                      gpsMode ? "bg-[rgba(203,184,146,0.6)]" : "bg-white/15"
+                    }`}
+                  >
+                    <div
+                      className={`absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-all duration-200 ${
+                        gpsMode ? "left-[22px]" : "left-0.5"
+                      }`}
+                    />
+                  </div>
+                </button>
+              </div>
+            )}
 
             {/* Begin Round Button */}
             <div className="pt-4">
