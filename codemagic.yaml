@@ -1,27 +1,27 @@
-# Codemagic CI/CD â builds "Your Mental Coach" (Capacitor iOS) and ships to TestFlight.
+# Codemagic CI/CD -- builds "Your Mental Coach" (Capacitor iOS) and ships to TestFlight.
 # This lets you release from your Windows PC: push to GitHub, Codemagic builds on a
 # cloud Mac and uploads to TestFlight automatically.
 #
-# ONE-TIME SETUP (already done â documented here for reproducibility):
+# ONE-TIME SETUP (already done -- documented here for reproducibility):
 #   1) App Store Connect API key named YMC_ASC_KEY, role "App Manager", added in Codemagic.
 #   2) CERTIFICATE_PRIVATE_KEY secret (RSA private key, PKCS#1 PEM) in variable group
 #      "ios-signing". fetch-signing-files uses it to create a signable distribution cert.
 #   3) APP_STORE_APP_ID set below (6759075246).
 #
 # HOW SIGNING WORKS HERE (manual flow, fully automatic once the secrets above exist):
-#   keychain initialize â fetch-signing-files --create (makes cert + app_store profile)
-#   â keychain add-certificates â xcode-project use-profiles.
+#   keychain initialize -> fetch-signing-files --create (makes cert + app_store profile)
+#   -> keychain add-certificates -> xcode-project use-profiles.
 #   The CLI saves files under ~/Library/Developer/Xcode/UserData/, NOT the old
-#   ~/Library/MobileDevice/ path â do not "verify" against the old path.
+#   ~/Library/MobileDevice/ path -- do not "verify" against the old path.
 #
-# TROUBLESHOOTING â always open the failing STEP's log, not the build summary toast:
+# TROUBLESHOOTING -- always open the failing STEP's log, not the build summary toast:
 #   "Cannot save Signing Certificates without certificate private key"
-#     â CERTIFICATE_PRIVATE_KEY missing/empty, or in the wrong format. It must be a
+#     -> CERTIFICATE_PRIVATE_KEY missing/empty, or in the wrong format. It must be a
 #       PKCS#1 RSA key: generate with `openssl genrsa 2048` (header BEGIN RSA PRIVATE KEY).
 #   "No matching profiles found for bundle identifier ... app_store"
-#     â fetch-signing-files did not actually create a profile. Check the fetch output
+#     -> fetch-signing-files did not actually create a profile. Check the fetch output
 #       above it: the bundle id must exist as an Identifier and the API key needs
-#       App Manager role. (NOT a use-profiles path issue â paths are handled below.)
+#       App Manager role. (NOT a use-profiles path issue -- paths are handled below.)
 
 workflows:
   ios-testflight:
@@ -43,7 +43,7 @@ workflows:
       app_store_connect: YMC_ASC_KEY        # must match the API key name in Codemagic; needs App Manager role
     environment:
       # NOTE: ios_signing block is intentionally absent.
-      # Mixing ios_signing with manual fetch-signing-files scripts causes a conflict â
+      # Mixing ios_signing with manual fetch-signing-files scripts causes a conflict --
       # Codemagic treats them as two separate signing mechanisms and they fight each other.
       # Signing is handled entirely by the scripts below using the app_store_connect integration.
       groups:
@@ -69,7 +69,7 @@ workflows:
           #    secret (group: ios-signing). fetch-signing-files uses it to create and
           #    download a distribution cert it can actually sign with.
           if [ -z "$CERTIFICATE_PRIVATE_KEY" ]; then
-            echo "ERROR: CERTIFICATE_PRIVATE_KEY is empty â is the 'ios-signing' variable group loaded?"
+            echo "ERROR: CERTIFICATE_PRIVATE_KEY is empty -- is the 'ios-signing' variable group loaded?"
             exit 1
           fi
           echo "Certificate private key present (${#CERTIFICATE_PRIVATE_KEY} chars)."
@@ -171,11 +171,4 @@ workflows:
       #     - you@example.com
       #   notify:
       #     success: true
-      #     failure: true
-
-# build trigger (Jun 10 2026)
-# trigger build v2
-
-# trigger-build
-
-# build trigger Jun 10 2026 v4
+      #     failure: tru
