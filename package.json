@@ -1,5 +1,5 @@
 {
-  "name": "vite_react_shadcn_ts",
+  "name": "the-caddie",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -11,6 +11,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@revenuecat/purchases-capacitor": "^5.0.0",
     "@capacitor/app": "^8.0.0",
     "@capacitor/browser": "^8.0.3",
     "@capacitor/cli": "^8.1.0",

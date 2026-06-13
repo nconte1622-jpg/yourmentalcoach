@@ -195,46 +195,7 @@ const PostRound = () => {
     }
   }, [getActiveRound, isPro, roundId]);
 
-  if (!isPro) {
-    return (
-      <PageShell backgroundVariant="default">
-        <AppShell
-          contentClassName="flex flex-col"
-          header={
-            <AppHeader
-              left={
-                <button
-                  type="button"
-                  onClick={() => navigate("/round-setup")}
-                  className="header-hit-button tap-44 text-muted-foreground/70 hover:text-foreground hover:bg-foreground/5 transition-all duration-300"
-                >
-                  <ArrowLeft className="mr-2 h-4 w-4" />
-                  Start Round
-                </button>
-              }
-              center={<h1 className="truncate text-base md:text-lg font-serif tracking-wide text-foreground">Post-Round</h1>}
-              right={<div className="tap-44" />}
-            />
-          }
-        >
-          <main className="flex flex-1 items-center justify-center px-5 pb-12">
-            <div className="max-w-md rounded-[28px] border border-[var(--border)] bg-[rgba(14,42,31,0.52)] p-6 text-center shadow-[0_16px_40px_rgba(0,0,0,0.32)] backdrop-blur-xl">
-              <p className="text-xs uppercase tracking-[0.18em] text-[var(--sand-0)]">Pro Feature</p>
-              <h1 className="mt-3 text-2xl font-serif text-[var(--text-0)]">Post-Round Reflection</h1>
-              <p className="mt-3 text-sm leading-6 text-[var(--text-1)]">
-                Structured post-round reflection is available on Pro. You can still end the round from the round screen without reflection.
-              </p>
-              <Button className="mt-5 min-h-11 w-full rounded-2xl" onClick={() => navigate("/upgrade")}>
-                Unlock Pro
-              </Button>
-            </div>
-          </main>
-          <ProUpgradeModal open={showUpgradeModal} onOpenChange={setShowUpgradeModal} />
-        </AppShell>
-      </PageShell>
-    );
-  }
-
+  // Rules of Hooks: currentStep/progressPercent must be defined before useMemo below.
   const currentStep = STEPS[currentStepIndex];
   const progressPercent = ((currentStepIndex + 1) / STEPS.length) * 100;
 
@@ -425,6 +386,48 @@ const PostRound = () => {
     }
     setCurrentStepIndex((index) => Math.min(STEPS.length - 1, index + 1));
   }, [canContinue, currentStepIndex, handleSave, isSaving]);
+
+  // ── All hooks above run unconditionally ──
+  // Conditional paywall return is safe here, after every hook.
+  if (!isPro) {
+    return (
+      <PageShell backgroundVariant="default">
+        <AppShell
+          contentClassName="flex flex-col"
+          header={
+            <AppHeader
+              left={
+                <button
+                  type="button"
+                  onClick={() => navigate(-1)}
+                  className="header-hit-button tap-44 text-muted-foreground/70 hover:text-foreground hover:bg-foreground/5 transition-all duration-300"
+                >
+                  <ArrowLeft className="mr-2 h-4 w-4" />
+                  Back
+                </button>
+              }
+              center={<h1 className="truncate text-base md:text-lg font-serif tracking-wide text-foreground">Post-Round</h1>}
+              right={<div className="tap-44" />}
+            />
+          }
+        >
+          <main className="flex flex-1 items-center justify-center px-5 pb-12">
+            <div className="max-w-md rounded-[28px] border border-[var(--border)] bg-[rgba(14,42,31,0.52)] p-6 text-center shadow-[0_16px_40px_rgba(0,0,0,0.32)] backdrop-blur-xl">
+              <p className="text-xs uppercase tracking-[0.18em] text-[var(--sand-0)]">Pro Feature</p>
+              <h1 className="mt-3 text-2xl font-serif text-[var(--text-0)]">Post-Round Reflection</h1>
+              <p className="mt-3 text-sm leading-6 text-[var(--text-1)]">
+                Structured post-round reflection is available on Pro. You can still end the round from the round screen without reflection.
+              </p>
+              <Button className="mt-5 min-h-11 w-full rounded-2xl" onClick={() => navigate("/upgrade")}>
+                Unlock Pro
+              </Button>
+            </div>
+          </main>
+          <ProUpgradeModal open={showUpgradeModal} onOpenChange={setShowUpgradeModal} />
+        </AppShell>
+      </PageShell>
+    );
+  }
 
   const renderStepContent = () => {
     switch (currentStep.id) {

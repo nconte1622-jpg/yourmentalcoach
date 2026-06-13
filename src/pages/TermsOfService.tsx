@@ -1,11 +1,10 @@
 import { useNavigate } from "react-router-dom";
-import { ExternalLink, FileText } from "lucide-react";
+import { FileText } from "lucide-react";
 import { PageShell } from "@/components/PageShell";
 import { AppShell } from "@/components/ui/AppShell";
 import { AppHeader } from "@/components/ui/AppHeader";
 import { FrostedSandCard } from "@/components/ui/frosted-sand-card";
-import { LEGAL_LAST_UPDATED, isLegalUrlAvailable, PUBLIC_LEGAL_URLS } from "@/lib/legal";
-import { openExternal } from "@/lib/openExternal";
+import { LEGAL_LAST_UPDATED } from "@/lib/legal";
 
 const TermsOfService = () => {
   const navigate = useNavigate();
@@ -106,21 +105,6 @@ const TermsOfService = () => {
             </section>
           </FrostedSandCard>
 
-          {isLegalUrlAvailable(PUBLIC_LEGAL_URLS.terms) && (
-            <FrostedSandCard className="space-y-3 p-4 md:p-5">
-              <p className="text-sm font-medium" style={{ color: "var(--ink-0)" }}>
-                Public document
-              </p>
-              <button
-                type="button"
-                className="legal-link-row"
-                onClick={() => void openExternal(PUBLIC_LEGAL_URLS.terms)}
-              >
-                <span>Open full Terms of Service</span>
-                <ExternalLink className="h-4 w-4" />
-              </button>
-            </FrostedSandCard>
-          )}
         </main>
       </AppShell>
     </PageShell>

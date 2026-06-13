@@ -11,9 +11,20 @@ import {
   useState,
   type ReactNode,
 } from "react";
+import { Capacitor } from "@capacitor/core";
 import { supabase } from "@/integrations/supabase/client";
 import { openExternal } from "@/lib/openExternal";
+import { identifyRevenueCatUser, logOutRevenueCatUser } from "@/lib/revenueCat";
 import { User, Session } from "@supabase/supabase-js";
+
+/**
+ * On iOS (Capacitor), window.location.origin === "capacitor://localhost" which
+ * Supabase rejects as an invalid redirect URL. Use the app's deep-link scheme
+ * on native, and the real browser origin on web.
+ */
+const EMAIL_REDIRECT_URL = Capacitor.isNativePlatform()
+  ? "com.nconte.thecaddie://auth/callback"
+  : `${window.location.origin}/auth/callback`;
 
 interface AuthState {
   user: User | null;
@@ -76,6 +87,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
       updateFromSession(session);
+      // Sync RevenueCat user identity so purchase history follows the account
+      if (session?.user?.id) {
+        void identifyRevenueCatUser(session.user.id);
+      } else {
+        void logOutRevenueCatUser();
+      }
     });
 
     void supabase.auth.getSession().then(({ data: { session } }) => {
@@ -101,7 +118,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       email: email.trim(),
       password,
       options: {
-        emailRedirectTo: `${window.location.origin}/auth/callback`,
+        emailRedirectTo: EMAIL_REDIRECT_URL,
         data: metadata,
       },
     });
@@ -131,7 +148,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const resetPassword = useCallback(async (email: string) => {
     const { error } = await supabase.auth.resetPasswordForEmail(email.trim(), {
-      redirectTo: `${window.location.origin}/auth/callback`,
+      redirectTo: EMAIL_REDIRECT_URL,
     });
     return { error };
   }, []);

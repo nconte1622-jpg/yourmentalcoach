@@ -10,8 +10,9 @@ import { loadGolferProfile, type GolferProfile, getHeightDisplay } from "@/lib/g
 import { AppShell } from "@/components/ui/AppShell";
 import { AppHeader } from "@/components/ui/AppHeader";
 import { FrostedSandCard } from "@/components/ui/frosted-sand-card";
-import { PUBLIC_LEGAL_URLS, isLegalUrlAvailable } from "@/lib/legal";
+import { PUBLIC_LEGAL_URLS } from "@/lib/legal";
 import { openExternal } from "@/lib/openExternal";
+import { supabase } from "@/integrations/supabase/client";
 import { BottomDock } from "@/components/ui/BottomDock";
 import { ActiveRoundResumeChip } from "@/components/ui/ActiveRoundResumeChip";
 
@@ -64,32 +65,33 @@ const Account = () => {
     setIsRestoring(false);
   }, [restorePurchases]);
 
-  const handleDeleteAccount = useCallback(() => {
+  const handleDeleteAccount = useCallback(async () => {
     // window.confirm() is disabled in iOS WKWebView — use state-based confirmation instead
     if (!isConfirmingDelete) {
       setIsConfirmingDelete(true);
       return;
     }
     setIsConfirmingDelete(false);
-    window.location.href =
-      "mailto:support@thecaddie.app?subject=Delete%20Account%20Request&body=Please%20delete%20my%20account%20and%20associated%20data.";
-  }, [isConfirmingDelete]);
-
-  const handleOpenPrivacy = useCallback(async () => {
-    if (!isLegalUrlAvailable(PUBLIC_LEGAL_URLS.privacy)) {
-      toast.info("Link unavailable");
-      return;
+    try {
+      const { error } = await supabase.functions.invoke("delete-account", {
+        method: "POST",
+      });
+      if (error) throw error;
+      toast.success("Account deleted. Sorry to see you go.");
+      await signOut();
+    } catch (err) {
+      console.error("Delete account error:", err);
+      toast.error("Unable to delete account. Contact support@thecaddie.app.");
     }
-    await openExternal(PUBLIC_LEGAL_URLS.privacy);
-  }, []);
+  }, [isConfirmingDelete, signOut]);
 
-  const handleOpenTerms = useCallback(async () => {
-    if (!isLegalUrlAvailable(PUBLIC_LEGAL_URLS.terms)) {
-      toast.info("Link unavailable");
-      return;
-    }
-    await openExternal(PUBLIC_LEGAL_URLS.terms);
-  }, []);
+  const handleOpenPrivacy = useCallback(() => {
+    navigate(PUBLIC_LEGAL_URLS.privacy);
+  }, [navigate]);
+
+  const handleOpenTerms = useCallback(() => {
+    navigate(PUBLIC_LEGAL_URLS.terms);
+  }, [navigate]);
 
   const handleTestOverride = useCallback(async (plan: "pro" | "free") => {
     setIsOverriding(true);

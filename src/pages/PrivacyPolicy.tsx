@@ -1,11 +1,10 @@
 import { useNavigate } from "react-router-dom";
-import { ExternalLink, ShieldAlert } from "lucide-react";
+import { ShieldAlert } from "lucide-react";
 import { PageShell } from "@/components/PageShell";
 import { AppShell } from "@/components/ui/AppShell";
 import { AppHeader } from "@/components/ui/AppHeader";
 import { FrostedSandCard } from "@/components/ui/frosted-sand-card";
-import { LEGAL_LAST_UPDATED, isLegalUrlAvailable, PUBLIC_LEGAL_URLS } from "@/lib/legal";
-import { openExternal } from "@/lib/openExternal";
+import { LEGAL_LAST_UPDATED } from "@/lib/legal";
 
 const PrivacyPolicy = () => {
   const navigate = useNavigate();
@@ -119,21 +118,6 @@ const PrivacyPolicy = () => {
             </section>
           </FrostedSandCard>
 
-          {isLegalUrlAvailable(PUBLIC_LEGAL_URLS.privacy) && (
-            <FrostedSandCard className="space-y-3 p-4 md:p-5">
-              <p className="text-sm font-medium" style={{ color: "var(--ink-0)" }}>
-                Public document
-              </p>
-              <button
-                type="button"
-                className="legal-link-row"
-                onClick={() => void openExternal(PUBLIC_LEGAL_URLS.privacy)}
-              >
-                <span>Open full Privacy Policy</span>
-                <ExternalLink className="h-4 w-4" />
-              </button>
-            </FrostedSandCard>
-          )}
         </main>
       </AppShell>
     </PageShell>

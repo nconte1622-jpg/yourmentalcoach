@@ -1,7 +1,7 @@
 import { cn } from "@/lib/utils";
 import { FeedbackType } from "@/hooks/useMentalCoach";
 import { normalizeToCanonical } from "@/lib/canonicalCues";
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef, memo } from "react";
 import { getBubbleClasses, ChatTheme } from "@/lib/chatTheme";
 
 interface ChatMessageProps {
@@ -65,9 +65,9 @@ const parseIntoSegments = (text: string): ContentSegment[] => {
   return segments;
 };
 
-export function ChatMessage({ 
-  content, 
-  isUser, 
+function ChatMessageComponent({
+  content,
+  isUser,
   isLatest = false,
   messageId,
   feedback,
@@ -78,7 +78,11 @@ export function ChatMessage({
 }: ChatMessageProps) {
   // Track which segments are visible for staggered animation
   const [visibleSegments, setVisibleSegments] = useState<Set<number>>(new Set([0]));
-  
+  // Remembers which message we've already played the stagger reveal for, so a
+  // streaming message (whose content/segments change every token) doesn't restart
+  // the animation on each token — that was the chat bubble's visible "flicker".
+  const staggeredMessageIdRef = useRef<string | undefined>(undefined);
+
   const segments = useMemo(() => parseIntoSegments(content), [content]);
   
   // Determine theme - use prop if provided, otherwise derive from frustration mode
@@ -91,29 +95,40 @@ export function ChatMessage({
       setVisibleSegments(new Set(segments.map((_, i) => i)));
       return;
     }
-    
-    // Reset and start stagger animation
+
+    // Same message, just more tokens streamed in — reveal any newly-arrived
+    // segments without resetting the animation (no flicker). Bails out of the
+    // render entirely once everything is already visible.
+    if (staggeredMessageIdRef.current === messageId) {
+      setVisibleSegments((prev) =>
+        prev.size >= segments.length ? prev : new Set(segments.map((_, i) => i))
+      );
+      return;
+    }
+
+    // First time we've seen this message → play the staggered reveal once.
+    staggeredMessageIdRef.current = messageId;
     setVisibleSegments(new Set([0]));
-    
-    const timers: NodeJS.Timeout[] = [];
-    
+
+    const timers: ReturnType<typeof setTimeout>[] = [];
+
     segments.forEach((segment, index) => {
       if (index === 0) return; // First segment is already visible
-      
+
       // Cue gets extra delay (400ms), directive follows (200ms after cue)
-      const delay = segment.type === "cue" ? 400 : 
-                    segment.type === "directive" ? 600 : 
+      const delay = segment.type === "cue" ? 400 :
+                    segment.type === "directive" ? 600 :
                     200;
-      
+
       const timer = setTimeout(() => {
         setVisibleSegments(prev => new Set([...prev, index]));
       }, delay);
-      
+
       timers.push(timer);
     });
-    
+
     return () => timers.forEach(t => clearTimeout(t));
-  }, [content, isUser, segments]);
+  }, [content, isUser, segments, messageId]);
 
   // Render a cue tag with proper styling
   const renderCueTag = (part: string) => {
@@ -294,3 +309,10 @@ export function ChatMessage({
     </div>
   );
 }
+
+/**
+ * Memoized so that while the AI streams a reply, only the actively-growing
+ * bubble re-renders — the rest of the chat history stays untouched. This relies
+ * on `onFeedback` being a stable reference (see useMentalCoach's messagesRef).
+ */
+export const ChatMessage = memo(ChatMessageComponent);

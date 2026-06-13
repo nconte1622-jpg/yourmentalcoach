@@ -11,8 +11,9 @@ import { triggerHaptic } from "@/lib/haptics";
 import { AppShell } from "@/components/ui/AppShell";
 import { AppHeader } from "@/components/ui/AppHeader";
 import { cn } from "@/lib/utils";
-import { toast } from "sonner";
 import { extractAndSaveQuickEndData } from "@/lib/quickEndRound";
+import { clearActiveRoundSession, clearRoundMessages } from "@/lib/roundSession";
+import { recordCompletedRound } from "@/lib/streakStorage";
 import {
   Dialog,
   DialogContent,
@@ -89,39 +90,46 @@ export default function RoundCloseStrong() {
       return;
     }
 
+    setIsEndingRound(true);
+
+    // Local-first: extract chat data + record the streak with no network dependency.
+    extractAndSaveQuickEndData(activeRoundId);
+    recordCompletedRound();
+
+    // Post-round feeling is non-critical telemetry — fire and forget so it can
+    // never hang the "End Round" flow.
+    void createRoundEvent({
+      round_id: activeRoundId,
+      event_type: "note",
+      label: "post_round_feeling",
+      notes: JSON.stringify({
+        feeling_score: postRoundFeeling,
+        timestamp: new Date().toISOString(),
+      }),
+    }).catch(() => { /* non-critical */ });
+
+    // Persist the close, but never let a slow/failed request trap the user behind
+    // an "Ending..." spinner. Race the DB write against a hard timeout; either way
+    // we clear the local active-round state and head home.
+    const ENDED_TIMEOUT_MS = 6000;
     try {
-      setIsEndingRound(true);
-
-      // Extract and save data from chat BEFORE the round closes and clears storage
-      extractAndSaveQuickEndData(activeRoundId);
-
-      await createRoundEvent({
-        round_id: activeRoundId,
-        event_type: "note",
-        label: "post_round_feeling",
-        notes: JSON.stringify({
-          feeling_score: postRoundFeeling,
-          timestamp: new Date().toISOString(),
+      await Promise.race([
+        updateRound(activeRoundId, {
+          ended_at: new Date().toISOString(),
+          status: "completed",
         }),
-      });
-
-      const ended = await updateRound(activeRoundId, {
-        ended_at: new Date().toISOString(),
-        status: "completed",
-      });
-      if (ended) {
-        toast.success("Round ended");
-        setEndRoundDialogOpen(false);
-        navigate("/", { replace: true });
-      } else {
-        toast.error("Unable to end round");
-      }
+        new Promise((resolve) => setTimeout(resolve, ENDED_TIMEOUT_MS)),
+      ]);
     } catch (error) {
       console.error("Failed to end active round:", error);
-      toast.error("Unable to end round");
-    } finally {
-      setIsEndingRound(false);
     }
+
+    clearActiveRoundSession();
+    clearRoundMessages(activeRoundId);
+
+    setIsEndingRound(false);
+    setEndRoundDialogOpen(false);
+    navigate("/", { replace: true });
   }, [activeRoundId, createRoundEvent, navigate, postRoundFeeling, updateRound]);
 
   const recentMessages = messages.slice(-4);

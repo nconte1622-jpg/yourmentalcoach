@@ -54,15 +54,17 @@ function buildPersonalizedGreeting(): string {
   return "Hey — what's happening out there? Talk to me.";
 }
 
-const GREETING = buildPersonalizedGreeting();
 const AI_USAGE_STORAGE_PREFIX = "round-ai-usage";
-const DEFAULT_MESSAGES: Message[] = [
-  {
-    id: "greeting",
-    content: GREETING,
-    isUser: false,
-  },
-];
+
+function buildDefaultMessages(): Message[] {
+  return [
+    {
+      id: "greeting",
+      content: buildPersonalizedGreeting(),
+      isUser: false,
+    },
+  ];
+}
 
 // Frustration detection patterns
 const FRUSTRATION_PATTERNS = [
@@ -92,13 +94,24 @@ export function useMentalCoach(options?: UseMentalCoachOptions) {
   }, [options?.quickMode]);
   const { features, aiMessagesPerRoundLimit } = useFeatureFlags();
   const { getActiveRound, createRoundEvent } = useRounds();
-  const [messages, setMessages] = useState<Message[]>(DEFAULT_MESSAGES);
+  // Greeting computed once per mount (fresh time-of-day + last-round takeaway).
+  const defaultMessagesRef = useRef<Message[]>(buildDefaultMessages());
+  const defaultMessages = defaultMessagesRef.current;
+  const [messages, setMessages] = useState<Message[]>(defaultMessages);
   const [isTyping, setIsTyping] = useState(false);
   const [preferredWords, setPreferredWords] = useState<string[]>([]);
   const [isFrustrationMode, setIsFrustrationMode] = useState(false);
   const [activeRoundId, setActiveRoundId] = useState<string | null>(null);
   const activeRequestIdRef = useRef<string | null>(null);
   const activeAbortControllerRef = useRef<AbortController | null>(null);
+  // Mirror of `messages` so streaming-sensitive callbacks (sendMessage,
+  // buildRecentContext, setFeedback) can read the latest transcript WITHOUT
+  // listing `messages` in their deps — otherwise they'd be recreated on every
+  // streamed token and cascade fresh props into ChatInput / every ChatMessage.
+  const messagesRef = useRef<Message[]>(messages);
+  useEffect(() => {
+    messagesRef.current = messages;
+  }, [messages]);
 
   useEffect(() => {
     setPreferredWords(loadPreferredWords());
@@ -120,7 +133,7 @@ export function useMentalCoach(options?: UseMentalCoachOptions) {
 
   useEffect(() => {
     if (!activeRoundId) {
-      setMessages(DEFAULT_MESSAGES);
+      setMessages(defaultMessages);
       return;
     }
 
@@ -131,20 +144,38 @@ export function useMentalCoach(options?: UseMentalCoachOptions) {
       return;
     }
 
-    setMessages(DEFAULT_MESSAGES);
-  }, [activeRoundId, sessionPrefix]);
+    setMessages(defaultMessages);
+  }, [activeRoundId, sessionPrefix, defaultMessages]);
 
-  useEffect(() => {
+  // Always points at the latest "write the transcript to localStorage" closure,
+  // so both the debounced effect and the unmount flush use current values.
+  const persistMessagesRef = useRef<() => void>(() => {});
+  persistMessagesRef.current = () => {
     if (!activeRoundId) return;
     const storageKey = sessionPrefix ? `${sessionPrefix}:${activeRoundId}` : activeRoundId;
-    const payload: PersistedRoundMessage[] = messages.map((message) => ({
+    const payload: PersistedRoundMessage[] = messagesRef.current.map((message) => ({
       id: message.id,
       content: message.content,
       isUser: message.isUser,
       feedback: message.feedback ?? null,
     }));
     saveRoundMessages(storageKey, payload);
+  };
+
+  useEffect(() => {
+    if (!activeRoundId) return;
+    // Debounce: during streaming `messages` changes on every token. Without this
+    // we'd JSON.stringify + write the whole transcript to localStorage per token
+    // (main-thread jank). Coalesce into one write once the stream settles.
+    const timer = setTimeout(() => persistMessagesRef.current(), 400);
+    return () => clearTimeout(timer);
   }, [activeRoundId, messages, sessionPrefix]);
+
+  // Flush on unmount so nothing is lost if the user leaves within the debounce
+  // window (e.g. sends a message then immediately navigates home).
+  useEffect(() => {
+    return () => persistMessagesRef.current();
+  }, []);
 
   useEffect(() => {
     return () => {
@@ -281,8 +312,9 @@ export function useMentalCoach(options?: UseMentalCoachOptions) {
     // Detect and save any triggers mentioned in the user message
     detectAndSaveTriggers(content);
 
-    // Build API messages from conversation history
-    const apiMessages: ApiMessage[] = messages
+    // Build API messages from conversation history (read via ref so this
+    // callback is stable across streaming — see messagesRef above).
+    const apiMessages: ApiMessage[] = messagesRef.current
       .filter((m) => m.id !== "greeting")
       .map((m) => ({
         role: m.isUser ? "user" as const : "assistant" as const,
@@ -324,12 +356,13 @@ export function useMentalCoach(options?: UseMentalCoachOptions) {
         activeAbortControllerRef.current = null;
       },
     });
-  }, [activeRoundId, appendFallbackMessage, beginRequest, canUseAi, features.unlimited_ai, getLimitError, incrementAiUsage, isTyping, logAiEvent, messages]);
+  }, [activeRoundId, appendFallbackMessage, beginRequest, canUseAi, features.unlimited_ai, getLimitError, incrementAiUsage, isTyping, logAiEvent]);
 
   // Build recent conversation context so quick-actions feel personal
   const buildRecentContext = useCallback((): ApiMessage[] => {
-    // Grab last ~6 messages (3 exchanges) for context, skip greeting
-    const recent = messages
+    // Grab last ~6 messages (3 exchanges) for context, skip greeting.
+    // Read via ref so this stays stable while streaming.
+    const recent = messagesRef.current
       .filter((m) => m.id !== "greeting")
       .slice(-6)
       .map((m) => ({
@@ -337,7 +370,7 @@ export function useMentalCoach(options?: UseMentalCoachOptions) {
         content: m.content,
       }));
     return recent;
-  }, [messages]);
+  }, []);
 
   const getQuickCue = useCallback((context: CoachContext = "round") => {
     if (isTyping) return;
@@ -553,8 +586,8 @@ export function useMentalCoach(options?: UseMentalCoachOptions) {
   }, [activeRoundId, appendFallbackMessage, beginRequest, buildRecentContext, canUseAi, getLimitError, incrementAiUsage, isTyping, logAiEvent]);
 
   const setFeedback = useCallback((messageId: string, feedback: FeedbackType) => {
-    const message = messages.find((m) => m.id === messageId);
-    
+    const message = messagesRef.current.find((m) => m.id === messageId);
+
     if (feedback === "helpful" && message) {
       // Extract only the emphasized cue words from the response
       const cueWords = extractCueWords(message.content);
@@ -570,7 +603,7 @@ export function useMentalCoach(options?: UseMentalCoachOptions) {
         msg.id === messageId ? { ...msg, feedback } : msg
       )
     );
-  }, [messages]);
+  }, []);
 
   return {
     messages,

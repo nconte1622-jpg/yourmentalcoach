@@ -9,6 +9,7 @@ import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { AppErrorBoundary } from "@/components/AppErrorBoundary";
 import { initSafeAreaInsets } from "@/lib/safeArea";
 import { Capacitor } from "@capacitor/core";
+import { configureRevenueCat } from "@/lib/revenueCat";
 import { AuthProvider, useAuth } from "@/hooks/useAuth";
 import { EntitlementsProvider, useEntitlements } from "@/hooks/useEntitlements";
 import Home from "./pages/Home";
@@ -132,6 +133,8 @@ const App = () => {
     };
 
     void configureStatusBar();
+    // Initialize RevenueCat (no-op on web; user ID will be set after login via useAuth)
+    void configureRevenueCat();
     import("./lib/capacitorDeepLink").then((m) => m.initCapacitorDeepLinks());
     // Check streak / welcome-back / other notification conditions on every boot
     import("./lib/notifications").then((m) => m.initNotifications());

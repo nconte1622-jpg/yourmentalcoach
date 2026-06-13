@@ -82,47 +82,38 @@ export const RoundBriefingCard = ({ onDismiss, className }: RoundBriefingCardPro
   }
 
   return (
-    <div
-      className={cn(
-        "pt-4 shrink-0 animate-slide-up",
-        className
-      )}
-    >
-      <div className="max-w-2xl mx-auto">
-        <div
-          className={cn(
-            "rounded-3xl border border-[rgba(203,184,146,0.15)] bg-[rgba(9,19,15,0.95)]",
-            "px-5 py-4 shadow-[0_20px_50px_rgba(0,0,0,0.4)] backdrop-blur-xl",
-            "space-y-3"
-          )}
-        >
-          {/* Header */}
-          <div className="flex items-start justify-between gap-3">
-            <div>
-              <p className="text-xs uppercase tracking-[0.16em] text-[var(--sand-0)] opacity-70">
-                Round Briefing
+    <div className={cn("animate-fade-in", className)}>
+      <div
+        className={cn(
+          "rounded-2xl border border-[rgba(203,184,146,0.12)] bg-[rgba(9,19,15,0.82)]",
+          "px-4 py-3.5 backdrop-blur-xl",
+          "space-y-2"
+        )}
+      >
+        {/* Header */}
+        <div className="flex items-center justify-between gap-3">
+          <p className="text-[10px] uppercase tracking-[0.18em] text-[var(--sand-0)] opacity-60">
+            Round Briefing
+          </p>
+          <button
+            onClick={onDismiss}
+            className="shrink-0 text-white/20 hover:text-white/50 transition-all duration-200"
+            aria-label="Dismiss briefing"
+          >
+            <X className="w-3.5 h-3.5" />
+          </button>
+        </div>
+
+        {/* Briefing items */}
+        <div className="space-y-1.5">
+          {briefingItems.map((item, index) => (
+            <div key={index} className="flex items-start gap-2.5">
+              <span className="text-sm mt-0.5 shrink-0">{item.icon}</span>
+              <p className="text-[13px] text-[rgba(233,241,236,0.68)] leading-relaxed tracking-wide">
+                {item.text}
               </p>
             </div>
-            <button
-              onClick={onDismiss}
-              className="shrink-0 text-muted-foreground/25 hover:text-muted-foreground/50 transition-all duration-300 mt-0.5"
-              aria-label="Dismiss briefing"
-            >
-              <X className="w-4 h-4" />
-            </button>
-          </div>
-
-          {/* Briefing items */}
-          <div className="space-y-2">
-            {briefingItems.map((item, index) => (
-              <div key={index} className="flex items-start gap-3">
-                <span className="text-lg mt-0.5 shrink-0">{item.icon}</span>
-                <p className="text-sm text-foreground/75 leading-relaxed tracking-wide pt-0.5">
-                  {item.text}
-                </p>
-              </div>
-            ))}
-          </div>
+          ))}
         </div>
       </div>
     </div>

@@ -95,6 +95,9 @@ const Round = () => {
   });
   const [gpsCheckInVisible, setGpsCheckInVisible] = useState(false);
   const [gpsHoleNumber, setGpsHoleNumber] = useState(1);
+  // Stable so GpsHoleCheckIn's 20s auto-dismiss timer isn't restarted on every
+  // re-render of this screen (e.g. while the coach is streaming).
+  const handleGpsDismiss = useCallback(() => setGpsCheckInVisible(false), []);
   const backendLabel = getAiBackendLabel();
   const showBackendLabel = showAiBackendIndicator();
   const coachEnabled = Boolean(import.meta.env.VITE_COACH_API_URL);
@@ -465,67 +468,60 @@ const Round = () => {
         }
       >
         <div className="flex-1 flex flex-col min-h-0">
-          {/* Round Briefing Card - Tier 2 feature with pattern-based warnings */}
-          {!briefingDismissed && !isFrustrationMode && !quickMode && (
-            <RoundBriefingCard onDismiss={() => setBriefingDismissed(true)} />
-          )}
-
-          {/* Pre-Round Recall Card - hide in frustration mode */}
-          {recallData && !recallDismissed && !isFrustrationMode && !currentRecall && (
-            <div className="pt-4 shrink-0">
-              <div className="max-w-2xl mx-auto card-floating p-5 animate-fade-in">
-                <div className="flex items-start justify-between gap-4">
-                  <div className="flex-1">
-                    <p className="text-sm text-foreground/75 leading-relaxed tracking-wide">
-                      Recall: When it mattered, you{" "}
-                      <span className="font-medium text-cue-focus">
-                        {recallData.cueWord}
-                      </span>
-                      .
-                    </p>
-                  </div>
-                  <button
-                    onClick={() => setRecallDismissed(true)}
-                    className="text-muted-foreground/25 hover:text-muted-foreground/50 text-sm transition-all duration-300 mt-1"
-                  >
-                    ✕
-                  </button>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* Contextual Recall Card - triggered by user input */}
-          {currentRecall && !isFrustrationMode && (
-            <div className="pt-4 shrink-0">
-              <div className="max-w-2xl mx-auto">
-                <RecallCard
-                  text={currentRecall.text}
-                  onDismiss={dismissRecall}
-                />
-              </div>
-            </div>
-          )}
-
-          {/* Hole-by-hole mood tracker */}
-          {activeRoundId && !isFrustrationMode && (
-            <HoleMoodTracker roundId={activeRoundId} className="mx-4 mb-3" />
-          )}
-
-          {/* Messages Area - scrollable, takes remaining space */}
+          {/* Single scrollable area — top cards + messages scroll together.
+              This prevents the keyboard from crushing the messages view to
+              zero height, since everything competes in the same scroll region. */}
           <main
             className={cn(
               "flex-1 overflow-y-auto min-h-0",
-              isFrustrationMode ? "py-16 flex items-center" : "py-10"
+              isFrustrationMode && "flex items-center"
             )}
           >
-            <div 
+            <div
               className={cn(
                 "max-w-2xl mx-auto w-full",
                 "pb-[calc(180px+var(--sab))]",
-                isFrustrationMode ? "space-y-8" : "space-y-6"
+                isFrustrationMode ? "space-y-8 py-16" : "space-y-3 pt-3"
               )}
             >
+              {/* Top context cards — only in normal mode, scroll with messages */}
+              {!isFrustrationMode && (
+                <>
+                  {!briefingDismissed && !quickMode && (
+                    <RoundBriefingCard onDismiss={() => setBriefingDismissed(true)} />
+                  )}
+
+                  {recallData && !recallDismissed && !currentRecall && (
+                    <div className="rounded-2xl border border-[rgba(255,255,255,0.07)] bg-[rgba(9,19,15,0.72)] px-5 py-3.5 backdrop-blur-sm animate-fade-in">
+                      <div className="flex items-center justify-between gap-4">
+                        <p className="text-sm text-[rgba(233,241,236,0.72)] leading-relaxed tracking-wide">
+                          Recall: When it mattered, you{" "}
+                          <span className="font-medium text-[rgba(152,215,175,0.9)]">
+                            {recallData.cueWord}
+                          </span>
+                          .
+                        </p>
+                        <button
+                          onClick={() => setRecallDismissed(true)}
+                          className="shrink-0 text-white/20 hover:text-white/50 text-base leading-none transition-all duration-200"
+                        >
+                          ✕
+                        </button>
+                      </div>
+                    </div>
+                  )}
+
+                  {currentRecall && (
+                    <RecallCard text={currentRecall.text} onDismiss={dismissRecall} />
+                  )}
+
+                  {activeRoundId && (
+                    <HoleMoodTracker roundId={activeRoundId} />
+                  )}
+                </>
+              )}
+
+              {/* Messages */}
               {displayMessages.map((message, index) => (
                 <div
                   key={message.id}
@@ -554,8 +550,8 @@ const Round = () => {
 
         {/* Input Area - docked at bottom */}
         <div className="chat-composer-dock shrink-0">
-          <div className={cn("max-w-2xl mx-auto w-full", isFrustrationMode ? "space-y-4" : "space-y-5")}>
-          <div className="rounded-3xl border border-foreground/10 bg-black/20 px-3 py-3 backdrop-blur-sm">
+          <div className="max-w-2xl mx-auto w-full space-y-3">
+          <div className="rounded-2xl border border-[rgba(255,255,255,0.06)] bg-[rgba(9,19,15,0.62)] px-3 py-2.5 backdrop-blur-sm">
             {features.quick_tap ? (
               <div className="flex gap-2 overflow-x-auto overscroll-contain pb-1" style={{ WebkitOverflowScrolling: "touch" }}>
                 {EMOTION_TAGS.map((tag) => (
@@ -564,7 +560,7 @@ const Round = () => {
                     type="button"
                     onClick={() => void handleEmotionTap(tag)}
                     disabled={isTyping}
-                    className="min-h-11 shrink-0 rounded-full border border-[var(--border)] bg-[rgba(18,64,47,0.42)] px-4 text-sm font-medium tracking-wide text-[var(--text-0)] transition-all duration-300 hover:bg-[rgba(18,64,47,0.62)] disabled:opacity-50"
+                    className="min-h-10 shrink-0 rounded-full border border-[rgba(255,255,255,0.1)] bg-[rgba(14,42,31,0.62)] px-4 text-[13px] font-medium tracking-wide text-[rgba(233,241,236,0.85)] transition-all duration-200 hover:bg-[rgba(18,64,47,0.8)] hover:text-[rgba(233,241,236,0.98)] active:scale-[0.97] disabled:opacity-50"
                   >
                     {tag}
                   </button>
@@ -643,7 +639,7 @@ const Round = () => {
                   }}
                   disabled={isTyping}
                   variant="outline"
-                  className="flex-1 py-6 text-sm font-medium rounded-2xl border-foreground/10 bg-black/25 hover:bg-black/35 transition-all duration-300"
+                  className="flex-1 py-3.5 text-sm font-medium rounded-2xl border-[rgba(255,255,255,0.08)] bg-[rgba(9,19,15,0.55)] hover:bg-[rgba(9,19,15,0.72)] transition-all duration-200"
                   size="lg"
                 >
                   <span className="flex items-center gap-3 text-white font-medium drop-shadow-sm">
@@ -660,11 +656,11 @@ const Round = () => {
                     setPreShotOpen(true);
                   }}
                   variant="outline"
-                  className="shrink-0 py-6 px-5 rounded-2xl border-foreground/10 bg-black/25 hover:bg-black/35 transition-all duration-300"
+                  className="shrink-0 py-3.5 px-5 rounded-2xl border-[rgba(255,255,255,0.08)] bg-[rgba(9,19,15,0.55)] hover:bg-[rgba(9,19,15,0.72)] transition-all duration-200"
                   size="lg"
                 >
-                  <span className="flex items-center gap-2 text-white font-medium drop-shadow-sm">
-                    <Wind className="w-5 h-5" />
+                  <span className="flex items-center gap-1.5 text-white font-medium drop-shadow-sm">
+                    <Wind className="w-4 h-4" />
                     <span className="text-sm">Breathe</span>
                   </span>
                 </Button>
@@ -831,7 +827,7 @@ const Round = () => {
       <GpsHoleCheckIn
         holeNumber={gpsHoleNumber}
         visible={gpsCheckInVisible}
-        onDismiss={() => setGpsCheckInVisible(false)}
+        onDismiss={handleGpsDismiss}
       />
       </div>
     </PageShell>

@@ -9,8 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useAuth } from "@/hooks/useAuth";
 import { PageShell } from "@/components/PageShell";
-import { PUBLIC_LEGAL_URLS, isLegalUrlAvailable } from "@/lib/legal";
-import { openExternal } from "@/lib/openExternal";
+import { PUBLIC_LEGAL_URLS } from "@/lib/legal";
 
 type Mode = "signin" | "signup" | "forgot";
 
@@ -49,13 +48,8 @@ const Login = () => {
     clearMessages();
   };
 
-  const openLegalLink = async (type: "privacy" | "terms") => {
-    const url = PUBLIC_LEGAL_URLS[type];
-    if (!isLegalUrlAvailable(url)) {
-      setError("Legal link unavailable.");
-      return;
-    }
-    await openExternal(url);
+  const openLegalLink = (type: "privacy" | "terms") => {
+    navigate(PUBLIC_LEGAL_URLS[type]);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
