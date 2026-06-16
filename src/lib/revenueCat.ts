@@ -21,7 +21,7 @@ import { Capacitor } from "@capacitor/core";
 // ──────────────────────────────────────────────
 //  ⚠️  PASTE YOUR REVENUECAT iOS API KEY HERE
 // ──────────────────────────────────────────────
-export const RC_API_KEY_IOS = "REPLACE_WITH_YOUR_REVENUECAT_IOS_API_KEY";
+export const RC_API_KEY_IOS = "appl_vnnquVfDgzWmdIUyRniZvGifoaX";
 
 /** RevenueCat entitlement ID — must match what you create in the RC dashboard */
 export const RC_ENTITLEMENT_ID = "pro";

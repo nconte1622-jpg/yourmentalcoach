@@ -8,6 +8,8 @@ import { ShareRoundCard } from "@/components/ShareRoundCard";
 import { loadResilienceScores } from "@/lib/resilienceScore";
 import { schedulePostRoundPrompt } from "@/lib/notifications";
 import { generateRoundWord, loadRoundWord, clearRoundWord } from "@/lib/roundWord";
+import { buildSnapshotFromRoundData, updateRoundMemory } from "@/lib/playerMemory";
+import { loadActiveRoundSession } from "@/lib/roundSession";
 
 const RoundComplete = () => {
   const navigate = useNavigate();
@@ -38,6 +40,31 @@ const RoundComplete = () => {
 
   // Schedule a post-round reflection nudge for next app open
   useEffect(() => { schedulePostRoundPrompt(); }, []);
+
+  // Persist round memory snapshot for adaptive AI
+  useEffect(() => {
+    try {
+      const session = loadActiveRoundSession();
+      if (!roundContext) return;
+      const snapshot = buildSnapshotFromRoundData({
+        roundId: session?.roundId ?? `round-${Date.now()}`,
+        location: roundContext.location,
+        roundType: roundContext.roundType,
+        environment: roundContext.environment,
+        mentalTakeaway: roundContext.intent ?? "",
+        emotionalStart: "neutral", // populated by GPS tracker when available
+        emotionalFinish: "neutral",
+        biggestChallenge: "",
+        bestMoment: todaysHighlights[0]
+          ? `Committed to "${todaysHighlights[0].cueWord}" on a key shot`
+          : "",
+        cueWordUsed: cueWord ?? undefined,
+        mentalHandicap: latestScore,
+      });
+      updateRoundMemory(snapshot);
+    } catch { /* never crash round complete screen */ }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Generate AI round word on mount (non-blocking)
   useEffect(() => {

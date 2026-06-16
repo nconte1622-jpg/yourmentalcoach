@@ -62,5 +62,11 @@
 			</array>
 		</dict>
 	</array>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>The Caddie needs access to your photo library to upload swing videos for AI analysis.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>The Caddie needs camera access to record your swing for AI analysis.</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>The Caddie uses your location to measure distances to the pin during your round.</string>
 </dict>
 </plist>

@@ -4,6 +4,7 @@ type AnalyticsEventName =
   | "post_round_completed"
   | "paywall_viewed"
   | "subscription_started"
+  | "subscription_completed"
   | "restore_purchases_tapped";
 
 type AnalyticsEvent = {

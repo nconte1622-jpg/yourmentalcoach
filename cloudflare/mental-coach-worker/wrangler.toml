@@ -3,7 +3,7 @@ main = "src/index.ts"
 compatibility_date = "2026-02-26"
 
 [vars]
-SUPABASE_URL = "https://YOUR_PROJECT.supabase.co"
+SUPABASE_URL = "https://unjrvkvsrktiwuzclbnh.supabase.co"
 REQUIRE_AUTH = "true"
 SUPABASE_JWT_AUD = "authenticated"
 ALLOWED_ORIGINS = "capacitor://localhost,http://localhost,https://yourmentalcoach.app"
@@ -11,7 +11,7 @@ OPENAI_MODEL = "gpt-4.1-mini"
 LOG_REQUESTS = "false"
 
 [env.staging.vars]
-SUPABASE_URL = "https://YOUR_PROJECT.supabase.co"
+SUPABASE_URL = "https://unjrvkvsrktiwuzclbnh.supabase.co"
 REQUIRE_AUTH = "false"
 SUPABASE_JWT_AUD = "authenticated"
 ALLOWED_ORIGINS = "*"
@@ -19,7 +19,7 @@ OPENAI_MODEL = "gpt-4.1-mini"
 LOG_REQUESTS = "true"
 
 [env.production.vars]
-SUPABASE_URL = "https://YOUR_PROJECT.supabase.co"
+SUPABASE_URL = "https://unjrvkvsrktiwuzclbnh.supabase.co"
 REQUIRE_AUTH = "true"
 SUPABASE_JWT_AUD = "authenticated"
 ALLOWED_ORIGINS = "capacitor://localhost,http://localhost,https://yourmentalcoach.app"

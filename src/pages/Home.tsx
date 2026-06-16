@@ -42,6 +42,7 @@ import { getStreakData, streakLabel, daysSinceLastRound, type StreakData } from 
 import { formatRoundDuration } from "@/lib/roundTime";
 import { DailyCheckIn } from "@/components/DailyCheckIn";
 import { loadPreferredWords as loadCueWords } from "@/lib/memoryStorage";
+import { InAppAlertBanner } from "@/components/InAppAlertBanner";
 
 // Daily focus rotates through a curated 30-item library keyed to day-of-year.
 // This keeps the habit loop alive — same phrase every day kills engagement.
@@ -320,6 +321,9 @@ const Home = () => {
             }
           >
             <div className="with-bottom-dock space-y-4 overflow-y-auto px-5 pb-8 pt-5">
+
+              {/* In-app notification alerts */}
+              <InAppAlertBanner />
 
               {/* Active Round */}
               {activeRoundSummary && activeRoundMeta && (

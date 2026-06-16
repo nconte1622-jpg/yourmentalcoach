@@ -61,70 +61,80 @@ const Login = () => {
       return;
     }
 
-    if (mode === "forgot") {
+    try {
+      if (mode === "forgot") {
+        setSubmitting(true);
+        const { error: err } = await resetPassword(email);
+        setSubmitting(false);
+        if (err) {
+          setError(err instanceof Error ? err.message : String(err));
+        } else {
+          setSuccess("Check your email for a password reset link.");
+        }
+        return;
+      }
+
+      if (!password) {
+        setError("Please enter a password.");
+        return;
+      }
+
+      if (mode === "signup") {
+        if (password.length < 6) {
+          setError("Password must be at least 6 characters.");
+          return;
+        }
+        if (password !== confirmPassword) {
+          setError("Passwords do not match.");
+          return;
+        }
+        if (!privacyAccepted || !termsAccepted) {
+          setError("You must agree to the Privacy Policy and Terms of Service to create an account.");
+          return;
+        }
+        setSubmitting(true);
+        const acceptedAt = new Date().toISOString();
+        const { error: err } = await signUp(email, password, {
+          privacy_accepted_at: acceptedAt,
+          terms_accepted_at: acceptedAt,
+        });
+        setSubmitting(false);
+        if (err) {
+          setError(err instanceof Error ? err.message : String(err));
+        } else {
+          setSuccess("Account created! Check your email to confirm, then sign in.");
+        }
+        return;
+      }
+
+      // signin
       setSubmitting(true);
-      const { error: err } = await resetPassword(email);
+      const { error: err } = await signIn(email, password);
       setSubmitting(false);
       if (err) {
-        setError(err.message);
-      } else {
-        setSuccess("Check your email for a password reset link.");
+        setError(err instanceof Error ? err.message : String(err));
       }
-      return;
-    }
-
-    if (!password) {
-      setError("Please enter a password.");
-      return;
-    }
-
-    if (mode === "signup") {
-      if (password.length < 6) {
-        setError("Password must be at least 6 characters.");
-        return;
-      }
-      if (password !== confirmPassword) {
-        setError("Passwords do not match.");
-        return;
-      }
-      if (!privacyAccepted || !termsAccepted) {
-        setError("You must agree to the Privacy Policy and Terms of Service to create an account.");
-        return;
-      }
-      setSubmitting(true);
-      const acceptedAt = new Date().toISOString();
-      const { error: err } = await signUp(email, password, {
-        privacy_accepted_at: acceptedAt,
-        terms_accepted_at: acceptedAt,
-      });
+      // on success, onAuthStateChange will trigger redirect
+    } catch (unexpected) {
       setSubmitting(false);
-      if (err) {
-        setError(err.message);
-      } else {
-        setSuccess("Account created! Check your email to confirm, then sign in.");
-      }
-      return;
+      setError(unexpected instanceof Error ? unexpected.message : "Something went wrong. Please try again.");
     }
-
-    // signin
-    setSubmitting(true);
-    const { error: err } = await signIn(email, password);
-    setSubmitting(false);
-    if (err) {
-      setError(err.message);
-    }
-    // on success, onAuthStateChange will trigger redirect
   };
 
   const handleOAuth = async (provider: "apple" | "google") => {
     clearMessages();
     setOauthLoading(provider);
-    const { error: err } = await signInWithOAuth(provider);
-    setOauthLoading(null);
-    if (err) {
-      setError(err instanceof Error ? err.message : String(err));
+    try {
+      const { error: err } = await signInWithOAuth(provider);
+      if (err) {
+        setError(err instanceof Error ? err.message : String(err));
+      }
+      // On success, the redirect/session update handles navigation
+    } catch (unexpected) {
+      setError(unexpected instanceof Error ? unexpected.message : "Something went wrong. Please try again.");
+    } finally {
+      setOauthLoading(null);
     }
-    // On success, the redirect/session update handles navigation
   };
 
   const inputClass =

@@ -186,10 +186,8 @@ export function EntitlementsProvider({ children }: { children: ReactNode }) {
       });
       if (error) throw error;
       if (data) setEntitlements(normalizeEntitlements(data));
-      trackEvent("subscription_started", {
-        productId: purchaseData.productId ?? null,
-        isPro: purchaseData.isPro,
-      });
+      // subscription_completed is tracked in ProUpgradeModal after the purchase
+      // succeeds — no need to double-fire here.
       return { error: null };
     } catch (err) {
       return { error: err };

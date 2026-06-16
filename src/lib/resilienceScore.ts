@@ -28,6 +28,15 @@ export interface RoundScoreInput {
   checkInTimestamps: number[];
   usedPreShotReset: boolean;
   roundDurationMinutes: number;
+  /** Optional shot pattern data from Mental GPS tracker */
+  shotPatternData?: {
+    holesLogged: number;
+    threePutts: number;
+    obShots: number;
+    recoveryHoles: number; // holes golfer bounced back after an OB or bad tee shot
+    focusedHoles: number;
+    frustratedHoles: number;
+  };
 }
 
 /**
@@ -127,6 +136,37 @@ export function calculateResilienceScore(roundData: RoundScoreInput): number {
     const lastEmotion = emotionLog[emotionLog.length - 1].tag;
     if (NEGATIVE_EMOTIONS.has(lastEmotion)) {
       score -= 10;
+    }
+  }
+
+  // SHOT PATTERN ADJUSTMENTS (from Mental GPS data, when available)
+  if (roundData.shotPatternData) {
+    const sp = roundData.shotPatternData;
+
+    // Emotional consistency bonus — focused holes vs frustrated (up to +8)
+    if (sp.holesLogged >= 3) {
+      const focusRatio = sp.focusedHoles / sp.holesLogged;
+      score += Math.round(focusRatio * 8);
+
+      // Frustration spiral penalty — clusters of 2+ frustrated holes hurt more
+      if (sp.frustratedHoles >= 4) {
+        score -= 5; // spiraled mentally
+      }
+    }
+
+    // Recovery bonus — bounced back after OB or rough hole (+3 per hole, up to +9)
+    if (sp.recoveryHoles > 0) {
+      score += Math.min(9, sp.recoveryHoles * 3);
+    }
+
+    // 3-putt penalty (-2 per three-putt, up to -8) — signals putting anxiety
+    if (sp.threePutts > 0) {
+      score -= Math.min(8, sp.threePutts * 2);
+    }
+
+    // OB mental cost (-3 per OB, up to -9) — OB often signals over-aggression or tension
+    if (sp.obShots > 0) {
+      score -= Math.min(9, sp.obShots * 3);
     }
   }
 

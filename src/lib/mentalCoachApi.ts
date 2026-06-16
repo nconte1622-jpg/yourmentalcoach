@@ -3,6 +3,7 @@ import { buildRoundContextString } from "./roundContext";
 import { loadGolferProfile, buildProfileContextString } from "./golferProfile";
 import { buildInsightJournalContext } from "./insightJournal";
 import { buildBack9ContextForAI } from "./back9Detection";
+import { buildMemoryContext as buildPlayerMemoryContext } from "./playerMemory";
 import { supabase } from "@/integrations/supabase/client";
 
 export type CoachContext = "pre-game" | "round" | "round-frustrated" | "locker-room" | "coach" | "reset" | "close-strong";
@@ -79,6 +80,10 @@ export async function streamCoachResponse({
     const insightJournalContext = buildInsightJournalContext() || "";
     // Build back-9 tendency context
     const back9Context = buildBack9ContextForAI() || "";
+    // Build player round-history memory (last 5 rounds + derived patterns)
+    const playerHistoryContext = buildPlayerMemoryContext() || "";
+    // Combine cue-word memory + player history into one memoryContext block
+    const combinedMemoryContext = [memoryContext, playerHistoryContext].filter(Boolean).join("\n\n");
     const requestId = `coach_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
 
     const resp = await fetch(CHAT_URL, {
@@ -88,7 +93,7 @@ export async function streamCoachResponse({
         Authorization: `Bearer ${accessToken}`,
         "X-Request-Id": requestId,
       },
-      body: JSON.stringify({ messages, context, memoryContext, roundContext, golferContext, insightJournalContext, back9Context }),
+      body: JSON.stringify({ messages, context, memoryContext: combinedMemoryContext, roundContext, golferContext, insightJournalContext, back9Context }),
       signal,
     });
 

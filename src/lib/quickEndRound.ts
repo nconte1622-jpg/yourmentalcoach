@@ -18,6 +18,7 @@ import {
   loadUsedPreShotReset,
 } from "./roundMetrics";
 import { getMoodSummary, getMoodInsight } from "./holeMoods";
+import { loadActivePatternRound } from "./gpsPatternStorage";
 
 /**
  * Extract and save round data from chat messages when the user does a quick end.
@@ -55,11 +56,36 @@ export function extractAndSaveQuickEndData(roundId: string): void {
         ? Math.round((Date.now() - new Date(ctx.startedAt).getTime()) / 60000)
         : 0;
 
+      // Pull shot pattern data from Mental GPS if available
+      const gpsRound = loadActivePatternRound();
+      const shotPatternData = gpsRound && gpsRound.holes.length >= 3
+        ? {
+            holesLogged: gpsRound.holes.length,
+            threePutts: gpsRound.holes.filter((h) => h.puttResult === "3-putt" || h.puttResult === "4-putt").length,
+            obShots: gpsRound.holes.filter((h) => h.teeResult === "ob").length,
+            recoveryHoles: (() => {
+              let count = 0;
+              for (let i = 1; i < gpsRound.holes.length; i++) {
+                const prev = gpsRound.holes[i - 1];
+                const curr = gpsRound.holes[i];
+                if (
+                  (prev.teeResult === "ob" || prev.emotionalTag === "frustrated") &&
+                  (curr.emotionalTag === "focused" || curr.emotionalTag === "confident" || curr.teeResult === "fairway" || curr.teeResult === "great")
+                ) count++;
+              }
+              return count;
+            })(),
+            focusedHoles: gpsRound.holes.filter((h) => h.emotionalTag === "focused" || h.emotionalTag === "confident").length,
+            frustratedHoles: gpsRound.holes.filter((h) => h.emotionalTag === "frustrated").length,
+          }
+        : undefined;
+
       const score = calculateResilienceScore({
         emotionLog,
         checkInTimestamps,
         usedPreShotReset,
         roundDurationMinutes,
+        shotPatternData,
       });
       saveResilienceScore(roundId, score, new Date().toISOString());
     } catch { /* silent */ }

@@ -7,6 +7,7 @@ import { loadRoundContext, clearRoundContext, saveRoundToHistory } from "@/lib/r
 import { loadHighlights } from "@/lib/memoryStorage";
 import { getCoachResponse } from "@/lib/mentalCoachApi";
 import { format } from "date-fns";
+import { PatternAnalysis } from "@/components/PatternAnalysis";
 
 const RoundSummary = () => {
   const navigate = useNavigate();
@@ -246,6 +247,9 @@ const RoundSummary = () => {
                 )}
               </div>
             </div>
+
+            {/* Pattern insights from GPS tracker */}
+            <PatternAnalysis minRounds={2} maxInsights={3} className="pt-2" />
 
             {/* Save Button */}
             <div className="pt-4 space-y-4">

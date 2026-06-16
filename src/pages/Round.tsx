@@ -19,7 +19,7 @@ import { cn } from "@/lib/utils";
 import { getAiBackendLabel, showAiBackendIndicator } from "@/lib/aiBackend";
 import { AppHeader } from "@/components/ui/AppHeader";
 import { AppShell } from "@/components/ui/AppShell";
-import { Lock, Wind, ClipboardList, Flag, Zap } from "lucide-react";
+import { Lock, Wind, ClipboardList, Flag, Zap, Navigation } from "lucide-react";
 import { ProUpgradeModal } from "@/components/ProUpgradeModal";
 import { useFeatureFlags } from "@/hooks/useFeatureFlags";
 import { loadActiveRoundSession, clearActiveRoundSession, clearRoundMessages } from "@/lib/roundSession";
@@ -450,6 +450,17 @@ const Round = () => {
                   title="Scorecard"
                 >
                   <ClipboardList className="w-4 h-4" />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    triggerHaptic("light");
+                    navigate("/mental-gps");
+                  }}
+                  className="header-hit-button tap-44 text-muted-foreground/60 hover:text-foreground hover:bg-foreground/5 transition-all duration-300"
+                  title="Mental GPS"
+                >
+                  <Navigation className="w-4 h-4" />
                 </button>
                 <button
                   type="button"

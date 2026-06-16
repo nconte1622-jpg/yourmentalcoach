@@ -3,7 +3,7 @@
  * Accessible from the Round page header.
  * Works during AND after a round. Score data feeds the AI coach context.
  */
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { triggerHaptic } from "@/lib/haptics";
 import { PageShell } from "@/components/PageShell";
@@ -83,8 +83,37 @@ interface HoleRowProps {
   onClearScore: (hole: number) => void;
 }
 
+const LONG_PRESS_MS = 500;
+
 function HoleRow({ hole, onChangePar, onChangeScore, onClearScore }: HoleRowProps) {
   const diff = hole.score !== null ? hole.score - hole.par : null;
+  const longPressTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const didLongPress = useRef(false);
+
+  const handleScorePointerDown = () => {
+    triggerHaptic("soft");
+    didLongPress.current = false;
+    longPressTimer.current = setTimeout(() => {
+      didLongPress.current = true;
+      onClearScore(hole.hole);
+    }, LONG_PRESS_MS);
+  };
+
+  const cancelLongPress = () => {
+    if (longPressTimer.current) {
+      clearTimeout(longPressTimer.current);
+      longPressTimer.current = null;
+    }
+  };
+
+  const handleScoreClick = () => {
+    // If the long-press already fired, swallow the click so score isn't incremented
+    if (didLongPress.current) {
+      didLongPress.current = false;
+      return;
+    }
+    if (hole.score === null) onChangeScore(hole.hole, 1);
+  };
 
   return (
     <div className="flex items-center gap-2 px-4 py-2.5 border-b border-white/5 last:border-b-0">
@@ -127,14 +156,14 @@ function HoleRow({ hole, onChangePar, onChangeScore, onClearScore }: HoleRowProp
           −
         </button>
 
-        {/* Score display */}
+        {/* Score display — long-press clears, tap increments if empty */}
         <button
           type="button"
-          onPointerDown={() => triggerHaptic("soft")}
-          onLongPress={() => onClearScore(hole.hole)}
-          onClick={() => {
-            if (hole.score === null) onChangeScore(hole.hole, 1);
-          }}
+          onPointerDown={handleScorePointerDown}
+          onPointerUp={cancelLongPress}
+          onPointerLeave={cancelLongPress}
+          onPointerCancel={cancelLongPress}
+          onClick={handleScoreClick}
           className={cn(
             "min-w-[52px] h-9 rounded-xl border text-center transition-all duration-200 flex flex-col items-center justify-center",
             scoreBg(hole.score, hole.par)
