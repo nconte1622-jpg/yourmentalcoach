@@ -103,7 +103,7 @@ export async function purchaseSubscription(cycle: BillingCycle): Promise<Purchas
   }
 
   try {
-    const { offerings } = await SDK.getOfferings();
+    const offerings = await SDK.getOfferings();
     const current = offerings.current;
     if (!current) {
       return { isPro: false, productId: null, error: "No offerings available", cancelled: false };
@@ -112,7 +112,7 @@ export async function purchaseSubscription(cycle: BillingCycle): Promise<Purchas
     // Find the matching package by product identifier
     const targetId = RC_PRODUCT_IDS[cycle];
     const pkg = current.availablePackages.find(
-      (p) => p.product.productIdentifier === targetId
+      (p) => p.product.identifier === targetId
     );
 
     if (!pkg) {

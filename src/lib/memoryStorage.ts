@@ -176,6 +176,7 @@ export interface Highlight {
   cueWord: string;        // Single emphasized cue word (max 1 word)
   mentalRule: string;     // Future-facing sentence (what to do next time)
   contextTag: string;     // Short tag inferred from situation
+  reflection?: string;    // Optional free-form post-round note
 }
 
 export function loadHighlights(): Highlight[] {
