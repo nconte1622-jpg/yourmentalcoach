@@ -56,7 +56,7 @@ workflows:
       xcode: latest
     scripts:
       - name: Install JS dependencies
-        script: npm ci
+        script: npm install
       - name: Build web app (Vite)
         script: npm run build
       - name: Sync web build into the iOS project
@@ -171,4 +171,4 @@ workflows:
       #     - you@example.com
       #   notify:
       #     success: true
-      #     failure: tru
+      #     failure

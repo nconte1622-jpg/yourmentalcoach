@@ -36,6 +36,7 @@ import MasterQuiz from "./pages/MasterQuiz";
 import SwingAnalysis from "./pages/SwingAnalysis";
 import MentalGPS from "./pages/MentalGPS";
 import Scorecard from "./pages/Scorecard";
+import RoundHistory from "./pages/RoundHistory";
 import Terms from "./pages/TermsOfService";
 import Privacy from "./pages/PrivacyPolicy";
 import { ScrollToTop } from "./components/ScrollToTop";
@@ -101,6 +102,7 @@ function AppRoutes({ showSplash, onSplashComplete }: { showSplash: boolean; onSp
           <Route path="/master-quiz" element={<ProtectedRoute><MasterQuiz /></ProtectedRoute>} />
           <Route path="/swing-analysis" element={<ProtectedRoute><SwingAnalysis /></ProtectedRoute>} />
           <Route path="/mental-gps" element={<ProtectedRoute><MentalGPS /></ProtectedRoute>} />
+          <Route path="/round-history" element={<ProtectedRoute><RoundHistory /></ProtectedRoute>} />
           <Route path="/upgrade" element={<ProtectedRoute><Upgrade /></ProtectedRoute>} />
           <Route path="/upgrade-success" element={<ProtectedRoute><UpgradeSuccess /></ProtectedRoute>} />
           <Route path="/terms" element={<Terms />} />

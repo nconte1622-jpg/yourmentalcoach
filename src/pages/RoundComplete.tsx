@@ -10,6 +10,7 @@ import { schedulePostRoundPrompt } from "@/lib/notifications";
 import { generateRoundWord, loadRoundWord, clearRoundWord } from "@/lib/roundWord";
 import { buildSnapshotFromRoundData, updateRoundMemory } from "@/lib/playerMemory";
 import { loadActiveRoundSession } from "@/lib/roundSession";
+import { incrementCompletedRounds, maybeRequestReview } from "@/lib/appReview";
 
 const RoundComplete = () => {
   const navigate = useNavigate();
@@ -40,6 +41,13 @@ const RoundComplete = () => {
 
   // Schedule a post-round reflection nudge for next app open
   useEffect(() => { schedulePostRoundPrompt(); }, []);
+
+  // Increment completed-round counter and maybe request App Store review
+  useEffect(() => {
+    incrementCompletedRounds();
+    void maybeRequestReview();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Persist round memory snapshot for adaptive AI
   useEffect(() => {

@@ -5,7 +5,7 @@ import { PageShell } from "@/components/PageShell";
 import { useAuth } from "@/hooks/useAuth";
 import { useEntitlements } from "@/hooks/useEntitlements";
 import { toast } from "sonner";
-import { User, Crown, LogOut, Mail, ArrowLeft, Shield, FlaskConical, RotateCcw, Bug, FileText, ShieldAlert, Trash2, Brain, ChevronRight, Pencil } from "lucide-react";
+import { User, Crown, LogOut, Mail, ArrowLeft, Shield, FlaskConical, RotateCcw, Bug, FileText, ShieldAlert, Trash2, Brain, ChevronRight, Pencil, History } from "lucide-react";
 import { loadGolferProfile, type GolferProfile, getHeightDisplay } from "@/lib/golferProfile";
 import { AppShell } from "@/components/ui/AppShell";
 import { AppHeader } from "@/components/ui/AppHeader";
@@ -330,6 +330,16 @@ const Account = () => {
               >
                 <RotateCcw className="h-4 w-4 mr-2" />
                 {isRestoring ? "Restoring..." : "Restore Purchases"}
+              </Button>
+
+              <Button
+                onClick={() => navigate("/round-history")}
+                variant="outline"
+                className="w-full py-6 text-base font-medium rounded-2xl border-primary/20 bg-card/50 hover:bg-card/70"
+                size="lg"
+              >
+                <History className="h-4 w-4 mr-2" />
+                Round History
               </Button>
 
               <FrostedSandCard className="rounded-2xl p-3">

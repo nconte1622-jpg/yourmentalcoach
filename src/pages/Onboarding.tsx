@@ -5,8 +5,9 @@ import { AppShell } from "@/components/ui/AppShell";
 import { AppHeader } from "@/components/ui/AppHeader";
 import { FrostedSandCard } from "@/components/ui/frosted-sand-card";
 import { Button } from "@/components/ui/button";
-import { Brain, MessageCircle, Sparkles, TrendingUp } from "lucide-react";
+import { Bell, Brain, MessageCircle, Sparkles, TrendingUp } from "lucide-react";
 import { completeOnboarding } from "@/lib/onboarding";
+import { requestNotificationPermission } from "@/lib/notifications";
 
 const STEPS = [
   {
@@ -29,7 +30,15 @@ const STEPS = [
     body: "Pro unlocks Round DNA, pattern detection, unlimited AI, and more personalized support across sessions.",
     icon: TrendingUp,
   },
+  {
+    title: "Stay in the game",
+    body: "Allow notifications so The Caddie can remind you to reflect between rounds and keep your mental game sharp.",
+    icon: Bell,
+  },
 ];
+
+// Index of the notification step — used to trigger the permission request
+const NOTIFICATION_STEP_INDEX = 4;
 
 const Onboarding = () => {
   const navigate = useNavigate();
@@ -37,16 +46,33 @@ const Onboarding = () => {
   const step = useMemo(() => STEPS[stepIndex], [stepIndex]);
   const Icon = step.icon;
 
-  const handleNext = () => {
-    if (stepIndex < STEPS.length - 1) {
-      setStepIndex((current) => current + 1);
-      return;
-    }
+  const finishOnboarding = () => {
     completeOnboarding();
     // Send new users to Master Quiz first so the AI has real context from round 1.
     // Pass state so MasterQuiz knows to redirect to /round-setup after saving.
     navigate("/master-quiz", { state: { fromOnboarding: true } });
   };
+
+  const handleNext = async () => {
+    // On the notification step, request permission before advancing
+    if (stepIndex === NOTIFICATION_STEP_INDEX) {
+      await requestNotificationPermission().catch(() => {
+        // Never block onboarding completion on a permission denial
+      });
+      finishOnboarding();
+      return;
+    }
+
+    if (stepIndex < STEPS.length - 1) {
+      setStepIndex((current) => current + 1);
+      return;
+    }
+
+    finishOnboarding();
+  };
+
+  const isNotificationStep = stepIndex === NOTIFICATION_STEP_INDEX;
+  const isLastStep = stepIndex === STEPS.length - 1;
 
   return (
     <PageShell backgroundVariant="default">
@@ -78,7 +104,10 @@ const Onboarding = () => {
                 STEP {stepIndex + 1} OF {STEPS.length}
               </p>
               <div className="h-2 overflow-hidden rounded-full bg-foreground/8">
-                <div className="h-full rounded-full bg-primary transition-all duration-300" style={{ width: `${((stepIndex + 1) / STEPS.length) * 100}%` }} />
+                <div
+                  className="h-full rounded-full bg-primary transition-all duration-300"
+                  style={{ width: `${((stepIndex + 1) / STEPS.length) * 100}%` }}
+                />
               </div>
             </div>
 
@@ -95,9 +124,18 @@ const Onboarding = () => {
                   {step.body}
                 </p>
               </div>
-              <Button onClick={handleNext} className="min-h-11 w-full rounded-2xl">
-                {stepIndex === STEPS.length - 1 ? "Set Up Your Profile" : "Continue"}
+              <Button onClick={() => void handleNext()} className="min-h-11 w-full rounded-2xl">
+                {isNotificationStep ? "Allow Notifications" : isLastStep ? "Set Up Your Profile" : "Continue"}
               </Button>
+              {isNotificationStep && (
+                <button
+                  type="button"
+                  onClick={finishOnboarding}
+                  className="w-full text-center text-sm text-muted-foreground/60 hover:text-muted-foreground transition-colors"
+                >
+                  Skip for now
+                </button>
+              )}
             </FrostedSandCard>
           </div>
         </main>

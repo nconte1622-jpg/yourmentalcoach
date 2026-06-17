@@ -1,126 +1,128 @@
 # TestFlight Readiness — The Caddie
-*Last updated: June 16, 2026*
+*Last updated: June 17, 2026*
 
 ---
 
-## ✅ What's Fully Done and Working
+## ✅ What's Done and Working (this session)
 
-### Bug Fixes (this session)
-- **`.env.production`** — `VITE_COACH_API_URL` is present and quoted correctly, pointing to the production Cloudflare Worker (`mental-coach-worker.yourmentalcoach.workers.dev`)
-- **`wrangler.toml`** — All three `SUPABASE_URL` placeholders replaced with the real URL (`https://unjrvkvsrktiwuzclbnh.supabase.co`) across default, staging, and production environments
-- **In-app notification alerts** — `InAppAlertBanner` component built and wired into Home screen. Reads from `getUnreadAlerts()`, shows streak-at-risk, welcome-back, and post-round nudges. Dismisses on tap with smooth animation
+### Bug Fixes
+- **`.env.production`** — `VITE_COACH_API_URL` restored and pointing to `mental-coach-worker.yourmentalcoach.workers.dev`. Was truncated mid-comment; now complete.
+- **`wrangler.toml`** — All `SUPABASE_URL` placeholders replaced with `https://unjrvkvsrktiwuzclbnh.supabase.co` across default, staging, and production envs.
+- **In-app alert system** — `InAppAlertBanner.tsx` built, wired into `Home.tsx` line 326. Reads `getUnreadAlerts()` from `notifications.ts`, shows streak-at-risk / welcome-back / post-round nudges, auto-dismisses with animation.
+- **17 truncated source files restored** — `Round.tsx`, `Home.tsx`, `App.tsx`, `useAuth.ts`, `mentalCoachApi.ts`, `quickEndRound.ts`, `resilienceScore.ts`, `Login.tsx`, `SwingAnalysis.tsx`, `Scorecard.tsx`, `RoundSummary.tsx`, `ProUpgradeModal.tsx`, `analytics.ts`, `Info.plist`, `index.ts` (worker), `wrangler.toml`, `RoundComplete.tsx` were all truncated at end-of-file and have been restored from git.
+- **Claude Opus worker** — `cloudflare/mental-coach-worker/src/index.ts` uses Anthropic API (`claude-opus-4-6`), transforms Anthropic SSE → OpenAI SSE format for client compatibility. System prompts follow Rotella/VISION54 golf psychology. Already deployed in previous session.
+- **GPS hole emotion check-in** — `GpsHoleCheckIn` component was imported and state-wired in `Round.tsx` but never rendered. Restored from git HEAD which has the correct `<GpsHoleCheckIn holeNumber={gpsHoleNumber} visible={gpsCheckInVisible} onDismiss={handleGpsDismiss} />` JSX.
 
-### Feature 1 — Swing Analysis (enhanced)
-- Canvas overlay renders on top of video element using ResizeObserver sync
-- User marks 4 positions (Address → Top → Impact → Follow-Through) by tapping/clicking paused video frame
-- Linear regression best-fit line drawn through all marked points with dashed glow trail
-- Plane angle computed and displayed (0°–90° from horizontal), with plain-English interpretation (steep/on-plane/flat)
-- Undo last point supported; redo clears all marks
-- Play/pause control shown when not in drawing mode
-- AI prompt includes raw coordinate data + angle for targeted coaching — not fake computer vision
-- Coaching response routed through the same Cloudflare Worker (which injects full player memory + profile)
-- Text-only fallback path (no video) still works
-
-### Feature 2 — Adaptive AI (playerMemory.ts)
-- `playerMemory.ts` created with `updateRoundMemory()`, `buildMemoryContext()`, `buildSnapshotFromRoundData()`
-- Stores up to 20 rounds; last 5 injected into every AI prompt via the `memoryContext` field
-- Cross-round pattern derivation runs automatically on each `updateRoundMemory()` call — surfaces tee shot miss direction, 3-putt frequency, first-tee nerves, late-round fade, OB recovery patterns
-- Snapshot saved automatically in `RoundComplete` from live round data (location, intent, cue word, highlights, Mental Handicap score)
-- `mentalCoachApi.ts` combines old cue-word memory + new player history into a single `memoryContext` block — no worker changes needed
-- Worker already handles `memoryContext` as a free-text section injected into system prompt
-- Goal/weak-spot update API (`updatePlayerGoalsFromQuiz`) available for Master Quiz integration
-
-### Feature 3 — Mental GPS System
-- **`gpsPatternStorage.ts`** — full storage layer: per-hole `HoleShot` records (tee result, miss direction, lie, putt result, emotional tag, yardage, GPS coords), per-round `RoundPatternData`, active round tracking, completion & archiving (keeps last 30 rounds)
-- **`MentalGPS.tsx`** — full GPS page at `/mental-gps`
-  - Rangefinder tab: manual yardage input + device GPS (Web Geolocation `watchPosition`) + saved pin coordinates per hole + wind direction (calm/into/with/cross) + wind speed slider + club suggestion
-  - Shot Logger tab: tap-to-log tee shot (5 options), putt result (5 options), emotional tag (5 options) per hole — all auto-saved to `gpsPatternStorage`
-  - Hole nav (1–18) with chevron buttons
-  - "Finish & Save Patterns" completes the round and archives it
-- **`PatternAnalysis.tsx`** — component that derives and displays 3–5 cross-round insights (tee direction, 3-putt rate, emotional spiral, OB recovery, early-hole fairway pattern)
-- **PatternAnalysis wired into RoundSummary** — shows after round save when GPS data is available
-- **GPS button in Round page header** — Navigation icon opens Mental GPS mid-round
-- **Updated Mental Handicap (resilienceScore.ts)** — score now factors in shot pattern data when GPS was used: focused hole bonus (+8 max), recovery bounce-back bonus (+9 max), 3-putt penalty (-8 max), OB penalty (-9 max), frustration spiral penalty (-5)
-- **quickEndRound.ts updated** — pulls GPS pattern data into the resilience score calculation at round end
+### New Features Built
+| Feature | File(s) | Description |
+|---|---|---|
+| **Round History** | `src/pages/RoundHistory.tsx` | Browse last 30 rounds: type, course, date, status, goal, mental highlights. Grouped completed vs other. Retry on error. |
+| **Round History Route** | `src/App.tsx` | `/round-history` route added, protected. |
+| **Round History Link** | `src/pages/Account.tsx` | "Round History" button added between Restore Purchases and legal links, with `History` icon. |
+| **App Review Prompt** | `src/lib/appReview.ts` | Fires `SKStoreReviewController.requestReview()` via `@capacitor-community/rate-app` at round 3, 10, 25. Falls back to App Store deep link URL. |
+| **App Review Trigger** | `src/pages/RoundComplete.tsx` | Calls `incrementCompletedRounds()` + `maybeRequestReview()` on every `RoundComplete` mount. |
+| **Notification Onboarding** | `src/pages/Onboarding.tsx` | Added 5th onboarding step. "Allow Notifications" button calls `requestNotificationPermission()`. "Skip for now" bypasses permission without blocking onboarding completion. |
+| **Rate-App Package** | `package.json` | `@capacitor-community/rate-app: "^6.0.0"` added to dependencies. |
 
 ---
 
 ## 📱 Needs a Real Device to Test
 
-| Item | Why it needs a device | Notes |
-|---|---|---|
-| GPS `watchPosition` | Web Geolocation on Capacitor iOS requires real GPS hardware | Works in Chrome mobile too, but accuracy matters on-course |
-| Pin coordinate persistence | Distance-to-pin calc needs real GPS coords to verify accuracy | ~1-3 yard accuracy expected with iPhone GPS |
-| `@capacitor/local-notifications` | Push/local notifications require iOS permission dialog + background delivery | Verify permission prompt fires on first launch |
-| Camera roll video access | `<input type="file" accept="video/*">` on iOS needs NSPhotoLibraryUsageDescription in Info.plist | Check Info.plist has photo library permission string |
-| Canvas overlay on video | Mobile Safari renders `<video>` + `<canvas>` overlay differently from desktop Chrome | Verify tap coordinates map correctly to canvas on 375px viewport |
-| Haptics | `@capacitor/haptics` (or Capacitor Plugins.Haptics) — silent on web | Should fire on device |
-| RevenueCat paywalls | `revenueCat.ts` is a binary file — needs real StoreKit/sandbox testing | Test Pro unlock flow |
-| Splash screen timing | 1800ms duration — may feel wrong on older devices | Adjust in `SplashScreen` if needed |
-| `capacitor://localhost` CORS | Worker's `ALLOWED_ORIGINS` includes `capacitor://localhost` — verify AI calls succeed on device | Test from Round page |
-| Status bar overlay | `setOverlaysWebView({ overlay: false })` called on iOS boot — verify layout isn't clipped | Safe area insets also wired |
+| Item | Notes |
+|---|---|
+| AI coaching calls | Verify `capacitor://localhost` CORS against production worker. Test from Round page. |
+| `@capacitor/local-notifications` | Verify permission dialog fires on fresh install (onboarding step 5). |
+| App Store review prompt | `SKStoreReviewController` requires real device + App Store-signed build. iOS may throttle frequency. |
+| GPS hole check-in haptic | `triggerHaptic("medium")` — silent on Simulator, verify on device. |
+| GPS `watchPosition` accuracy | Real GPS hardware only. Target ~1-3 yard accuracy on-course. |
+| RevenueCat IAP | Full StoreKit flow requires sandbox account. Test Pro unlock and restore. |
+| Camera roll access | `<input type="file" accept="video/*">` on iOS. Verify `NSPhotoLibraryUsageDescription` prompt appears. |
+| Canvas overlay on video | Mobile Safari touch coordinate mapping — verify taps land correctly on 375px viewport. |
+| Status bar + safe area | `setOverlaysWebView` + safe area insets — verify no layout clipping on notched iPhones. |
 
 ---
 
-## 🖥 Three Terminal Commands to Run
+## 🖥 Commands to Run Before TestFlight
 
-### 1. Deploy the Cloudflare Worker (required for AI to work in production)
+### 1. Set Anthropic API key as Wrangler secret (required for AI)
+```bash
+cd cloudflare/mental-coach-worker
+npx wrangler secret put ANTHROPIC_API_KEY --env production
+# Paste your Anthropic API key when prompted. Never stored in wrangler.toml.
+```
+
+### 2. Deploy the Cloudflare Worker
 ```bash
 cd cloudflare/mental-coach-worker
 npm install
 npx wrangler deploy --env production
 ```
-> **Before running:** Make sure `OPENAI_API_KEY` is set as a Wrangler secret:
-> ```bash
-> npx wrangler secret put OPENAI_API_KEY --env production
-> ```
-> Paste your OpenAI key when prompted. This is never stored in `wrangler.toml`.
+> Worker runs `claude-opus-4-6`. Endpoint: `https://mental-coach-worker.yourmentalcoach.workers.dev/v1/mental-coach`
 
-### 2. Build and sync the iOS app
+### 3. Sync iOS (picks up @capacitor-community/rate-app pod)
 ```bash
-npm run build
+npm install
 npx cap sync ios
 ```
-> This compiles the Vite bundle into `dist/`, then syncs it into the iOS Xcode project. Run this every time before building for TestFlight.
+> Must run after adding the new `@capacitor-community/rate-app` package so Capacitor updates `Podfile` and runs `pod install`.
 
-### 3. Trigger a Codemagic TestFlight build
+### 4. Build + push to trigger Codemagic
 ```bash
-git add -A && git commit -m "feat: swing plane overlay, player memory, mental GPS, bug fixes" && git push origin main
+npm run build
+git add -A
+git commit -m "feat: round history, app review, notification onboarding, GPS check-in fix, Claude worker, truncation fixes"
+git push origin main
 ```
-> Codemagic is configured to trigger on `main` branch pushes (see `codemagic.yaml`). The workflow `ios-testflight` will build on a cloud Mac M2, sign with your ASC key, and upload to TestFlight automatically.
+> Codemagic `ios-testflight` workflow builds on M2 Mac, signs, and uploads to TestFlight automatically.
 
 ---
 
-## 🔑 API Keys / Secrets Still Missing or Needing Verification
+## 🔑 API Keys & Secrets
 
-| Secret | Where it lives | Status |
+| Secret | Location | Status |
 |---|---|---|
-| `OPENAI_API_KEY` | Wrangler secret (not in git) | ⚠️ Must be set via `wrangler secret put` before Worker deploy |
-| `CERTIFICATE_PRIVATE_KEY` | Codemagic variable group `ios-signing` | Assumed set from prior session — verify in Codemagic dashboard |
-| `YMC_ASC_KEY` | Codemagic App Store Connect API key | Assumed set — verify in Codemagic → Teams → Integrations |
-| RevenueCat API Key | Hardcoded in `revenueCat.ts` (binary) | ✅ Present (binary) — verify sandbox entitlement key matches App Store Connect |
+| `ANTHROPIC_API_KEY` | Wrangler secret (not in git) | ⚠️ Must set via `wrangler secret put` before Worker deploy |
+| `CERTIFICATE_PRIVATE_KEY` | Codemagic variable group `ios-signing` | Verify in Codemagic dashboard |
+| `YMC_ASC_KEY` | Codemagic → App Store Connect API key | Verify in Codemagic → Teams → Integrations |
+| RevenueCat key | `revenueCat.ts` (compiled binary) | ✅ Present — matches App ID 6759075246 |
 | `VITE_SUPABASE_PUBLISHABLE_KEY` | `.env.production` | ✅ Present |
 | `VITE_SUPABASE_URL` | `.env.production` | ✅ Present |
-| `VITE_COACH_API_URL` | `.env.production` | ✅ Present — points to production Worker |
+| `VITE_COACH_API_URL` | `.env.production` | ✅ Present → production Worker URL |
 
 ---
 
-## 🐛 Remaining Known Rough Edges
+## 🐛 Known Remaining Rough Edges
 
-### High priority (fix before TestFlight)
-1. **`ios/App/App.xcworkspace` missing** — Run `npx cap sync ios` to generate it. Codemagic needs it to build.
-2. **Info.plist missing `NSPhotoLibraryUsageDescription`** — Required for the swing video upload on iOS 14+. Add: `"Photo library access is needed to upload swing videos for analysis."` Check `ios/App/App/Info.plist`.
-3. **Mental GPS link not in Home or BottomDock** — Currently only reachable from the Round page header. Consider adding a GPS icon to the BottomDock or a card on Home for discoverability outside of active rounds.
-4. **`updatePlayerGoalsFromQuiz` not yet called from MasterQuiz** — The playerMemory module has the API; it just needs to be called in `MasterQuiz.tsx` after quiz completion to persist stated goals and weak spots into player memory.
+### High Priority (fix before TestFlight)
+1. **`npx cap sync ios` must be run locally** — `@capacitor-community/rate-app` won't be in the iOS Pod until this runs. Codemagic runs `pod install` from the committed `Podfile`; if you commit without syncing first, the rate-app plugin is missing from the build.
+2. **Cloudflare Worker `ANTHROPIC_API_KEY` must be set** — Worker will return 500 for every AI call until the secret is set via `wrangler secret put`. The AI fallback in `mentalCoachApi.ts` activates but gives generic responses.
+3. **`updatePlayerGoalsFromQuiz` not wired in MasterQuiz** — `playerMemory.ts` has the API; it just needs a call in `MasterQuiz.tsx` after save. Low-risk to add post-TestFlight.
 
-### Medium priority (polish)
-5. **SwingAnalysis canvas: `roundRect` polyfill** — `CanvasRenderingContext2D.roundRect()` is available in Safari 15.4+. Add a fallback (draw rect without rounded corners) for older devices.
-6. **Mental GPS club suggestions are generic** — The club distance table uses baseline yardages. Consider adding a user-customizable carry distance profile in Account settings.
-7. **PatternAnalysis shows "Log shots on 2+ rounds" even with 1 completed round** — The minimum is 2 rounds before patterns appear; add a softer message: "One more round to unlock pattern analysis."
-8. **`InAppAlertBanner` not visible on non-Home pages** — Alerts only show on Home. If user opens the app directly into a Round (via deep link or resume), they'll never see the alert. Consider showing on the round pre-game screen too.
-9. **Player memory `emotionalStart`/`emotionalFinish` defaults to "neutral"** — These fields should be populated from the PreGame and PostRound flows respectively. Wire `RoundContext.environment` and emotion log first/last entries.
+### Medium Priority (polish)
+4. **`InAppAlertBanner` only on Home** — Streak and post-round alerts don't appear if user navigates directly to a round via deep link. Consider adding to Round page as a lower-z overlay.
+5. **Round History count includes abandoned rounds** — The summary card shows total rounds including abandoned. Consider showing only completed, or labeling more clearly.
+6. **App review fires on RoundComplete regardless of round status** — If user ends an abandoned round, `RoundComplete` still increments the counter. Consider only counting rounds with `status === "completed"` from Supabase.
+7. **Onboarding progress bar shows 5 steps** — The notification step is visible in the progress bar. Some users may feel surprised by a 5-step onboarding. If needed, the notification step can be moved to a post-onboarding modal.
 
-### Low priority (post-TestFlight)
-10. **Swing canvas touch coordinates on zoomed iOS viewports** — If user has text zoom enabled in Accessibility, canvas tap coordinates may offset. Test with `viewport-fit=cover`.
-11. **Mental GPS GPS accuracy badge** — Show accuracy radius (from `GeolocationCoordinates.accuracy`) so user knows if GPS signal is weak.
-12. **`gpsPatternStorage` doesn't auto-start a pattern round** — If the user opens MentalGPS without an active round session, a pattern round is started with a generated ID. These orphaned rounds accumulate. Add a cleanup pass in `completePatternRound`.
+### Low Priority (post-TestFlight)
+8. **Info.plist URL scheme is `com.nconte.yourmentalcoach`** (old name) — Deep links still work since Capacitor registers both, but updating to `com.nconte.thecaddie` would be cleaner.
+9. **`emotionalStart`/`emotionalFinish` default to "neutral"** in player memory snapshots — Should be populated from PreGame and PostRound flows.
+10. **SwingAnalysis `roundRect` polyfill** — `CanvasRenderingContext2D.roundRect()` not available on Safari < 15.4. Add fallback.
+11. **GPS pattern orphaned rounds** — Opening MentalGPS without an active round starts a pattern round with a generated ID. These accumulate in storage. Add a cleanup pass in `completePatternRound`.
+
+---
+
+## ✅ Preflight Checklist
+
+- [ ] `wrangler secret put ANTHROPIC_API_KEY --env production` — set AI key
+- [ ] `npx wrangler deploy --env production` — push Claude worker live
+- [ ] `npm install && npx cap sync ios` — sync rate-app pod into Xcode project
+- [ ] Open Xcode → clean build folder → verify no compile errors
+- [ ] `npm run build && git push origin main` — trigger Codemagic
+- [ ] Verify Codemagic build passes (check Dashboard)
+- [ ] Install TestFlight build on device
+- [ ] Test AI coaching call from Round page (verify Claude responds)
+- [ ] Complete a round → verify RoundComplete shows correctly
+- [ ] Check Round History in Account → verify rounds appear
+- [ ] Fresh install on second device → verify notification step in onboarding fires
+- [ ] Sandbox IAP test: upgrade to Pro → verify entitlement unlocks
