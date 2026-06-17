@@ -1,8 +1,8 @@
 import { createRemoteJWKSet, jwtVerify, JWTPayload } from "jose";
 
 type Env = {
-  OPENAI_API_KEY: string;
-  OPENAI_MODEL?: string;
+  ANTHROPIC_API_KEY: string;
+  ANTHROPIC_MODEL?: string;
   SUPABASE_URL: string;
   REQUIRE_AUTH?: string;
   SUPABASE_JWT_AUD?: string;
@@ -11,7 +11,7 @@ type Env = {
 };
 
 type ChatMessage = {
-  role: "system" | "user" | "assistant";
+  role: "user" | "assistant";
   content: string;
 };
 
@@ -62,7 +62,7 @@ Keep it to 2-3 sentences. Give them ONE thing to focus on today. If you know the
 };
 
 /* ═══════════════════════════════════════════════════════════════
-   INFRASTRUCTURE — Auth, CORS, routing (unchanged)
+   INFRASTRUCTURE — Auth, CORS, routing
    ═══════════════════════════════════════════════════════════════ */
 
 const jwksByProject = new Map<string, ReturnType<typeof createRemoteJWKSet>>();
@@ -144,6 +144,74 @@ function logRequest(
 }
 
 /* ═══════════════════════════════════════════════════════════════
+   ANTHROPIC STREAM → OpenAI-compatible SSE transform
+   The frontend already consumes OpenAI's SSE format, so we
+   translate Anthropic's events on the fly to avoid frontend changes.
+   ═══════════════════════════════════════════════════════════════ */
+
+function transformAnthropicStream(anthropicStream: ReadableStream<Uint8Array>): ReadableStream<Uint8Array> {
+  const encoder = new TextEncoder();
+  const decoder = new TextDecoder();
+  let buffer = "";
+
+  return new ReadableStream({
+    async start(controller) {
+      const reader = anthropicStream.getReader();
+      try {
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+
+          buffer += decoder.decode(value, { stream: true });
+          const lines = buffer.split("\n");
+          buffer = lines.pop() ?? "";
+
+          for (const line of lines) {
+            if (!line.startsWith("data: ")) continue;
+            const raw = line.slice(6).trim();
+            if (!raw) continue;
+
+            let event: Record<string, unknown>;
+            try {
+              event = JSON.parse(raw) as Record<string, unknown>;
+            } catch {
+              continue;
+            }
+
+            if (event.type === "content_block_delta") {
+              const delta = event.delta as Record<string, unknown> | undefined;
+              if (delta?.type === "text_delta" && typeof delta.text === "string") {
+                const chunk = {
+                  id: "chatcmpl-anthropic",
+                  object: "chat.completion.chunk",
+                  created: Math.floor(Date.now() / 1000),
+                  model: "claude-opus",
+                  choices: [{ index: 0, delta: { content: delta.text }, finish_reason: null }],
+                };
+                controller.enqueue(encoder.encode(`data: ${JSON.stringify(chunk)}\n\n`));
+              }
+            } else if (event.type === "message_stop") {
+              const doneChunk = {
+                id: "chatcmpl-anthropic",
+                object: "chat.completion.chunk",
+                created: Math.floor(Date.now() / 1000),
+                model: "claude-opus",
+                choices: [{ index: 0, delta: {}, finish_reason: "stop" }],
+              };
+              controller.enqueue(encoder.encode(`data: ${JSON.stringify(doneChunk)}\n\n`));
+              controller.enqueue(encoder.encode("data: [DONE]\n\n"));
+            }
+          }
+        }
+      } finally {
+        reader.releaseLock();
+        controller.close();
+      }
+    },
+  });
+}
+
+/* ═══════════════════════════════════════════════════════════════
    MAIN HANDLER
    ═══════════════════════════════════════════════════════════════ */
 
@@ -209,9 +277,9 @@ export default {
       }
     }
 
-    if (!env.OPENAI_API_KEY) {
-      logRequest(env, { ...logBase, status: 500, errorBucket: "server_config_missing_openai_key" });
-      return new Response(JSON.stringify({ error: "OPENAI_API_KEY is not configured" }), {
+    if (!env.ANTHROPIC_API_KEY) {
+      logRequest(env, { ...logBase, status: 500, errorBucket: "server_config_missing_anthropic_key" });
+      return new Response(JSON.stringify({ error: "ANTHROPIC_API_KEY is not configured" }), {
         status: 500,
         headers: new Headers({
           ...Object.fromEntries(corsHeaders.entries()),
@@ -231,11 +299,18 @@ export default {
       back9Context?: string;
     };
 
-    const messages = Array.isArray(body.messages) ? body.messages : [];
+    const rawMessages = Array.isArray(body.messages) ? body.messages : [];
+    // Anthropic requires alternating user/assistant and must start with user
+    const messages: ChatMessage[] = rawMessages.filter(
+      (m): m is ChatMessage => m.role === "user" || m.role === "assistant"
+    );
+
     const context = String(body.context || "round");
     const contextPrompt = CONTEXT_PROMPTS[context] || CONTEXT_PROMPTS.round;
     const golferSection = body.golferContext ? `--- WHO YOU'RE COACHING ---\n${body.golferContext}` : "";
-    const journalSection = body.insightJournalContext ? `--- THINGS THEY'VE TOLD YOU (from past rounds) ---\n${body.insightJournalContext}\nWeave these naturally into your coaching. Don't announce that you "remember" — just reference it like you've been paying attention.` : "";
+    const journalSection = body.insightJournalContext
+      ? `--- THINGS THEY'VE TOLD YOU (from past rounds) ---\n${body.insightJournalContext}\nWeave these naturally into your coaching. Don't announce that you "remember" — just reference it like you've been paying attention.`
+      : "";
     const back9Section = body.back9Context ? `--- BACK NINE TENDENCY ---\n${body.back9Context}` : "";
     const sessionSection = [body.roundContext, body.memoryContext].filter(Boolean).join("\n\n");
     const extraContext = [golferSection, journalSection, back9Section, sessionSection].filter(Boolean).join("\n\n");
@@ -244,25 +319,29 @@ export default {
       ? `${BASE_SYSTEM_PROMPT}\n\n--- CURRENT MODE ---\n${contextPrompt}\n\n${extraContext}`
       : `${BASE_SYSTEM_PROMPT}\n\n--- CURRENT MODE ---\n${contextPrompt}`;
 
-    console.log(`mental-coach request_id=${requestId} context=${context} model=${env.OPENAI_MODEL || "gpt-4.1-mini"}`);
+    const model = env.ANTHROPIC_MODEL || "claude-opus-4-6";
+    console.log(`mental-coach request_id=${requestId} context=${context} model=${model}`);
 
-    const upstream = await fetch("https://api.openai.com/v1/chat/completions", {
+    const upstream = await fetch("https://api.anthropic.com/v1/messages", {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${env.OPENAI_API_KEY}`,
-        "Content-Type": "application/json",
+        "x-api-key": env.ANTHROPIC_API_KEY,
+        "anthropic-version": "2023-06-01",
+        "content-type": "application/json",
       },
       body: JSON.stringify({
-        model: env.OPENAI_MODEL || "gpt-4.1-mini",
+        model,
+        max_tokens: 1024,
         stream: true,
-        messages: [{ role: "system", content: systemPrompt }, ...messages],
+        system: systemPrompt,
+        messages: messages.length > 0 ? messages : [{ role: "user", content: "Hi" }],
       }),
     });
 
     if (!upstream.ok || !upstream.body) {
       const text = await upstream.text();
       console.error(`mental-coach upstream_error request_id=${requestId} status=${upstream.status} body=${text.slice(0, 500)}`);
-      logRequest(env, { ...logBase, status: upstream.status || 500, errorBucket: "openai_upstream_error" });
+      logRequest(env, { ...logBase, status: upstream.status || 500, errorBucket: "anthropic_upstream_error" });
       return new Response(
         JSON.stringify({ error: "Unable to connect to coach.", request_id: requestId }),
         {
@@ -283,6 +362,6 @@ export default {
     responseHeaders.set("x-request-id", requestId);
     logRequest(env, { ...logBase, status: 200, errorBucket: "ok" });
 
-    return new Response(upstream.body, { status: 200, headers: responseHeaders });
+    return new Response(transformAnthropicStream(upstream.body), { status: 200, headers: responseHeaders });
   },
 };
