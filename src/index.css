@@ -220,7 +220,7 @@
 
   h1, h2, h3, h4, h5, h6 {
     font-family: 'Cormorant Garamond', serif;
-    font-weight: 500;
+    font-weight: 600;
     letter-spacing: 0.02em;
     text-shadow: 0 1px 6px rgba(0, 0, 0, 0.35);
   }
@@ -284,7 +284,7 @@
 
   .app-header-grid {
     display: grid;
-    grid-template-columns: minmax(44px, 1fr) minmax(0, 2fr) minmax(44px, 1fr);
+    grid-template-columns: auto 1fr auto;
     align-items: center;
   }
 
@@ -301,8 +301,10 @@
     justify-self: center;
     min-width: 0;
     text-align: center;
-    padding-inline: 8px;
+    padding-inline: 4px;
     overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   .app-header-right {
@@ -312,7 +314,7 @@
     display: flex;
     align-items: center;
     justify-content: flex-end;
-    gap: 8px;
+    gap: 2px;
   }
 
   .app-header-subrow {
@@ -336,10 +338,10 @@
   }
 
   .header-hit-button {
-    min-width: 44px;
-    min-height: 44px;
-    padding-block: 10px;
-    padding-inline: 14px;
+    min-width: 40px;
+    min-height: 40px;
+    padding-block: 8px;
+    padding-inline: 10px;
     border-radius: 9999px;
     display: inline-flex;
     align-items: center;
@@ -1216,4 +1218,124 @@
 
 .animate-slide-up {
   animation: slide-up 0.35s ease-out forwards;
+}
+
+/* ============================================
+   PAGE TRANSITIONS
+   ============================================ */
+
+@keyframes page-enter {
+  from {
+    opacity: 0;
+    transform: translateX(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes page-enter-back {
+  from {
+    opacity: 0;
+    transform: translateX(-16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.page-transition-enter {
+  animation: page-enter 0.3s cubic-bezier(0.32, 0.72, 0, 1) both;
+}
+
+.page-transition-enter-back {
+  animation: page-enter-back 0.3s cubic-bezier(0.32, 0.72, 0, 1) both;
+}
+
+/* ============================================
+   GLOBAL INTERACTIVE STATES
+   ============================================ */
+
+button:not(:disabled),
+[role="button"]:not(:disabled) {
+  transition: transform 150ms ease, opacity 150ms ease, background-color 200ms ease, border-color 200ms ease, color 200ms ease, box-shadow 200ms ease;
+}
+
+button:not(:disabled):active,
+[role="button"]:not(:disabled):active {
+  transform: scale(0.96);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .page-transition-enter,
+  .page-transition-enter-back,
+  .animate-page-enter {
+    animation: none;
+  }
+
+  button:not(:disabled):active,
+  [role="button"]:not(:disabled):active {
+    transform: none;
+  }
+}
+
+@keyframes page-enter-slide {
+  0% {
+    opacity: 0;
+    transform: translateX(16px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.animate-page-enter {
+  animation: page-enter-slide 0.3s cubic-bezier(0.32, 0.72, 0, 1) forwards;
+}
+
+/* ============================================
+   LEAFLET MAP OVERRIDES
+   ============================================ */
+
+.leaflet-container {
+  background: #0b1512 !important;
+  border-radius: 20px;
+}
+
+.leaflet-control-zoom {
+  border: none !important;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.4) !important;
+}
+
+.leaflet-control-zoom a {
+  background: rgba(14,42,31,0.9) !important;
+  color: var(--text-0) !important;
+  border: 1px solid rgba(203,184,146,0.15) !important;
+  backdrop-filter: blur(8px);
+}
+
+.leaflet-control-zoom a:hover {
+  background: rgba(31,106,74,0.9) !important;
+}
+
+.distance-overlay-label {
+  background: rgba(14,42,31,0.92) !important;
+  border: 1px solid rgba(203,184,146,0.25) !important;
+  border-radius: 12px !important;
+  padding: 6px 14px !important;
+  color: var(--sand-0) !important;
+  font-family: 'Inter', sans-serif !important;
+  font-size: 15px !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.02em !important;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.4) !important;
+  backdrop-filter: blur(12px) !important;
+  white-space: nowrap !important;
+}
+
+.distance-overlay-label::before {
+  border: none !important;
 }

@@ -228,3 +228,24 @@
     animation: none;
   }
 }
+
+/* ── Leaflet map dark-theme overrides ────────────────────── */
+.leaflet-container {
+  background: #050807;
+}
+
+.leaflet-popup-content-wrapper {
+  background: rgba(9, 19, 15, 0.92);
+  color: var(--text-0, #eaf2ee);
+  border-radius: 12px;
+  border: 1px solid rgba(203, 184, 146, 0.16);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+}
+
+.leaflet-popup-tip {
+  background: rgba(9, 19, 15, 0.92);
+}
+
+.leaflet-popup-close-button {
+  color: rgba(233, 241, 236, 0.6) !important;
+}

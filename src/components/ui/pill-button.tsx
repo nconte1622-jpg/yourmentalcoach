@@ -9,7 +9,7 @@ export function PillButton({ className, tone = "sand", ...props }: PillButtonPro
   return (
     <button
       className={cn(
-        "calm-pro-focus calm-pro-press min-h-11 rounded-full px-5 py-2 text-sm font-medium",
+        "calm-pro-focus calm-pro-press inline-flex items-center min-h-11 rounded-full px-5 py-2 text-sm font-medium",
         "transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed",
         tone === "sand" && [
           "bg-[var(--sand-0)] text-[#1a1e1c]",

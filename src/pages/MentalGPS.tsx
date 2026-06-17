@@ -18,6 +18,9 @@ import {
   Check,
   MapPin,
 } from "lucide-react";
+import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
+import L from "leaflet";
+import "leaflet/dist/leaflet.css";
 import { PageShell } from "@/components/PageShell";
 import { AppShell } from "@/components/ui/AppShell";
 import { AppHeader } from "@/components/ui/AppHeader";
@@ -39,6 +42,34 @@ import {
 } from "@/lib/gpsPatternStorage";
 import { loadRoundContext } from "@/lib/roundContext";
 import { loadActiveRoundSession } from "@/lib/roundSession";
+
+/* ─── Leaflet marker icons (fixes missing default icons) ─── */
+const playerIcon = new L.Icon({
+  iconUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
+  iconRetinaUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png",
+  shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
+  shadowSize: [41, 41],
+});
+
+const pinIcon = new L.Icon({
+  iconUrl: "data:image/svg+xml," + encodeURIComponent(
+    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23e53e3e" width="32" height="32"><path d="M12 0C7.58 0 4 3.58 4 8c0 5.25 8 16 8 16s8-10.75 8-16c0-4.42-3.58-8-8-8zm0 12c-2.21 0-4-1.79-4-4s1.79-4 4-4 4 1.79 4 4-1.79 4-4 4z"/></svg>'
+  ),
+  iconSize: [32, 32],
+  iconAnchor: [16, 32],
+  popupAnchor: [0, -32],
+});
+
+function MapRecenter({ lat, lng }: { lat: number; lng: number }) {
+  const map = useMap();
+  useEffect(() => {
+    map.setView([lat, lng], map.getZoom());
+  }, [lat, lng, map]);
+  return null;
+}
 
 /* ─── Club distances (baseline at sea level, no wind) ──── */
 const CLUB_SUGGESTIONS: { club: string; min: number; max: number }[] = [
@@ -290,41 +321,41 @@ const MentalGPS = () => {
               </button>
             }
             center={
-              <div>
-                <h1 className="font-serif text-[23px] leading-tight tracking-wide text-[var(--text-0)]">
+              <div className="text-center">
+                <h1 className="font-serif text-[22px] font-semibold leading-tight tracking-wide text-[var(--text-0)]">
                   Mental GPS
                 </h1>
-                <p className="text-[11px] uppercase tracking-[0.14em] text-[var(--text-1)]">
-                  Rangefinder · Pattern Tracker
+                <p className="text-[10px] uppercase tracking-[0.18em] text-[var(--text-1)] mt-0.5">
+                  Rangefinder&nbsp;&middot;&nbsp;Pattern Tracker
                 </p>
               </div>
             }
-            right={<div className="tap-44" />}
+            right={<div className="w-10" />}
           />
         }
       >
         <div className="with-bottom-dock flex flex-col overflow-y-auto pb-6 pt-4">
 
           {/* ── Hole selector ─────────────────────── */}
-          <div className="flex items-center justify-between gap-4 px-5 pb-4">
+          <div className="flex items-center justify-between gap-3 px-5 pb-4">
             <button
               onClick={() => handleHoleChange(-1)}
               disabled={currentHole <= 1}
-              className="tap-44 flex h-10 w-10 items-center justify-center rounded-full border border-[rgba(203,184,146,0.2)] bg-[rgba(203,184,146,0.06)] text-[var(--text-0)] disabled:opacity-30"
+              className="flex h-12 w-12 items-center justify-center rounded-full border border-[rgba(203,184,146,0.25)] bg-[rgba(203,184,146,0.08)] text-[var(--text-0)] disabled:opacity-30 shadow-[0_2px_8px_rgba(0,0,0,0.2)]"
             >
-              <ChevronLeft className="h-5 w-5" />
+              <ChevronLeft className="h-6 w-6" />
             </button>
-            <div className="text-center">
-              <p className="text-[10px] uppercase tracking-[0.18em] text-[var(--text-1)]">Hole</p>
-              <p className="font-serif text-3xl text-[var(--text-0)]">{currentHole}</p>
-              <p className="text-[10px] text-[var(--text-1)] opacity-50">{loggedCount} holes logged</p>
+            <div className="text-center flex-1">
+              <p className="text-[9px] uppercase tracking-[0.22em] text-[var(--text-1)] font-medium">Hole</p>
+              <p className="font-serif text-4xl font-semibold text-[var(--sand-0)] leading-none mt-0.5">{currentHole}</p>
+              <p className="text-[10px] text-[var(--text-1)] opacity-60 mt-1">{loggedCount} of 18 logged</p>
             </div>
             <button
               onClick={() => handleHoleChange(1)}
               disabled={currentHole >= 18}
-              className="tap-44 flex h-10 w-10 items-center justify-center rounded-full border border-[rgba(203,184,146,0.2)] bg-[rgba(203,184,146,0.06)] text-[var(--text-0)] disabled:opacity-30"
+              className="flex h-12 w-12 items-center justify-center rounded-full border border-[rgba(203,184,146,0.25)] bg-[rgba(203,184,146,0.08)] text-[var(--text-0)] disabled:opacity-30 shadow-[0_2px_8px_rgba(0,0,0,0.2)]"
             >
-              <ChevronRight className="h-5 w-5" />
+              <ChevronRight className="h-6 w-6" />
             </button>
           </div>
 
@@ -387,43 +418,82 @@ const MentalGPS = () => {
                 </div>
               </GlassCard>
 
-              {/* GPS controls */}
-              <GlassCard className="p-4">
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <p className="text-sm font-medium text-[var(--text-0)]">GPS Pin</p>
-                    <span className={cn("text-xs", watching ? "text-[rgba(31,180,100,0.9)]" : "text-[var(--text-1)]")}>
-                      {watching ? "● Tracking" : "○ Off"}
-                    </span>
-                  </div>
-                  {gpsError && <p className="text-xs text-[rgba(220,80,60,0.9)]">{gpsError}</p>}
-                  {coords && (
-                    <p className="text-xs text-[var(--text-1)]">
-                      {coords.lat.toFixed(5)}, {coords.lng.toFixed(5)}
-                    </p>
-                  )}
-                  <div className="flex gap-2">
-                    {!watching && (
-                      <PillButton tone="sand" onClick={startWatching} className="flex-1 text-sm">
-                        <Navigation className="mr-1.5 h-3.5 w-3.5" />
-                        Start GPS
-                      </PillButton>
-                    )}
-                    <PillButton
-                      tone="green"
-                      onClick={handleSetPin}
-                      disabled={!coords}
-                      className="flex-1 text-sm"
+              {/* Course map */}
+              <GlassCard className="overflow-hidden p-0">
+                <div className="relative" style={{ height: 220 }}>
+                  {coords ? (
+                    <MapContainer
+                      center={[coords.lat, coords.lng]}
+                      zoom={17}
+                      scrollWheelZoom={false}
+                      zoomControl={false}
+                      attributionControl={false}
+                      style={{ height: "100%", width: "100%" }}
                     >
-                      <MapPin className="mr-1.5 h-3.5 w-3.5" />
-                      {pinCoords[currentHole] ? "Move Pin" : "Set Pin Here"}
-                    </PillButton>
+                      <TileLayer
+                        url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
+                      />
+                      <MapRecenter lat={coords.lat} lng={coords.lng} />
+                      <Marker position={[coords.lat, coords.lng]} icon={playerIcon}>
+                        <Popup>Your position</Popup>
+                      </Marker>
+                      {pinCoords[currentHole] && (
+                        <Marker position={[pinCoords[currentHole].lat, pinCoords[currentHole].lng]} icon={pinIcon}>
+                          <Popup>Pin — Hole {currentHole}</Popup>
+                        </Marker>
+                      )}
+                    </MapContainer>
+                  ) : (
+                    <div className="flex h-full items-center justify-center bg-[rgba(5,8,7,0.6)]">
+                      <div className="text-center space-y-2">
+                        <Navigation className="h-8 w-8 text-[var(--text-1)] mx-auto opacity-40" />
+                        <p className="text-sm text-[var(--text-1)]">
+                          {watching ? "Acquiring GPS signal..." : "Start GPS to see course map"}
+                        </p>
+                      </div>
+                    </div>
+                  )}
+                  {/* Distance overlay */}
+                  {gpsYards !== null && (
+                    <div className="absolute top-3 left-3 z-[1000] rounded-xl bg-[rgba(5,8,7,0.82)] backdrop-blur-sm px-3 py-1.5 border border-[rgba(31,180,100,0.3)]">
+                      <p className="text-[10px] uppercase tracking-wider text-[rgba(31,180,100,0.8)]">GPS Distance</p>
+                      <p className="text-lg font-serif font-semibold text-[rgba(31,180,100,0.95)]">{gpsYards} yds</p>
+                    </div>
+                  )}
+                  {/* Tracking status badge */}
+                  <div className={cn(
+                    "absolute top-3 right-3 z-[1000] rounded-full px-2.5 py-1 text-[10px] font-medium tracking-wide",
+                    watching
+                      ? "bg-[rgba(31,180,100,0.2)] text-[rgba(31,180,100,0.95)] border border-[rgba(31,180,100,0.3)]"
+                      : "bg-[rgba(5,8,7,0.7)] text-[var(--text-1)] border border-[rgba(255,255,255,0.1)]"
+                  )}>
+                    {watching ? "● Live" : "○ Off"}
                   </div>
-                  <p className="text-[10px] text-[var(--text-1)] opacity-60">
-                    Walk to the pin flag and tap Set Pin. GPS distance updates as you move.
-                  </p>
                 </div>
               </GlassCard>
+
+              {/* GPS controls — full-width CTA buttons */}
+              <div className="space-y-2.5">
+                {gpsError && <p className="text-xs text-[rgba(220,80,60,0.9)] px-1">{gpsError}</p>}
+                {!watching && (
+                  <PillButton tone="sand" onClick={startWatching} className="w-full min-h-[52px] text-base font-medium justify-center">
+                    <Navigation className="mr-2 h-5 w-5" />
+                    Start GPS
+                  </PillButton>
+                )}
+                <PillButton
+                  tone="green"
+                  onClick={handleSetPin}
+                  disabled={!coords}
+                  className="w-full min-h-[52px] text-base font-medium justify-center"
+                >
+                  <MapPin className="mr-2 h-5 w-5" />
+                  {pinCoords[currentHole] ? "Move Pin" : "Set Pin Here"}
+                </PillButton>
+                <p className="text-[10px] text-center text-[var(--text-1)] opacity-60 px-4">
+                  Walk to the pin flag and tap Set Pin. GPS distance updates as you move.
+                </p>
+              </div>
 
               {/* Wind */}
               <GlassCard className="p-4">

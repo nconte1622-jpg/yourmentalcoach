@@ -21,11 +21,8 @@ export const PageShell = ({
   return (
     <>
       <Background variant={backgroundVariant} />
-      {/* h-[100dvh] caps the shell at exactly the visible viewport so content
-          can't grow off-screen. overflow-y-auto enables smooth in-shell scroll
-          instead of the document scrolling (which is locked in scroll-fixes.css). */}
       <main
-        className={`relative z-10 h-[100dvh] overflow-y-auto overflow-x-hidden ${className}`}
+        className={`relative z-10 h-[100dvh] overflow-y-auto overflow-x-hidden page-transition-enter ${className}`}
         style={{
           WebkitOverflowScrolling: 'touch',
           overscrollBehavior: 'contain',
