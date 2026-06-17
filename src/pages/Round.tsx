@@ -403,15 +403,15 @@ const Round = () => {
                   triggerHaptic("light");
                   navigate("/");
                 }}
-                className="header-hit-button text-muted-foreground/85 hover:text-foreground hover:bg-foreground/5 text-sm"
+                className="tap-44 flex items-center justify-center rounded-full px-3 text-sm text-muted-foreground/85 hover:text-foreground hover:bg-foreground/5 transition-all"
               >
                 ← Home
               </button>
             }
             center={
               activeRoundSummary ? (
-                <p className="text-[10px] text-muted-foreground/70 text-center truncate">
-                  {activeRoundSummary.roundType.replace("-", " ")}&nbsp;&middot;&nbsp;{activeRoundSummary.environment}
+                <p className="text-[10px] text-muted-foreground/60 text-center truncate pointer-events-auto">
+                  {activeRoundSummary.roundType.replace("-", " ")} · {activeRoundSummary.environment}
                 </p>
               ) : null
             }
@@ -428,14 +428,13 @@ const Round = () => {
                     else toast("Full coaching mode restored", { duration: 2000 });
                   }}
                   className={cn(
-                    "flex items-center gap-0.5 rounded-full px-2 py-1.5 text-[10px] font-medium tracking-wide min-h-[36px]",
+                    "flex items-center gap-0.5 rounded-full px-2 py-1.5 text-[10px] font-medium tracking-wide min-h-[36px] transition-all",
                     quickMode
                       ? "border border-[rgba(203,184,146,0.35)] bg-[rgba(203,184,146,0.12)] text-[var(--sand-0)]"
                       : "text-muted-foreground/50 hover:text-foreground/70 hover:bg-foreground/5"
                   )}
                 >
                   <Zap className="w-3 h-3" />
-                  <span>Quick</span>
                 </button>
                 <button
                   type="button"
@@ -443,7 +442,7 @@ const Round = () => {
                     triggerHaptic("light");
                     navigate("/round/scorecard");
                   }}
-                  className="header-hit-button text-muted-foreground/60 hover:text-foreground hover:bg-foreground/5"
+                  className="flex h-9 w-9 items-center justify-center rounded-full text-muted-foreground/60 hover:text-foreground hover:bg-foreground/5 transition-all"
                   title="Scorecard"
                 >
                   <ClipboardList className="w-4 h-4" />
@@ -454,7 +453,7 @@ const Round = () => {
                     triggerHaptic("light");
                     navigate("/mental-gps");
                   }}
-                  className="header-hit-button text-muted-foreground/60 hover:text-foreground hover:bg-foreground/5"
+                  className="flex h-9 w-9 items-center justify-center rounded-full text-muted-foreground/60 hover:text-foreground hover:bg-foreground/5 transition-all"
                   title="Mental GPS"
                 >
                   <Navigation className="w-4 h-4" />
@@ -465,7 +464,7 @@ const Round = () => {
                     setEndRoundStep("actions");
                     setEndRoundDialogOpen(true);
                   }}
-                  className="header-hit-button text-[10px] uppercase tracking-[0.14em] font-semibold text-[var(--sand-0)] hover:bg-white/5"
+                  className="flex h-9 items-center justify-center rounded-full px-2.5 text-[10px] uppercase tracking-[0.14em] font-semibold text-[var(--sand-0)] hover:bg-white/5 transition-all"
                 >
                   End
                 </button>
