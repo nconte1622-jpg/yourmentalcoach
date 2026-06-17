@@ -3,10 +3,11 @@
  *
  * Two panels:
  * 1. Rangefinder: yardage to pin (manual input + device GPS) + wind + club suggestion
+ *    + satellite map (react-leaflet + ESRI World Imagery tiles)
  * 2. Shot Logger: tap-to-log tee shot, lie, putt result, emotional tag per hole
  */
 
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback, useRef, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   ArrowLeft,
@@ -17,6 +18,7 @@ import {
   ChevronRight,
   Check,
   MapPin,
+  Locate,
 } from "lucide-react";
 import { PageShell } from "@/components/PageShell";
 import { AppShell } from "@/components/ui/AppShell";
@@ -35,10 +37,12 @@ import {
   type TeeResult,
   type PuttResult,
   type EmotionalTag,
-  type LieType,
 } from "@/lib/gpsPatternStorage";
 import { loadRoundContext } from "@/lib/roundContext";
 import { loadActiveRoundSession } from "@/lib/roundSession";
+import { MapContainer, TileLayer, Marker, Polyline, useMap } from "react-leaflet";
+import L from "leaflet";
+import "leaflet/dist/leaflet.css";
 
 /* ─── Club distances (baseline at sea level, no wind) ──── */
 const CLUB_SUGGESTIONS: { club: string; min: number; max: number }[] = [
@@ -60,7 +64,6 @@ const CLUB_SUGGESTIONS: { club: string; min: number; max: number }[] = [
 ];
 
 function suggestClub(yards: number, windMph: number, windDir: "headwind" | "tailwind" | "crosswind" | "none"): string {
-  // Adjust yardage for wind
   let adjusted = yards;
   if (windDir === "headwind") adjusted += Math.round(windMph * 0.8);
   if (windDir === "tailwind") adjusted -= Math.round(windMph * 0.7);
@@ -103,6 +106,30 @@ const EMOTION_OPTIONS: { value: EmotionalTag; label: string; emoji: string }[] =
   { value: "frustrated", label: "Frustrated", emoji: "😤" },
   { value: "distracted", label: "Distracted", emoji: "💭" },
 ];
+
+/* ─── Leaflet custom icons ─────────────────────────────── */
+const playerIcon = L.divIcon({
+  className: "",
+  html: '<div style="width:18px;height:18px;border-radius:50%;background:rgba(31,180,100,0.95);border:3px solid white;box-shadow:0 0 12px rgba(31,180,100,0.6),0 2px 8px rgba(0,0,0,0.3);"></div>',
+  iconSize: [18, 18],
+  iconAnchor: [9, 9],
+});
+
+const pinIcon = L.divIcon({
+  className: "",
+  html: '<div style="display:flex;flex-direction:column;align-items:center;"><div style="width:12px;height:12px;border-radius:50%;background:rgba(220,60,40,0.95);border:2px solid white;box-shadow:0 0 10px rgba(220,60,40,0.5);"></div><div style="width:2px;height:16px;background:white;margin-top:-1px;box-shadow:0 1px 4px rgba(0,0,0,0.3);"></div></div>',
+  iconSize: [12, 30],
+  iconAnchor: [6, 30],
+});
+
+/* ─── Map recenter component ───────────────────────────── */
+function MapRecenter({ lat, lng }: { lat: number; lng: number }) {
+  const map = useMap();
+  useEffect(() => {
+    map.setView([lat, lng], map.getZoom(), { animate: true });
+  }, [lat, lng, map]);
+  return null;
+}
 
 /* ─── GPS hook ───────────────────────────────────────────── */
 function useDeviceGPS() {
@@ -148,25 +175,19 @@ const MentalGPS = () => {
   const navigate = useNavigate();
   const { coords, error: gpsError, watching, startWatching } = useDeviceGPS();
 
-  // Current hole
   const [currentHole, setCurrentHole] = useState(1);
-  // Active tab: rangefinder vs logger
   const [tab, setTab] = useState<"range" | "log">("range");
 
-  // Rangefinder state
   const [yardageInput, setYardageInput] = useState("");
   const [windDir, setWindDir] = useState<WindDir>("none");
   const [windMph, setWindMph] = useState(0);
-  // Pin coords (stored per-hole)
   const [pinCoords, setPinCoords] = useState<Record<number, { lat: number; lng: number }>>({});
 
-  // Shot logger state — reads from gpsPatternStorage
   const [holeShot, setHoleShot] = useState(() => getHoleShot(1));
   const [selectedTee, setSelectedTee] = useState<TeeResult | null>(null);
   const [selectedPutt, setSelectedPutt] = useState<PuttResult | null>(null);
   const [selectedEmotion, setSelectedEmotion] = useState<EmotionalTag | null>(null);
 
-  // Ensure a pattern round is active
   useEffect(() => {
     if (!loadActivePatternRound()) {
       const session = loadActiveRoundSession();
@@ -178,7 +199,6 @@ const MentalGPS = () => {
     }
   }, []);
 
-  // Reload hole data when hole changes
   useEffect(() => {
     const shot = getHoleShot(currentHole);
     setHoleShot(shot);
@@ -187,15 +207,13 @@ const MentalGPS = () => {
     setSelectedEmotion(shot?.emotionalTag ?? null);
   }, [currentHole]);
 
-  // ── Rangefinder math ────────────────────────────────
   const yardage = parseInt(yardageInput, 10);
   const validYardage = !isNaN(yardage) && yardage > 0;
 
-  // Distance from GPS to saved pin
   const gpsDistanceToPin = useCallback((): number | null => {
     const pin = pinCoords[currentHole];
     if (!pin || !coords) return null;
-    const R = 6371000; // meters
+    const R = 6371000;
     const dLat = ((pin.lat - coords.lat) * Math.PI) / 180;
     const dLng = ((pin.lng - coords.lng) * Math.PI) / 180;
     const a =
@@ -204,7 +222,7 @@ const MentalGPS = () => {
         Math.cos((pin.lat * Math.PI) / 180) *
         Math.sin(dLng / 2) ** 2;
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-    return Math.round((R * c) / 0.9144); // convert meters → yards
+    return Math.round((R * c) / 0.9144);
   }, [pinCoords, currentHole, coords]);
 
   const gpsYards = gpsDistanceToPin();
@@ -221,7 +239,6 @@ const MentalGPS = () => {
     toast.success(`Pin set for hole ${currentHole}`);
   };
 
-  // ── Shot logger ─────────────────────────────────────
   const saveShot = (updates: {
     teeResult?: TeeResult;
     puttResult?: PuttResult;
@@ -275,6 +292,20 @@ const MentalGPS = () => {
 
   const loggedCount = loadActivePatternRound()?.holes.length ?? 0;
 
+  const currentPin = pinCoords[currentHole];
+  const mapCenter = useMemo(() => {
+    if (coords) return { lat: coords.lat, lng: coords.lng };
+    return { lat: 33.45, lng: -111.94 };
+  }, [coords]);
+
+  const linePositions = useMemo(() => {
+    if (!coords || !currentPin) return null;
+    return [
+      [coords.lat, coords.lng] as [number, number],
+      [currentPin.lat, currentPin.lng] as [number, number],
+    ];
+  }, [coords, currentPin]);
+
   return (
     <PageShell backgroundVariant="default">
       <AppShell
@@ -291,11 +322,11 @@ const MentalGPS = () => {
             }
             center={
               <div>
-                <h1 className="font-serif text-[23px] leading-tight tracking-wide text-[var(--text-0)]">
+                <h1 className="font-serif text-[23px] font-semibold leading-tight tracking-wide text-[var(--text-0)]">
                   Mental GPS
                 </h1>
-                <p className="text-[11px] uppercase tracking-[0.14em] text-[var(--text-1)]">
-                  Rangefinder · Pattern Tracker
+                <p className="text-[10px] uppercase tracking-[0.16em] text-[var(--text-1)] opacity-70">
+                  Rangefinder
                 </p>
               </div>
             }
@@ -306,25 +337,25 @@ const MentalGPS = () => {
         <div className="with-bottom-dock flex flex-col overflow-y-auto pb-6 pt-4">
 
           {/* ── Hole selector ─────────────────────── */}
-          <div className="flex items-center justify-between gap-4 px-5 pb-4">
+          <div className="flex items-center justify-between gap-2 px-5 pb-4">
             <button
               onClick={() => handleHoleChange(-1)}
               disabled={currentHole <= 1}
-              className="tap-44 flex h-10 w-10 items-center justify-center rounded-full border border-[rgba(203,184,146,0.2)] bg-[rgba(203,184,146,0.06)] text-[var(--text-0)] disabled:opacity-30"
+              className="flex h-12 w-12 items-center justify-center rounded-full border border-[rgba(203,184,146,0.25)] bg-[rgba(203,184,146,0.08)] text-[var(--text-0)] shadow-[0_4px_12px_rgba(0,0,0,0.2)] transition-all hover:bg-[rgba(203,184,146,0.14)] hover:shadow-[0_4px_16px_rgba(0,0,0,0.3)] disabled:opacity-30 disabled:shadow-none"
             >
-              <ChevronLeft className="h-5 w-5" />
+              <ChevronLeft className="h-6 w-6" />
             </button>
             <div className="text-center">
-              <p className="text-[10px] uppercase tracking-[0.18em] text-[var(--text-1)]">Hole</p>
-              <p className="font-serif text-3xl text-[var(--text-0)]">{currentHole}</p>
-              <p className="text-[10px] text-[var(--text-1)] opacity-50">{loggedCount} holes logged</p>
+              <p className="text-[9px] font-semibold uppercase tracking-[0.2em] text-[var(--text-1)]">Hole</p>
+              <p className="font-serif text-4xl font-semibold text-[var(--text-0)]">{currentHole}</p>
+              <p className="text-[10px] text-[var(--text-1)] opacity-50">{loggedCount} logged</p>
             </div>
             <button
               onClick={() => handleHoleChange(1)}
               disabled={currentHole >= 18}
-              className="tap-44 flex h-10 w-10 items-center justify-center rounded-full border border-[rgba(203,184,146,0.2)] bg-[rgba(203,184,146,0.06)] text-[var(--text-0)] disabled:opacity-30"
+              className="flex h-12 w-12 items-center justify-center rounded-full border border-[rgba(203,184,146,0.25)] bg-[rgba(203,184,146,0.08)] text-[var(--text-0)] shadow-[0_4px_12px_rgba(0,0,0,0.2)] transition-all hover:bg-[rgba(203,184,146,0.14)] hover:shadow-[0_4px_16px_rgba(0,0,0,0.3)] disabled:opacity-30 disabled:shadow-none"
             >
-              <ChevronRight className="h-5 w-5" />
+              <ChevronRight className="h-6 w-6" />
             </button>
           </div>
 
@@ -335,9 +366,9 @@ const MentalGPS = () => {
                 key={t}
                 onClick={() => { triggerHaptic("light"); setTab(t); }}
                 className={cn(
-                  "flex-1 rounded-xl py-2 text-sm font-medium transition-all",
+                  "flex-1 rounded-xl py-2.5 text-sm font-medium transition-all",
                   tab === t
-                    ? "bg-[rgba(203,184,146,0.15)] text-[var(--sand-0)]"
+                    ? "bg-[rgba(203,184,146,0.15)] text-[var(--sand-0)] shadow-[0_2px_8px_rgba(0,0,0,0.15)]"
                     : "text-[var(--text-1)]"
                 )}
               >
@@ -350,20 +381,71 @@ const MentalGPS = () => {
           {tab === "range" && (
             <div className="space-y-4 px-5">
 
+              {/* Satellite map */}
+              <GlassCard className="overflow-hidden p-0">
+                <div className="relative h-[240px] w-full overflow-hidden rounded-[24px]">
+                  <MapContainer
+                    center={[mapCenter.lat, mapCenter.lng]}
+                    zoom={17}
+                    zoomControl={false}
+                    attributionControl={false}
+                    className="h-full w-full"
+                    style={{ borderRadius: "24px" }}
+                  >
+                    <TileLayer
+                      url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
+                    />
+                    {coords && <MapRecenter lat={coords.lat} lng={coords.lng} />}
+                    {coords && (
+                      <Marker position={[coords.lat, coords.lng]} icon={playerIcon} />
+                    )}
+                    {currentPin && (
+                      <Marker position={[currentPin.lat, currentPin.lng]} icon={pinIcon} />
+                    )}
+                    {linePositions && (
+                      <Polyline
+                        positions={linePositions}
+                        pathOptions={{
+                          color: "rgba(203,184,146,0.8)",
+                          weight: 2,
+                          dashArray: "6,8",
+                        }}
+                      />
+                    )}
+                  </MapContainer>
+                  {gpsYards !== null && (
+                    <div className="absolute left-1/2 top-4 z-[1000] -translate-x-1/2">
+                      <div className="flex items-center gap-2 rounded-2xl border border-[rgba(203,184,146,0.25)] bg-[rgba(14,42,31,0.92)] px-4 py-2 shadow-[0_8px_24px_rgba(0,0,0,0.4)] backdrop-blur-xl">
+                        <Navigation className="h-4 w-4 text-[rgba(31,180,100,0.9)]" />
+                        <span className="font-serif text-2xl font-semibold text-[var(--sand-0)]">{gpsYards}</span>
+                        <span className="text-xs text-[var(--text-1)]">yds</span>
+                      </div>
+                    </div>
+                  )}
+                  {!watching && !coords && (
+                    <div className="absolute inset-0 z-[1000] flex items-center justify-center bg-[rgba(5,8,7,0.6)] backdrop-blur-sm">
+                      <div className="text-center">
+                        <Locate className="mx-auto mb-2 h-8 w-8 text-[var(--sand-0)] opacity-60" />
+                        <p className="text-sm text-[var(--text-1)]">Start GPS to see your position</p>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </GlassCard>
+
               {/* Yardage display */}
               <GlassCard glow className="p-5">
                 <div className="space-y-4">
                   <div className="text-center">
-                    <p className="text-[10px] uppercase tracking-[0.18em] text-[var(--text-1)]">Distance to pin</p>
-                    <p className="font-serif text-5xl text-[var(--sand-0)]">
+                    <p className="text-[9px] font-semibold uppercase tracking-[0.2em] text-[var(--text-1)]">Distance to pin</p>
+                    <p className="font-serif text-5xl font-semibold text-[var(--sand-0)]">
                       {displayYards ?? "—"}
                     </p>
-                    <p className="text-sm text-[var(--text-1)]">yards</p>
+                    <p className="text-sm text-[var(--text-1)] opacity-70">yards</p>
                   </div>
 
-                  {/* Manual yardage input */}
                   <div>
-                    <label className="mb-1 block text-xs text-[var(--text-1)]">Enter yardage manually</label>
+                    <label className="mb-1 block text-xs font-medium text-[var(--text-1)]">Enter yardage manually</label>
                     <input
                       type="number"
                       inputMode="numeric"
@@ -373,67 +455,53 @@ const MentalGPS = () => {
                       className="w-full rounded-xl border border-[rgba(203,184,146,0.2)] bg-[rgba(5,8,7,0.5)] px-4 py-3 text-center text-lg font-medium text-[var(--text-0)] placeholder-[var(--text-1)] focus:outline-none focus:ring-2 focus:ring-[var(--sand-0)]"
                     />
                   </div>
-
-                  {/* GPS distance if pin is set */}
-                  {gpsYards !== null && (
-                    <div className="flex items-center justify-between rounded-xl border border-[rgba(31,180,100,0.2)] bg-[rgba(31,180,100,0.06)] px-4 py-2.5">
-                      <div className="flex items-center gap-2">
-                        <Navigation className="h-4 w-4 text-[rgba(31,180,100,0.9)]" />
-                        <p className="text-sm text-[var(--text-0)]">GPS to pin</p>
-                      </div>
-                      <p className="font-medium text-[rgba(31,180,100,0.9)]">{gpsYards} yds</p>
-                    </div>
-                  )}
                 </div>
               </GlassCard>
 
-              {/* GPS controls */}
-              <GlassCard className="p-4">
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <p className="text-sm font-medium text-[var(--text-0)]">GPS Pin</p>
-                    <span className={cn("text-xs", watching ? "text-[rgba(31,180,100,0.9)]" : "text-[var(--text-1)]")}>
-                      {watching ? "● Tracking" : "○ Off"}
-                    </span>
-                  </div>
-                  {gpsError && <p className="text-xs text-[rgba(220,80,60,0.9)]">{gpsError}</p>}
-                  {coords && (
-                    <p className="text-xs text-[var(--text-1)]">
-                      {coords.lat.toFixed(5)}, {coords.lng.toFixed(5)}
-                    </p>
-                  )}
-                  <div className="flex gap-2">
-                    {!watching && (
-                      <PillButton tone="sand" onClick={startWatching} className="flex-1 text-sm">
-                        <Navigation className="mr-1.5 h-3.5 w-3.5" />
-                        Start GPS
-                      </PillButton>
+              {/* GPS controls — large full-width CTAs */}
+              <div className="space-y-3">
+                {!watching && (
+                  <button
+                    onClick={startWatching}
+                    className="flex w-full items-center justify-center gap-3 rounded-2xl border border-[rgba(203,184,146,0.2)] bg-[var(--sand-0)] px-6 py-4 text-base font-semibold text-[#1a1e1c] shadow-[0_4px_16px_rgba(203,184,146,0.25)] transition-all hover:shadow-[0_6px_24px_rgba(203,184,146,0.35)]"
+                  >
+                    <Navigation className="h-5 w-5" />
+                    Start GPS Tracking
+                  </button>
+                )}
+                <button
+                  onClick={handleSetPin}
+                  disabled={!coords}
+                  className="flex w-full items-center justify-center gap-3 rounded-2xl border border-[rgba(31,106,74,0.3)] bg-[rgba(31,106,74,0.95)] px-6 py-4 text-base font-semibold text-[var(--text-0)] shadow-[0_4px_16px_rgba(18,64,47,0.4)] transition-all hover:bg-[rgba(31,106,74,1)] hover:shadow-[0_6px_24px_rgba(18,64,47,0.5)] disabled:opacity-40 disabled:shadow-none"
+                >
+                  <MapPin className="h-5 w-5" />
+                  {pinCoords[currentHole] ? "Move Pin Location" : "Set Pin Here"}
+                </button>
+                {watching && (
+                  <div className="flex items-center justify-center gap-2 text-xs text-[rgba(31,180,100,0.9)]">
+                    <span className="inline-block h-2 w-2 animate-pulse rounded-full bg-[rgba(31,180,100,0.9)]" />
+                    GPS Tracking Active
+                    {coords && (
+                      <span className="ml-1 text-[var(--text-1)]">
+                        ({coords.lat.toFixed(4)}, {coords.lng.toFixed(4)})
+                      </span>
                     )}
-                    <PillButton
-                      tone="green"
-                      onClick={handleSetPin}
-                      disabled={!coords}
-                      className="flex-1 text-sm"
-                    >
-                      <MapPin className="mr-1.5 h-3.5 w-3.5" />
-                      {pinCoords[currentHole] ? "Move Pin" : "Set Pin Here"}
-                    </PillButton>
                   </div>
-                  <p className="text-[10px] text-[var(--text-1)] opacity-60">
-                    Walk to the pin flag and tap Set Pin. GPS distance updates as you move.
-                  </p>
-                </div>
-              </GlassCard>
+                )}
+                {gpsError && <p className="text-center text-xs text-[rgba(220,80,60,0.9)]">{gpsError}</p>}
+                <p className="text-center text-[10px] text-[var(--text-1)] opacity-60">
+                  Walk to the pin flag and tap Set Pin. GPS distance updates as you move.
+                </p>
+              </div>
 
               {/* Wind */}
               <GlassCard className="p-4">
                 <div className="space-y-3">
                   <div className="flex items-center gap-2">
                     <Wind className="h-4 w-4 text-[var(--sand-0)]" />
-                    <p className="text-sm font-medium text-[var(--text-0)]">Wind</p>
+                    <p className="text-sm font-semibold text-[var(--text-0)]">Wind</p>
                   </div>
 
-                  {/* Wind direction */}
                   <div className="flex gap-2">
                     {WIND_DIRS.map((wd) => (
                       <button
@@ -442,8 +510,8 @@ const MentalGPS = () => {
                         className={cn(
                           "flex flex-1 flex-col items-center gap-0.5 rounded-xl border py-2 text-xs transition-all",
                           windDir === wd.id
-                            ? "border-[var(--sand-0)] bg-[rgba(203,184,146,0.12)] text-[var(--sand-0)]"
-                            : "border-[rgba(255,255,255,0.08)] text-[var(--text-1)]"
+                            ? "border-[var(--sand-0)] bg-[rgba(203,184,146,0.12)] text-[var(--sand-0)] shadow-[0_2px_8px_rgba(203,184,146,0.15)]"
+                            : "border-[rgba(255,255,255,0.08)] text-[var(--text-1)] hover:bg-[rgba(255,255,255,0.04)]"
                         )}
                       >
                         <span className="text-base">{wd.icon}</span>
@@ -452,7 +520,6 @@ const MentalGPS = () => {
                     ))}
                   </div>
 
-                  {/* Wind speed */}
                   {windDir !== "none" && (
                     <div>
                       <p className="mb-1 text-xs text-[var(--text-1)]">Speed: {windMph} mph</p>
@@ -474,12 +541,12 @@ const MentalGPS = () => {
                 <GlassCard className="p-4">
                   <div className="flex items-center justify-between gap-4">
                     <div className="flex items-center gap-3">
-                      <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[rgba(203,184,146,0.12)]">
+                      <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[rgba(203,184,146,0.12)]">
                         <Target className="h-5 w-5 text-[var(--sand-0)]" />
                       </div>
                       <div>
-                        <p className="text-xs text-[var(--text-1)]">Suggested club</p>
-                        <p className="text-lg font-medium text-[var(--text-0)]">{clubSuggestion}</p>
+                        <p className="text-[10px] font-medium uppercase tracking-wider text-[var(--text-1)]">Suggested club</p>
+                        <p className="text-xl font-semibold text-[var(--text-0)]">{clubSuggestion}</p>
                       </div>
                     </div>
                     <div className="text-right">
@@ -498,19 +565,18 @@ const MentalGPS = () => {
           {tab === "log" && (
             <div className="space-y-4 px-5">
 
-              {/* Tee shot */}
               <GlassCard className="p-4">
-                <p className="mb-3 text-sm font-medium text-[var(--text-0)]">Tee shot</p>
+                <p className="mb-3 text-sm font-semibold text-[var(--text-0)]">Tee shot</p>
                 <div className="flex flex-wrap gap-2">
                   {TEE_OPTIONS.map((opt) => (
                     <button
                       key={opt.value}
                       onClick={() => handleTeeSelect(opt.value)}
                       className={cn(
-                        "rounded-xl border px-3 py-2 text-sm transition-all",
+                        "rounded-xl border px-3.5 py-2.5 text-sm font-medium transition-all",
                         selectedTee === opt.value
-                          ? "border-transparent text-white"
-                          : "border-[rgba(255,255,255,0.1)] bg-[rgba(255,255,255,0.04)] text-[var(--text-1)]"
+                          ? "border-transparent text-white shadow-[0_2px_10px_rgba(0,0,0,0.2)]"
+                          : "border-[rgba(255,255,255,0.1)] bg-[rgba(255,255,255,0.04)] text-[var(--text-1)] hover:bg-[rgba(255,255,255,0.08)]"
                       )}
                       style={selectedTee === opt.value ? { backgroundColor: opt.color, borderColor: opt.color } : {}}
                     >
@@ -521,19 +587,18 @@ const MentalGPS = () => {
                 </div>
               </GlassCard>
 
-              {/* Putt result */}
               <GlassCard className="p-4">
-                <p className="mb-3 text-sm font-medium text-[var(--text-0)]">Putting</p>
+                <p className="mb-3 text-sm font-semibold text-[var(--text-0)]">Putting</p>
                 <div className="flex flex-wrap gap-2">
                   {PUTT_OPTIONS.map((opt) => (
                     <button
                       key={opt.value}
                       onClick={() => handlePuttSelect(opt.value)}
                       className={cn(
-                        "rounded-xl border px-3 py-2 text-sm transition-all",
+                        "rounded-xl border px-3.5 py-2.5 text-sm font-medium transition-all",
                         selectedPutt === opt.value
-                          ? "border-transparent text-white"
-                          : "border-[rgba(255,255,255,0.1)] bg-[rgba(255,255,255,0.04)] text-[var(--text-1)]"
+                          ? "border-transparent text-white shadow-[0_2px_10px_rgba(0,0,0,0.2)]"
+                          : "border-[rgba(255,255,255,0.1)] bg-[rgba(255,255,255,0.04)] text-[var(--text-1)] hover:bg-[rgba(255,255,255,0.08)]"
                       )}
                       style={selectedPutt === opt.value ? { backgroundColor: opt.color, borderColor: opt.color } : {}}
                     >
@@ -544,20 +609,19 @@ const MentalGPS = () => {
                 </div>
               </GlassCard>
 
-              {/* Emotional tag */}
               <GlassCard className="p-4">
-                <p className="mb-1 text-sm font-medium text-[var(--text-0)]">Mental state this hole</p>
-                <p className="mb-3 text-xs text-[var(--text-1)]">Optional — tap to toggle</p>
+                <p className="mb-1 text-sm font-semibold text-[var(--text-0)]">Mental state this hole</p>
+                <p className="mb-3 text-xs text-[var(--text-1)] opacity-70">Optional — tap to toggle</p>
                 <div className="flex flex-wrap gap-2">
                   {EMOTION_OPTIONS.map((opt) => (
                     <button
                       key={opt.value}
                       onClick={() => handleEmotionSelect(opt.value)}
                       className={cn(
-                        "flex items-center gap-1.5 rounded-xl border px-3 py-2 text-sm transition-all",
+                        "flex items-center gap-1.5 rounded-xl border px-3.5 py-2.5 text-sm font-medium transition-all",
                         selectedEmotion === opt.value
-                          ? "border-[rgba(203,184,146,0.5)] bg-[rgba(203,184,146,0.15)] text-[var(--sand-0)]"
-                          : "border-[rgba(255,255,255,0.1)] bg-[rgba(255,255,255,0.04)] text-[var(--text-1)]"
+                          ? "border-[rgba(203,184,146,0.5)] bg-[rgba(203,184,146,0.15)] text-[var(--sand-0)] shadow-[0_2px_10px_rgba(203,184,146,0.15)]"
+                          : "border-[rgba(255,255,255,0.1)] bg-[rgba(255,255,255,0.04)] text-[var(--text-1)] hover:bg-[rgba(255,255,255,0.08)]"
                       )}
                     >
                       <span>{opt.emoji}</span>
@@ -567,7 +631,6 @@ const MentalGPS = () => {
                 </div>
               </GlassCard>
 
-              {/* Saved indicator */}
               {holeShot && (
                 <div className="flex items-center justify-center gap-2 text-sm text-[rgba(31,180,100,0.9)]">
                   <Check className="h-4 w-4" />
@@ -575,19 +638,18 @@ const MentalGPS = () => {
                 </div>
               )}
 
-              {/* Next hole */}
               {currentHole < 18 && (
                 <PillButton
                   tone="sand"
                   onClick={() => handleHoleChange(1)}
-                  className="w-full"
+                  className="w-full py-4 text-base"
                 >
                   Next hole →
                 </PillButton>
               )}
 
               {loggedCount >= 3 && (
-                <PillButton tone="green" onClick={handleFinishRound} className="w-full">
+                <PillButton tone="green" onClick={handleFinishRound} className="w-full py-4 text-base">
                   Finish & Save Patterns
                 </PillButton>
               )}

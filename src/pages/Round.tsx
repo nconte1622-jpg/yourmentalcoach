@@ -403,23 +403,20 @@ const Round = () => {
                   triggerHaptic("light");
                   navigate("/");
                 }}
-                className="header-hit-button tap-44 text-muted-foreground/85 hover:text-foreground hover:bg-foreground/5 transition-all duration-300"
+                className="tap-44 flex items-center justify-center rounded-full px-3 text-sm text-muted-foreground/85 hover:text-foreground hover:bg-foreground/5 transition-all"
               >
                 ← Home
               </button>
             }
             center={
               activeRoundSummary ? (
-                <div className="max-w-[280px] mx-auto">
-                  <p className="text-[11px] text-muted-foreground/70 text-center">
-                    {activeRoundSummary.roundType.replace("-", " ")} · {activeRoundSummary.environment}
-                  </p>
-                </div>
+                <p className="text-[10px] text-muted-foreground/60 text-center truncate pointer-events-auto">
+                  {activeRoundSummary.roundType.replace("-", " ")} · {activeRoundSummary.environment}
+                </p>
               ) : null
             }
             right={
-              <div className="flex items-center gap-1">
-                {/* Quick Mode toggle — labeled so users know what it does */}
+              <div className="flex items-center gap-0">
                 <button
                   type="button"
                   onClick={() => {
@@ -431,14 +428,13 @@ const Round = () => {
                     else toast("Full coaching mode restored", { duration: 2000 });
                   }}
                   className={cn(
-                    "tap-44 flex items-center gap-1 rounded-full px-2.5 py-1 text-[11px] font-medium tracking-wide transition-all duration-300",
+                    "flex items-center gap-0.5 rounded-full px-2 py-1.5 text-[10px] font-medium tracking-wide min-h-[36px] transition-all",
                     quickMode
                       ? "border border-[rgba(203,184,146,0.35)] bg-[rgba(203,184,146,0.12)] text-[var(--sand-0)]"
                       : "text-muted-foreground/50 hover:text-foreground/70 hover:bg-foreground/5"
                   )}
                 >
                   <Zap className="w-3 h-3" />
-                  <span>Quick</span>
                 </button>
                 <button
                   type="button"
@@ -446,7 +442,7 @@ const Round = () => {
                     triggerHaptic("light");
                     navigate("/round/scorecard");
                   }}
-                  className="header-hit-button tap-44 text-muted-foreground/60 hover:text-foreground hover:bg-foreground/5 transition-all duration-300"
+                  className="flex h-9 w-9 items-center justify-center rounded-full text-muted-foreground/60 hover:text-foreground hover:bg-foreground/5 transition-all"
                   title="Scorecard"
                 >
                   <ClipboardList className="w-4 h-4" />
@@ -457,7 +453,7 @@ const Round = () => {
                     triggerHaptic("light");
                     navigate("/mental-gps");
                   }}
-                  className="header-hit-button tap-44 text-muted-foreground/60 hover:text-foreground hover:bg-foreground/5 transition-all duration-300"
+                  className="flex h-9 w-9 items-center justify-center rounded-full text-muted-foreground/60 hover:text-foreground hover:bg-foreground/5 transition-all"
                   title="Mental GPS"
                 >
                   <Navigation className="w-4 h-4" />
@@ -468,7 +464,7 @@ const Round = () => {
                     setEndRoundStep("actions");
                     setEndRoundDialogOpen(true);
                   }}
-                  className="header-hit-button tap-44 text-[11px] uppercase tracking-[0.16em] text-[var(--sand-0)] transition-all duration-300 hover:bg-white/5"
+                  className="flex h-9 items-center justify-center rounded-full px-2.5 text-[10px] uppercase tracking-[0.14em] font-semibold text-[var(--sand-0)] hover:bg-white/5 transition-all"
                 >
                   End
                 </button>
@@ -571,7 +567,7 @@ const Round = () => {
                     type="button"
                     onClick={() => void handleEmotionTap(tag)}
                     disabled={isTyping}
-                    className="min-h-10 shrink-0 rounded-full border border-[rgba(255,255,255,0.1)] bg-[rgba(14,42,31,0.62)] px-4 text-[13px] font-medium tracking-wide text-[rgba(233,241,236,0.85)] transition-all duration-200 hover:bg-[rgba(18,64,47,0.8)] hover:text-[rgba(233,241,236,0.98)] active:scale-[0.97] disabled:opacity-50"
+                    className="min-h-10 shrink-0 rounded-full border border-[rgba(255,255,255,0.1)] bg-[rgba(14,42,31,0.62)] px-4 text-[13px] font-medium tracking-wide text-[rgba(233,241,236,0.85)] transition-all duration-200 hover:bg-[rgba(18,64,47,0.8)] hover:text-[rgba(233,241,236,0.98)] hover:border-[rgba(255,255,255,0.18)] hover:shadow-[0_2px_10px_rgba(18,64,47,0.4)] disabled:opacity-50"
                   >
                     {tag}
                   </button>
@@ -650,7 +646,7 @@ const Round = () => {
                   }}
                   disabled={isTyping}
                   variant="outline"
-                  className="flex-1 py-3.5 text-sm font-medium rounded-2xl border-[rgba(255,255,255,0.08)] bg-[rgba(9,19,15,0.55)] hover:bg-[rgba(9,19,15,0.72)] transition-all duration-200"
+                  className="flex-1 py-3.5 text-sm font-medium rounded-2xl border-[rgba(255,255,255,0.1)] bg-[rgba(9,19,15,0.55)] hover:bg-[rgba(9,19,15,0.72)] hover:border-[rgba(255,255,255,0.16)] hover:shadow-[0_4px_16px_rgba(0,0,0,0.3)]"
                   size="lg"
                 >
                   <span className="flex items-center gap-3 text-white font-medium drop-shadow-sm">
@@ -667,7 +663,7 @@ const Round = () => {
                     setPreShotOpen(true);
                   }}
                   variant="outline"
-                  className="shrink-0 py-3.5 px-5 rounded-2xl border-[rgba(255,255,255,0.08)] bg-[rgba(9,19,15,0.55)] hover:bg-[rgba(9,19,15,0.72)] transition-all duration-200"
+                  className="shrink-0 py-3.5 px-5 rounded-2xl border-[rgba(255,255,255,0.1)] bg-[rgba(9,19,15,0.55)] hover:bg-[rgba(9,19,15,0.72)] hover:border-[rgba(255,255,255,0.16)] hover:shadow-[0_4px_16px_rgba(0,0,0,0.3)]"
                   size="lg"
                 >
                   <span className="flex items-center gap-1.5 text-white font-medium drop-shadow-sm">
