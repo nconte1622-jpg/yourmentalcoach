@@ -36,14 +36,14 @@ export function CheckInCard({ message, onEmotion, onDismiss, className }: CheckI
         className,
       )}
     >
-      <div className="mx-auto max-w-md rounded-3xl border border-[rgba(203,184,146,0.15)] bg-[rgba(9,19,15,0.95)] p-5 shadow-[0_20px_50px_rgba(0,0,0,0.4)] backdrop-blur-xl">
+      <div className="mx-auto max-w-md rounded-3xl border border-[rgba(45,106,79,0.12)] bg-white/95 p-5 shadow-[0_20px_50px_rgba(0,0,0,0.4)] backdrop-blur-xl">
         {/* Header with dismiss */}
         <div className="flex items-start justify-between gap-3 mb-4">
           <div>
-            <p className="text-xs uppercase tracking-[0.16em] text-[var(--sand-0)] opacity-70 mb-1">
+            <p className="text-xs uppercase tracking-[0.16em] text-[#2d6a4f] opacity-70 mb-1">
               Check-in
             </p>
-            <p className="text-sm text-[var(--text-0)] leading-relaxed">
+            <p className="text-sm text-[#1a1a1a] leading-relaxed">
               {message}
             </p>
           </div>
@@ -69,7 +69,7 @@ export function CheckInCard({ message, onEmotion, onDismiss, className }: CheckI
                 triggerHaptic("medium");
                 onEmotion(emotion);
               }}
-              className="rounded-full border border-[var(--border)] bg-[rgba(18,64,47,0.42)] px-4 py-2.5 text-sm font-medium tracking-wide text-[var(--text-0)] transition-all duration-200 hover:bg-[rgba(18,64,47,0.62)] active:scale-95"
+              className="rounded-full border border-[rgba(45,106,79,0.12)] bg-[rgba(45,106,79,0.06)] px-4 py-2.5 text-sm font-medium tracking-wide text-[#1a1a1a] transition-all duration-200 hover:bg-[rgba(45,106,79,0.06)] active:scale-95"
             >
               {emotion}
             </button>

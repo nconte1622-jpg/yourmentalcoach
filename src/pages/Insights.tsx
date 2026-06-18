@@ -20,7 +20,7 @@ function SectionTooltip({ text }: { text: string }) {
   return (
     <InfoHint
       label="What is this?"
-      className="ml-1 inline-flex h-4 w-4 items-center justify-center rounded-full text-[var(--muted-ink)] transition-colors hover:text-[var(--text-1)]"
+      className="ml-1 inline-flex h-4 w-4 items-center justify-center rounded-full text-[rgba(26,26,26,0.4)] transition-colors hover:text-[rgba(26,26,26,0.6)]"
     >
       {text}
     </InfoHint>
@@ -77,7 +77,7 @@ const Insights = () => {
                   <p className="text-sm readable-on-sand">
                     Complete <span className="font-medium">{Math.max(0, 3 - eligibleRoundCount)} more round{Math.max(0, 3 - eligibleRoundCount) !== 1 ? "s" : ""} with post-round reflections</span> to unlock your personal pattern analysis.
                   </p>
-                  <p className="text-xs" style={{ color: "var(--muted-ink)" }}>
+                  <p className="text-xs" style={{ color: "rgba(26,26,26,0.4)" }}>
                     After 3 structured rounds, you'll see your emotional triggers, recovery patterns, and most effective mental cues.
                   </p>
                   <div className="flex items-center gap-2 pt-1">
@@ -92,7 +92,7 @@ const Insights = () => {
                         }}
                       />
                     ))}
-                    <span className="text-xs text-[var(--text-1)] opacity-50 ml-1">
+                    <span className="text-xs text-[rgba(26,26,26,0.6)] opacity-50 ml-1">
                       {eligibleRoundCount}/3
                     </span>
                   </div>
@@ -113,7 +113,7 @@ const Insights = () => {
 
           {hasPatternAccess && isLoading && (
             <FrostedSandCard>
-              <p className="text-sm" style={{ color: "var(--ink-1)" }}>Analyzing your rounds...</p>
+              <p className="text-sm" style={{ color: "rgba(26,26,26,0.7)" }}>Analyzing your rounds...</p>
             </FrostedSandCard>
           )}
 
@@ -140,7 +140,7 @@ const Insights = () => {
               <p className="text-sm readable-on-sand">
                 Your resilience chart will appear here after your first round with emotion tracking.
               </p>
-              <p className="text-xs" style={{ color: "var(--muted-ink)" }}>
+              <p className="text-xs" style={{ color: "rgba(26,26,26,0.4)" }}>
                 During a round, tap emotions as you feel them and respond to check-ins. Your resilience score is calculated when you end the round.
               </p>
             </FrostedSandCard>
@@ -156,35 +156,35 @@ const Insights = () => {
                       <p className="text-xs uppercase tracking-[0.18em] text-primary/70">Pattern Summary</p>
                       <SectionTooltip text="A summary of the mental patterns your coach has spotted across your rounds — your triggers, strengths, and how your emotions trend over time." />
                     </div>
-                    <p className="text-sm" style={{ color: "var(--muted-ink)" }}>{summary.round_count} structured rounds analyzed</p>
+                    <p className="text-sm" style={{ color: "rgba(26,26,26,0.4)" }}>{summary.round_count} structured rounds analyzed</p>
                   </div>
-                  <TrendingUp className="h-5 w-5" style={{ color: "var(--ink-0)" }} />
+                  <TrendingUp className="h-5 w-5" style={{ color: "#1a1a1a" }} />
                 </div>
                 <div className="space-y-3">
                   <p className="text-base readable-on-sand">{summary.struggle_summary}</p>
-                  <p className="text-base" style={{ color: "var(--ink-1)" }}>{summary.best_summary}</p>
+                  <p className="text-base" style={{ color: "rgba(26,26,26,0.7)" }}>{summary.best_summary}</p>
                 </div>
               </FrostedSandCard>
 
               <div className="grid gap-4 sm:grid-cols-2">
                 <FrostedSandCard className="p-5">
-                  <p className="text-[10px] uppercase tracking-[0.18em]" style={{ color: "var(--muted-ink)" }}>Most Common Trigger</p>
+                  <p className="text-[10px] uppercase tracking-[0.18em]" style={{ color: "rgba(26,26,26,0.4)" }}>Most Common Trigger</p>
                   <p className="mt-2 text-sm readable-on-sand">{summary.most_common_trigger_type}</p>
                 </FrostedSandCard>
                 <FrostedSandCard className="p-5">
-                  <p className="text-[10px] uppercase tracking-[0.18em]" style={{ color: "var(--muted-ink)" }}>Most Common Start</p>
+                  <p className="text-[10px] uppercase tracking-[0.18em]" style={{ color: "rgba(26,26,26,0.4)" }}>Most Common Start</p>
                   <p className="mt-2 text-sm readable-on-sand">{summary.most_common_emotional_start}</p>
                 </FrostedSandCard>
                 <FrostedSandCard className="p-5">
-                  <p className="text-[10px] uppercase tracking-[0.18em]" style={{ color: "var(--muted-ink)" }}>Emotional Trend</p>
+                  <p className="text-[10px] uppercase tracking-[0.18em]" style={{ color: "rgba(26,26,26,0.4)" }}>Emotional Trend</p>
                   <p className="mt-2 text-sm readable-on-sand">{summary.emotional_trend}</p>
                 </FrostedSandCard>
                 <FrostedSandCard className="p-5">
-                  <p className="text-[10px] uppercase tracking-[0.18em]" style={{ color: "var(--muted-ink)" }}>Most Effective Cue</p>
+                  <p className="text-[10px] uppercase tracking-[0.18em]" style={{ color: "rgba(26,26,26,0.4)" }}>Most Effective Cue</p>
                   <p className="mt-2 text-sm readable-on-sand">{summary.most_effective_cue}</p>
                 </FrostedSandCard>
                 <FrostedSandCard className="p-5 sm:col-span-2">
-                  <p className="text-[10px] uppercase tracking-[0.18em]" style={{ color: "var(--muted-ink)" }}>Recovery Trend</p>
+                  <p className="text-[10px] uppercase tracking-[0.18em]" style={{ color: "rgba(26,26,26,0.4)" }}>Recovery Trend</p>
                   <p className="mt-2 text-sm readable-on-sand">{summary.recovery_trend}</p>
                 </FrostedSandCard>
               </div>

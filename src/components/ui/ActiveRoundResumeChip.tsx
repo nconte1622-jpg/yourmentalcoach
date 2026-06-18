@@ -81,14 +81,14 @@ export function ActiveRoundResumeChip() {
         <CircleDot className="h-4 w-4" />
       </span>
       <span className="min-w-0 text-left">
-        <span className="block text-[10px] uppercase tracking-[0.16em] text-[var(--sand-0)]">
+        <span className="block text-[10px] uppercase tracking-[0.16em] text-[#2d6a4f]">
           Active Round
         </span>
-        <span className="block truncate text-xs text-[var(--text-0)]">
+        <span className="block truncate text-xs text-[#1a1a1a]">
           {summary.roundType.replace("-", " ")} · {summary.environment}
         </span>
       </span>
-      <Flag className="h-4 w-4 shrink-0 text-[var(--sand-0)]" />
+      <Flag className="h-4 w-4 shrink-0 text-[#2d6a4f]" />
     </button>
   );
 }

@@ -29,9 +29,9 @@ function alertIcon(type: Alert["type"]) {
     case "streak":
       return <Flame className="h-4 w-4 text-[#f97316]" />;
     case "post-round":
-      return <ArrowLeft className="h-4 w-4 rotate-[135deg] text-[var(--sand-0)]" />;
+      return <ArrowLeft className="h-4 w-4 rotate-[135deg] text-[#2d6a4f]" />;
     default:
-      return <Bell className="h-4 w-4 text-[var(--sand-0)]" />;
+      return <Bell className="h-4 w-4 text-[#2d6a4f]" />;
   }
 }
 
@@ -40,9 +40,9 @@ function alertAccent(type: Alert["type"]): string {
     case "streak":
       return "border-[rgba(249,115,22,0.3)] bg-[rgba(249,115,22,0.08)]";
     case "post-round":
-      return "border-[rgba(203,184,146,0.25)] bg-[rgba(203,184,146,0.07)]";
+      return "border-[rgba(45,106,79,0.15)] bg-[rgba(45,106,79,0.05)]";
     default:
-      return "border-[rgba(203,184,146,0.2)] bg-[rgba(203,184,146,0.06)]";
+      return "border-[rgba(45,106,79,0.12)] bg-[rgba(45,106,79,0.04)]";
   }
 }
 
@@ -105,14 +105,14 @@ export function InAppAlertBanner() {
 
         {/* Text */}
         <div className="min-w-0 flex-1">
-          <p className="text-sm font-medium leading-snug text-[var(--text-0)]">
+          <p className="text-sm font-medium leading-snug text-[#1a1a1a]">
             {current.title}
           </p>
-          <p className="mt-0.5 text-xs leading-relaxed text-[var(--text-1)]">
+          <p className="mt-0.5 text-xs leading-relaxed text-[rgba(26,26,26,0.6)]">
             {current.body}
           </p>
           {alerts.length > 1 && (
-            <p className="mt-1 text-[10px] text-[var(--text-1)] opacity-50">
+            <p className="mt-1 text-[10px] text-[rgba(26,26,26,0.6)] opacity-50">
               {alerts.length - 1} more alert{alerts.length > 2 ? "s" : ""}
             </p>
           )}
@@ -122,7 +122,7 @@ export function InAppAlertBanner() {
         <button
           onClick={handleDismiss}
           aria-label="Dismiss alert"
-          className="tap-44 -mr-1 -mt-1 shrink-0 rounded-full p-1.5 text-[var(--text-1)] transition-opacity hover:opacity-70"
+          className="tap-44 -mr-1 -mt-1 shrink-0 rounded-full p-1.5 text-[rgba(26,26,26,0.6)] transition-opacity hover:opacity-70"
         >
           <X className="h-4 w-4" />
         </button>

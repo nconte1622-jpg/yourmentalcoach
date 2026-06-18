@@ -430,7 +430,7 @@ const Round = () => {
                   className={cn(
                     "flex items-center gap-0.5 rounded-full px-2 py-1.5 text-[10px] font-medium tracking-wide min-h-[36px] transition-all",
                     quickMode
-                      ? "border border-[rgba(203,184,146,0.35)] bg-[rgba(203,184,146,0.12)] text-[var(--sand-0)]"
+                      ? "border border-[rgba(45,106,79,0.12)] bg-[rgba(45,106,79,0.06)] text-[#2d6a4f]"
                       : "text-muted-foreground/50 hover:text-foreground/70 hover:bg-foreground/5"
                   )}
                 >
@@ -464,7 +464,7 @@ const Round = () => {
                     setEndRoundStep("actions");
                     setEndRoundDialogOpen(true);
                   }}
-                  className="flex h-9 items-center justify-center rounded-full px-2.5 text-[10px] uppercase tracking-[0.14em] font-semibold text-[var(--sand-0)] hover:bg-white/5 transition-all"
+                  className="flex h-9 items-center justify-center rounded-full px-2.5 text-[10px] uppercase tracking-[0.14em] font-semibold text-[#2d6a4f] hover:bg-[rgba(0,0,0,0.03)] transition-all"
                 >
                   End
                 </button>
@@ -499,11 +499,11 @@ const Round = () => {
                   )}
 
                   {recallData && !recallDismissed && !currentRecall && (
-                    <div className="rounded-2xl border border-[rgba(255,255,255,0.07)] bg-[rgba(9,19,15,0.72)] px-5 py-3.5 backdrop-blur-sm animate-fade-in">
+                    <div className="rounded-2xl border border-[rgba(45,106,79,0.12)] bg-white/90 px-5 py-3.5 backdrop-blur-sm animate-fade-in">
                       <div className="flex items-center justify-between gap-4">
-                        <p className="text-sm text-[rgba(233,241,236,0.72)] leading-relaxed tracking-wide">
+                        <p className="text-sm text-[rgba(26,26,26,0.6)] leading-relaxed tracking-wide">
                           Recall: When it mattered, you{" "}
-                          <span className="font-medium text-[rgba(152,215,175,0.9)]">
+                          <span className="font-medium text-[#2d6a4f]">
                             {recallData.cueWord}
                           </span>
                           .
@@ -558,7 +558,7 @@ const Round = () => {
         {/* Input Area - docked at bottom */}
         <div className="chat-composer-dock shrink-0">
           <div className="max-w-2xl mx-auto w-full space-y-3">
-          <div className="rounded-2xl border border-[rgba(255,255,255,0.06)] bg-[rgba(9,19,15,0.62)] px-3 py-2.5 backdrop-blur-sm">
+          <div className="rounded-2xl border border-[rgba(45,106,79,0.08)] bg-white/70 px-3 py-2.5 backdrop-blur-sm">
             {features.quick_tap ? (
               <div className="flex gap-2 overflow-x-auto overscroll-contain pb-1" style={{ WebkitOverflowScrolling: "touch" }}>
                 {EMOTION_TAGS.map((tag) => (
@@ -567,7 +567,7 @@ const Round = () => {
                     type="button"
                     onClick={() => void handleEmotionTap(tag)}
                     disabled={isTyping}
-                    className="min-h-10 shrink-0 rounded-full border border-[rgba(255,255,255,0.1)] bg-[rgba(14,42,31,0.62)] px-4 text-[13px] font-medium tracking-wide text-[rgba(233,241,236,0.85)] transition-all duration-200 hover:bg-[rgba(18,64,47,0.8)] hover:text-[rgba(233,241,236,0.98)] hover:border-[rgba(255,255,255,0.18)] hover:shadow-[0_2px_10px_rgba(18,64,47,0.4)] disabled:opacity-50"
+                    className="min-h-11 shrink-0 rounded-full border border-[rgba(45,106,79,0.12)] bg-white px-5 text-[15px] font-medium tracking-wide text-[#1a1a1a] transition-all duration-200 hover:bg-[rgba(45,106,79,0.06)] hover:border-[rgba(45,106,79,0.2)] hover:shadow-[0_2px_8px_rgba(0,0,0,0.06)] disabled:opacity-50"
                   >
                     {tag}
                   </button>
@@ -583,17 +583,17 @@ const Round = () => {
                   {EMOTION_TAGS.map((tag) => (
                     <div
                       key={tag}
-                      className="min-h-11 shrink-0 rounded-full border border-[var(--border)] bg-[rgba(18,64,47,0.32)] px-4 text-xs font-medium tracking-wide text-[var(--text-0)] inline-flex items-center"
+                      className="min-h-11 shrink-0 rounded-full border border-[rgba(45,106,79,0.12)] bg-[rgba(45,106,79,0.06)] px-4 text-xs font-medium tracking-wide text-[#1a1a1a] inline-flex items-center"
                     >
                       {tag}
                     </div>
                   ))}
                 </div>
-                <div className="absolute inset-0 flex items-center justify-center gap-2 bg-[rgba(5,8,7,0.18)]">
-                  <span className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-[var(--border)] bg-black/25 text-[var(--sand-0)]">
+                <div className="absolute inset-0 flex items-center justify-center gap-2 bg-white/40">
+                  <span className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-[rgba(45,106,79,0.12)] bg-black/25 text-[#2d6a4f]">
                     <Lock className="h-4 w-4" />
                   </span>
-                  <span className="text-xs font-medium tracking-wide text-[var(--sand-0)]">
+                  <span className="text-xs font-medium tracking-wide text-[#2d6a4f]">
                     Pro only
                   </span>
                 </div>
@@ -604,10 +604,10 @@ const Round = () => {
             <button
               type="button"
               onClick={() => setShowUpgradeModal(true)}
-              className="w-full rounded-2xl border border-[var(--border)] bg-black/15 px-4 py-3 text-left transition-all duration-300 hover:bg-black/25"
+              className="w-full rounded-2xl border border-[rgba(45,106,79,0.12)] bg-black/15 px-4 py-3 text-left transition-all duration-300 hover:bg-black/25"
             >
-              <p className="text-xs uppercase tracking-[0.18em] text-[var(--sand-0)]">Free Plan</p>
-              <p className="mt-1 text-sm text-[var(--text-1)]">
+              <p className="text-xs uppercase tracking-[0.18em] text-[#2d6a4f]">Free Plan</p>
+              <p className="mt-1 text-sm text-[rgba(26,26,26,0.6)]">
                 {aiMessagesRemaining > 0
                   ? `${aiMessagesRemaining} live coaching messages left this round. Upgrade for unlimited AI.`
                   : "Free round limit reached. Upgrade for unlimited AI."}
@@ -623,18 +623,18 @@ const Round = () => {
                   type="button"
                   disabled={isTyping}
                   onClick={handleHoleTip}
-                  className="w-full flex items-center gap-3 px-4 py-2.5 rounded-2xl border border-[rgba(203,184,146,0.2)] bg-[rgba(203,184,146,0.07)] hover:bg-[rgba(203,184,146,0.12)] transition-all duration-200 disabled:opacity-50"
+                  className="w-full flex items-center gap-3 px-4 py-2.5 rounded-2xl border border-[rgba(45,106,79,0.12)] bg-[rgba(45,106,79,0.06)] hover:bg-[rgba(45,106,79,0.06)] transition-all duration-200 disabled:opacity-50"
                 >
-                  <Flag className="w-4 h-4 text-[var(--sand-0)] shrink-0" />
+                  <Flag className="w-4 h-4 text-[#2d6a4f] shrink-0" />
                   <div className="flex-1 text-left">
-                    <p className="text-[10px] text-[var(--sand-0)] uppercase tracking-[0.16em]">
+                    <p className="text-[10px] text-[#2d6a4f] uppercase tracking-[0.16em]">
                       {holeTipInfo.course}
                     </p>
-                    <p className="text-sm text-[var(--text-0)] font-medium leading-none mt-0.5">
+                    <p className="text-sm text-[#1a1a1a] font-medium leading-none mt-0.5">
                       Hole {holeTipInfo.hole} — get mental tip
                     </p>
                   </div>
-                  <span className="text-[var(--text-2)] text-xs">→</span>
+                  <span className="text-[rgba(26,26,26,0.4)] text-xs">→</span>
                 </button>
               )}
 
@@ -646,7 +646,7 @@ const Round = () => {
                   }}
                   disabled={isTyping}
                   variant="outline"
-                  className="flex-1 py-3.5 text-sm font-medium rounded-2xl border-[rgba(255,255,255,0.1)] bg-[rgba(9,19,15,0.55)] hover:bg-[rgba(9,19,15,0.72)] hover:border-[rgba(255,255,255,0.16)] hover:shadow-[0_4px_16px_rgba(0,0,0,0.3)]"
+                  className="flex-1 py-3.5 text-sm font-medium rounded-2xl border-[rgba(45,106,79,0.12)] bg-white/80 hover:bg-white/90 hover:border-[rgba(45,106,79,0.12)] hover:shadow-[0_2px_8px_rgba(0,0,0,0.06)]"
                   size="lg"
                 >
                   <span className="flex items-center gap-3 text-white font-medium drop-shadow-sm">
@@ -663,7 +663,7 @@ const Round = () => {
                     setPreShotOpen(true);
                   }}
                   variant="outline"
-                  className="shrink-0 py-3.5 px-5 rounded-2xl border-[rgba(255,255,255,0.1)] bg-[rgba(9,19,15,0.55)] hover:bg-[rgba(9,19,15,0.72)] hover:border-[rgba(255,255,255,0.16)] hover:shadow-[0_4px_16px_rgba(0,0,0,0.3)]"
+                  className="shrink-0 py-3.5 px-5 rounded-2xl border-[rgba(45,106,79,0.12)] bg-white/80 hover:bg-white/90 hover:border-[rgba(45,106,79,0.12)] hover:shadow-[0_2px_8px_rgba(0,0,0,0.06)]"
                   size="lg"
                 >
                   <span className="flex items-center gap-1.5 text-white font-medium drop-shadow-sm">
@@ -686,7 +686,7 @@ const Round = () => {
             disabled={isTyping}
             placeholder={isFrustrationMode ? "Take your time..." : "Tell me what's happening on the course..."}
             isFrustrationMode={isFrustrationMode}
-            className="rounded-2xl bg-[rgba(7,15,12,0.74)] border border-[var(--border)] px-3 py-3 shadow-[0_10px_30px_rgba(0,0,0,0.32)]"
+            className="rounded-2xl bg-white/90 border border-[rgba(45,106,79,0.1)] px-3 py-3 shadow-[0_2px_12px_rgba(0,0,0,0.06)]"
             inputClassName="min-h-[44px] rounded-xl"
             sendButtonClassName="h-11 w-11"
           />
@@ -704,16 +704,16 @@ const Round = () => {
         }}
       >
         <DialogContent
-          className="max-w-md rounded-[28px] border-[var(--border)] bg-[rgba(9,19,15,0.96)] p-0 text-[var(--text-0)] shadow-[0_24px_60px_rgba(0,0,0,0.38)] backdrop-blur-xl overflow-y-auto max-h-[90dvh]"
+          className="max-w-md rounded-[28px] border-[rgba(45,106,79,0.12)] bg-white p-0 text-[#1a1a1a] shadow-[0_24px_60px_rgba(0,0,0,0.38)] backdrop-blur-xl overflow-y-auto max-h-[90dvh]"
           onInteractOutside={(e) => e.preventDefault()}
           onPointerDownOutside={(e) => e.preventDefault()}
         >
           <div className="p-6">
             <DialogHeader className="space-y-3 text-left">
-              <DialogTitle className="text-2xl font-serif text-[var(--text-0)]">
+              <DialogTitle className="text-2xl font-serif text-[#1a1a1a]">
                 End this round?
               </DialogTitle>
-              <DialogDescription className="text-sm leading-6 text-[var(--text-1)]">
+              <DialogDescription className="text-sm leading-6 text-[rgba(26,26,26,0.6)]">
                 You&apos;re about to end the round. What would you like to do next?
               </DialogDescription>
             </DialogHeader>
@@ -739,7 +739,7 @@ const Round = () => {
                   type="button"
                   variant="outline"
                   onClick={() => setEndRoundStep("rating")}
-                  className="min-h-11 w-full rounded-2xl border-[var(--border)] bg-[rgba(203,184,146,0.08)] text-[var(--sand-0)] hover:bg-[rgba(203,184,146,0.14)]"
+                  className="min-h-11 w-full rounded-2xl border-[rgba(45,106,79,0.12)] bg-[rgba(45,106,79,0.06)] text-[#2d6a4f] hover:bg-[rgba(45,106,79,0.06)]"
                 >
                   Just end round
                 </Button>
@@ -747,7 +747,7 @@ const Round = () => {
                   type="button"
                   variant="ghost"
                   onClick={() => setEndRoundDialogOpen(false)}
-                  className="min-h-11 w-full rounded-2xl text-[var(--text-1)] hover:bg-white/5"
+                  className="min-h-11 w-full rounded-2xl text-[rgba(26,26,26,0.6)] hover:bg-[rgba(0,0,0,0.03)]"
                 >
                   Keep Round Going
                 </Button>
@@ -755,7 +755,7 @@ const Round = () => {
             ) : (
               <div className="mt-6 space-y-5">
                 <div>
-                  <p className="text-sm text-[var(--text-1)]">How did the round leave you feeling?</p>
+                  <p className="text-sm text-[rgba(26,26,26,0.6)]">How did the round leave you feeling?</p>
                   <div className="mt-3 grid grid-cols-5 gap-2">
                     {Array.from({ length: 10 }, (_, index) => {
                       const score = index + 1;
@@ -768,8 +768,8 @@ const Round = () => {
                           className={cn(
                             "min-h-11 rounded-2xl border text-sm font-medium transition-all duration-200",
                             selected
-                              ? "border-[rgba(203,184,146,0.28)] bg-[rgba(203,184,146,0.16)] text-[var(--sand-0)]"
-                              : "border-[var(--border)] bg-[rgba(14,42,31,0.46)] text-[var(--text-1)] hover:bg-[rgba(18,64,47,0.58)]"
+                              ? "border-[rgba(45,106,79,0.12)] bg-[rgba(45,106,79,0.06)] text-[#2d6a4f]"
+                              : "border-[rgba(45,106,79,0.12)] bg-[rgba(45,106,79,0.06)] text-[rgba(26,26,26,0.6)] hover:bg-[rgba(45,106,79,0.06)]"
                           )}
                         >
                           {score}
@@ -791,7 +791,7 @@ const Round = () => {
                     type="button"
                     variant="ghost"
                     onClick={() => setEndRoundStep("actions")}
-                    className="min-h-11 w-full rounded-2xl text-[var(--text-1)] hover:bg-white/5"
+                    className="min-h-11 w-full rounded-2xl text-[rgba(26,26,26,0.6)] hover:bg-[rgba(0,0,0,0.03)]"
                   >
                     Back
                   </Button>

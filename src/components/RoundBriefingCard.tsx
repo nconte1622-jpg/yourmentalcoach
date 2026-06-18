@@ -85,14 +85,14 @@ export const RoundBriefingCard = ({ onDismiss, className }: RoundBriefingCardPro
     <div className={cn("animate-fade-in", className)}>
       <div
         className={cn(
-          "rounded-2xl border border-[rgba(203,184,146,0.12)] bg-[rgba(9,19,15,0.82)]",
+          "rounded-2xl border border-[rgba(45,106,79,0.12)] bg-white/95",
           "px-4 py-3.5 backdrop-blur-xl",
           "space-y-2"
         )}
       >
         {/* Header */}
         <div className="flex items-center justify-between gap-3">
-          <p className="text-[10px] uppercase tracking-[0.18em] text-[var(--sand-0)] opacity-60">
+          <p className="text-[10px] uppercase tracking-[0.18em] text-[#2d6a4f] opacity-60">
             Round Briefing
           </p>
           <button

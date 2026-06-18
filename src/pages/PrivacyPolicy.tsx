@@ -31,7 +31,7 @@ const PrivacyPolicy = () => {
       >
         <main className="legal-shell space-y-5">
           <div className="space-y-2 pt-2">
-            <div className="inline-flex min-h-11 items-center gap-2 rounded-full border border-[rgba(203,184,146,0.16)] bg-[rgba(203,184,146,0.1)] px-3 py-2 text-sm text-[var(--sand-0)]">
+            <div className="inline-flex min-h-11 items-center gap-2 rounded-full border border-[rgba(45,106,79,0.12)] bg-[rgba(45,106,79,0.06)] px-3 py-2 text-sm text-[#2d6a4f]">
               <ShieldAlert className="h-4 w-4" />
               Privacy & Data
             </div>

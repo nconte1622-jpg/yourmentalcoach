@@ -269,7 +269,7 @@ const Home = () => {
      RENDER
      ══════════════════════════════════════════════════════ */
   return (
-    <main className="relative h-[100dvh] overflow-hidden bg-[var(--bg-0)]">
+    <main className="relative h-[100dvh] overflow-hidden bg-[#f5f2ea]">
 
       {/* ── Horizontal swipe container ──────────────────── */}
       <div
@@ -290,10 +290,10 @@ const Home = () => {
                 left={<div className="tap-44" />}
                 center={
                   <div>
-                    <h1 className="truncate font-serif text-[23px] leading-tight tracking-wide text-[var(--text-0)]">
+                    <h1 className="truncate font-serif text-[23px] leading-tight tracking-wide text-[#1a1a1a]">
                       The Caddie
                     </h1>
-                    <p className="truncate text-[11px] uppercase tracking-[0.14em] text-[var(--text-1)]">
+                    <p className="truncate text-[11px] uppercase tracking-[0.14em] text-[rgba(26,26,26,0.6)]">
                       Focus · Commit · Trust
                     </p>
                   </div>
@@ -305,8 +305,8 @@ const Home = () => {
                 }
                 subrow={
                   <div className="flex items-center gap-2">
-                    <div className="inline-flex min-h-11 items-center gap-1.5 rounded-full border border-[rgba(203,184,146,0.18)] bg-[rgba(203,184,146,0.1)] px-3.5 py-1 text-xs font-medium text-[var(--sand-0)]">
-                      <span className="inline-block h-1.5 w-1.5 rounded-full bg-[var(--sand-0)] opacity-70" />
+                    <div className="inline-flex min-h-11 items-center gap-1.5 rounded-full border border-[rgba(45,106,79,0.12)] bg-[rgba(45,106,79,0.06)] px-3.5 py-1 text-xs font-medium text-[#2d6a4f]">
+                      <span className="inline-block h-1.5 w-1.5 rounded-full bg-[#2d6a4f] opacity-70" />
                       {todayLabel()}
                     </div>
                     {streak.currentStreak >= 2 && (
@@ -335,14 +335,14 @@ const Home = () => {
                           <span className="absolute h-2.5 w-2.5 animate-ping rounded-full bg-[rgba(31,180,100,0.5)]" />
                           <span className="h-2 w-2 rounded-full bg-[rgba(31,180,100,0.9)]" />
                         </span>
-                        <p className="text-sm font-medium tracking-wide text-[var(--sand-0)]">
+                        <p className="text-sm font-medium tracking-wide text-[#2d6a4f]">
                           Round in Progress
                         </p>
                       </div>
-                      <p className="text-base capitalize text-[var(--text-0)]">
+                      <p className="text-base capitalize text-[#1a1a1a]">
                         {activeRoundMeta.roundType} · {activeRoundMeta.environment}
                       </p>
-                      <p className="text-sm text-[var(--text-1)]">{activeRoundMeta.durationLabel}</p>
+                      <p className="text-sm text-[rgba(26,26,26,0.6)]">{activeRoundMeta.durationLabel}</p>
                     </div>
                     <PillButton
                       tone="green"
@@ -366,16 +366,16 @@ const Home = () => {
                         <Flame className="h-5 w-5" />
                       </div>
                       <div className="min-w-0 flex-1">
-                        <p className="font-serif text-lg text-[var(--text-0)]">
+                        <p className="font-serif text-lg text-[#1a1a1a]">
                           {reEngageDays} days since your last round
                         </p>
-                        <p className="text-sm text-[var(--sand-0)] opacity-80">
+                        <p className="text-sm text-[#2d6a4f] opacity-80">
                           {streak.currentStreak >= 2
                             ? "Keep your streak alive — play before it resets."
                             : "Step back on the course and keep the momentum going."}
                         </p>
                       </div>
-                      <ChevronRight className="h-5 w-5 text-[var(--sand-0)] opacity-70 transition-transform group-hover:translate-x-0.5" />
+                      <ChevronRight className="h-5 w-5 text-[#2d6a4f] opacity-70 transition-transform group-hover:translate-x-0.5" />
                     </div>
                   </GlassCard>
                 </button>
@@ -388,15 +388,15 @@ const Home = () => {
               <GlassCard glow className="calm-pro-mount p-5">
                 <div className="space-y-4">
                   <div className="flex items-center gap-2">
-                    <Sparkles className="h-3.5 w-3.5 text-[var(--sand-0)]" />
-                    <p className="text-xs font-medium uppercase tracking-[0.18em] text-[var(--sand-0)]">
+                    <Sparkles className="h-3.5 w-3.5 text-[#2d6a4f]" />
+                    <p className="text-xs font-medium uppercase tracking-[0.18em] text-[#2d6a4f]">
                       Today&apos;s Focus
                     </p>
                   </div>
-                  <p className="font-serif text-2xl leading-8 text-[var(--text-0)]">
+                  <p className="font-serif text-2xl leading-8 text-[#1a1a1a]">
                     {TODAY_FOCUS_TEXT}
                   </p>
-                  <p className="text-sm text-[var(--text-1)]">
+                  <p className="text-sm text-[rgba(26,26,26,0.6)]">
                     Keep your process quiet and clear before every shot.
                   </p>
                   <PillButton
@@ -421,13 +421,13 @@ const Home = () => {
                 {hasPatternAccess && patternSummary ? (
                   <div className="space-y-3">
                     <div className="flex items-center gap-2">
-                      <TrendingUp className="h-3.5 w-3.5 text-[var(--sand-0)]" />
-                      <p className="text-xs font-medium uppercase tracking-[0.18em] text-[var(--sand-0)]">
+                      <TrendingUp className="h-3.5 w-3.5 text-[#2d6a4f]" />
+                      <p className="text-xs font-medium uppercase tracking-[0.18em] text-[#2d6a4f]">
                         Pattern Insight
                       </p>
                     </div>
-                    <p className="text-sm leading-6 text-[var(--text-0)]">{patternSummary?.struggle_summary}</p>
-                    <p className="text-sm leading-6 text-[var(--text-1)]">{patternSummary?.best_summary}</p>
+                    <p className="text-sm leading-6 text-[#1a1a1a]">{patternSummary?.struggle_summary}</p>
+                    <p className="text-sm leading-6 text-[rgba(26,26,26,0.6)]">{patternSummary?.best_summary}</p>
                     <PillButton tone="sand" onClick={() => withTap("/insights")}>
                       Open Insights
                     </PillButton>
@@ -435,21 +435,21 @@ const Home = () => {
                 ) : (
                   <div className="space-y-3">
                     <div className="flex items-center gap-2">
-                      <TrendingUp className="h-3.5 w-3.5 text-[var(--sand-0)]" />
-                      <p className="text-xs font-medium uppercase tracking-[0.18em] text-[var(--sand-0)]">
+                      <TrendingUp className="h-3.5 w-3.5 text-[#2d6a4f]" />
+                      <p className="text-xs font-medium uppercase tracking-[0.18em] text-[#2d6a4f]">
                         Pattern Insight
                       </p>
                     </div>
-                    <p className="text-sm text-[var(--text-1)]">
-                      Complete <span className="text-[var(--text-0)]">{Math.max(0, 3 - eligibleRoundCount)} more structured round{Math.max(0, 3 - eligibleRoundCount) !== 1 ? "s" : ""}</span> to unlock — free.
+                    <p className="text-sm text-[rgba(26,26,26,0.6)]">
+                      Complete <span className="text-[#1a1a1a]">{Math.max(0, 3 - eligibleRoundCount)} more structured round{Math.max(0, 3 - eligibleRoundCount) !== 1 ? "s" : ""}</span> to unlock — free.
                     </p>
-                    <div className="h-1 w-full overflow-hidden rounded-full bg-[rgba(255,255,255,0.06)]">
+                    <div className="h-1 w-full overflow-hidden rounded-full bg-[rgba(0,0,0,0.03)]">
                       <div
                         className="h-full rounded-full bg-[rgba(203,184,146,0.5)] transition-all"
                         style={{ width: `${Math.min(100, (eligibleRoundCount / 3) * 100)}%` }}
                       />
                     </div>
-                    <p className="text-xs text-[var(--text-1)]">{eligibleRoundCount} / 3 rounds</p>
+                    <p className="text-xs text-[rgba(26,26,26,0.6)]">{eligibleRoundCount} / 3 rounds</p>
                   </div>
                 )}
               </GlassCard>
@@ -460,16 +460,16 @@ const Home = () => {
                   onClick={() => withTap("/master-quiz")}
                   className="calm-pro-focus calm-pro-press calm-pro-mount group block w-full"
                 >
-                  <GlassCard className="min-h-11 p-5 border-[rgba(203,184,146,0.25)]">
+                  <GlassCard className="min-h-11 p-5 border-[rgba(45,106,79,0.12)]">
                     <div className="flex items-center gap-3.5">
-                      <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border border-[rgba(203,184,146,0.3)] bg-[rgba(203,184,146,0.12)] text-[var(--sand-0)]">
+                      <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border border-[rgba(45,106,79,0.12)] bg-[rgba(45,106,79,0.06)] text-[#2d6a4f]">
                         <Target className="h-5 w-5" />
                       </div>
                       <div className="min-w-0 flex-1 text-left">
-                        <p className="font-serif text-xl text-[var(--text-0)]">Set Up Your Profile</p>
-                        <p className="text-sm text-[var(--sand-0)] opacity-80">Tell your coach about your game — personalizes every response.</p>
+                        <p className="font-serif text-xl text-[#1a1a1a]">Set Up Your Profile</p>
+                        <p className="text-sm text-[#2d6a4f] opacity-80">Tell your coach about your game — personalizes every response.</p>
                       </div>
-                      <ChevronRight className="h-5 w-5 text-[var(--sand-0)] opacity-70" />
+                      <ChevronRight className="h-5 w-5 text-[#2d6a4f] opacity-70" />
                     </div>
                   </GlassCard>
                 </button>
@@ -482,14 +482,14 @@ const Home = () => {
               >
                 <GlassCard className="min-h-11 p-5">
                   <div className="flex items-center gap-3.5">
-                    <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border border-[var(--border)] bg-[rgba(18,64,47,0.6)] text-[var(--sand-0)]">
+                    <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border border-[rgba(45,106,79,0.12)] bg-[rgba(45,106,79,0.06)] text-[#2d6a4f]">
                       <MessageCircle className="h-5 w-5" />
                     </div>
                     <div className="min-w-0 flex-1 text-left">
-                      <p className="font-serif text-xl text-[var(--text-0)]">Quick Coach</p>
-                      <p className="text-sm text-[var(--text-1)]">Jump in for a live cue.</p>
+                      <p className="font-serif text-xl text-[#1a1a1a]">Quick Coach</p>
+                      <p className="text-sm text-[rgba(26,26,26,0.6)]">Jump in for a live cue.</p>
                     </div>
-                    <ChevronRight className="h-5 w-5 text-[var(--sand-0)] opacity-70" />
+                    <ChevronRight className="h-5 w-5 text-[#2d6a4f] opacity-70" />
                   </div>
                 </GlassCard>
               </button>
@@ -501,20 +501,20 @@ const Home = () => {
               >
                 <GlassCard className="min-h-11 p-5">
                   <div className="flex items-center gap-3.5">
-                    <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border border-[var(--border)] bg-[rgba(18,64,47,0.6)] text-[var(--sand-0)]">
+                    <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border border-[rgba(45,106,79,0.12)] bg-[rgba(45,106,79,0.06)] text-[#2d6a4f]">
                       <Video className="h-5 w-5" />
                     </div>
                     <div className="min-w-0 flex-1 text-left">
-                      <p className="font-serif text-xl text-[var(--text-0)]">Swing Analysis</p>
-                      <p className="text-sm text-[var(--text-1)]">Video mental coaching.</p>
+                      <p className="font-serif text-xl text-[#1a1a1a]">Swing Analysis</p>
+                      <p className="text-sm text-[rgba(26,26,26,0.6)]">Video mental coaching.</p>
                     </div>
-                    <ChevronRight className="h-5 w-5 text-[var(--sand-0)] opacity-70" />
+                    <ChevronRight className="h-5 w-5 text-[#2d6a4f] opacity-70" />
                   </div>
                 </GlassCard>
               </button>
 
               {/* Swipe hint */}
-              <div className="flex items-center justify-center gap-2 pt-2 text-[var(--text-1)] opacity-50">
+              <div className="flex items-center justify-center gap-2 pt-2 text-[rgba(26,26,26,0.6)] opacity-50">
                 <p className="text-xs tracking-wide">Swipe for modes</p>
                 <ArrowRight className="h-3 w-3" />
               </div>
@@ -530,7 +530,7 @@ const Home = () => {
           <div className="liquid-bg-round absolute inset-0">
             {/* Floating liquid orbs */}
             <div className="absolute -left-24 -top-24 h-[420px] w-[420px] rounded-full bg-[rgba(31,106,74,0.45)] blur-[100px] animate-liquid-1" />
-            <div className="absolute -right-16 bottom-[30%] h-[320px] w-[320px] rounded-full bg-[rgba(18,64,47,0.4)] blur-[90px] animate-liquid-2" />
+            <div className="absolute -right-16 bottom-[30%] h-[320px] w-[320px] rounded-full bg-[rgba(45,106,79,0.06)] blur-[90px] animate-liquid-2" />
             <div className="absolute left-[30%] top-[55%] h-[250px] w-[250px] rounded-full bg-[rgba(31,180,100,0.18)] blur-[80px] animate-liquid-3" />
             {/* Subtle grain */}
             <div className="absolute inset-0 opacity-[0.08]" style={{
@@ -543,20 +543,20 @@ const Home = () => {
           <div className="relative z-10 flex h-full flex-col items-center justify-center px-8">
             {/* Top label */}
             <div className="absolute left-0 right-0 top-[max(60px,env(safe-area-inset-top))] flex justify-center">
-              <span className="text-[10px] uppercase tracking-[0.3em] text-[var(--sand-0)] opacity-60">
+              <span className="text-[10px] uppercase tracking-[0.3em] text-[#2d6a4f] opacity-60">
                 The Caddie
               </span>
             </div>
 
             {/* Main title */}
             <div className="text-center space-y-4 mb-12">
-              <div className="inline-flex items-center justify-center h-16 w-16 rounded-3xl border border-[rgba(31,106,74,0.5)] bg-[rgba(18,64,47,0.5)] mx-auto mb-4">
+              <div className="inline-flex items-center justify-center h-16 w-16 rounded-3xl border border-[rgba(31,106,74,0.5)] bg-[rgba(45,106,79,0.06)] mx-auto mb-4">
                 <Play className="h-7 w-7 text-[rgba(31,180,100,0.8)] ml-0.5" />
               </div>
-              <h2 className="font-serif text-[42px] leading-[1.1] tracking-wide text-[var(--text-0)]">
+              <h2 className="font-serif text-[42px] leading-[1.1] tracking-wide text-[#1a1a1a]">
                 Start Your<br />Round
               </h2>
-              <p className="text-base leading-relaxed text-[var(--text-1)] max-w-[260px] mx-auto">
+              <p className="text-base leading-relaxed text-[rgba(26,26,26,0.6)] max-w-[260px] mx-auto">
                 Step onto the course with clarity and intention.
               </p>
             </div>
@@ -565,35 +565,35 @@ const Home = () => {
             <div className="w-full max-w-sm space-y-3">
               <button
                 onClick={() => withTap("/pre-game")}
-                className="calm-pro-press group flex w-full items-center gap-4 rounded-[20px] border border-[var(--border)] bg-[rgba(14,42,31,0.5)] p-4 backdrop-blur-md transition-all hover:bg-[rgba(14,42,31,0.7)]"
+                className="calm-pro-press group flex w-full items-center gap-4 rounded-[20px] border border-[rgba(45,106,79,0.12)] bg-[rgba(45,106,79,0.06)] p-4 backdrop-blur-md transition-all hover:bg-[rgba(45,106,79,0.06)]"
               >
-                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-[rgba(31,106,74,0.5)] text-[var(--sand-0)]">
+                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-[rgba(31,106,74,0.5)] text-[#2d6a4f]">
                   <Timer className="h-5 w-5" />
                 </div>
                 <div className="flex-1 text-left">
-                  <p className="font-serif text-lg text-[var(--text-0)]">Pre-Game Talk</p>
-                  <p className="text-xs text-[var(--text-1)]">Calm nerves · Set intention</p>
+                  <p className="font-serif text-lg text-[#1a1a1a]">Pre-Game Talk</p>
+                  <p className="text-xs text-[rgba(26,26,26,0.6)]">Calm nerves · Set intention</p>
                 </div>
-                <ChevronRight className="h-4 w-4 text-[var(--sand-0)] opacity-50 transition-transform group-hover:translate-x-0.5" />
+                <ChevronRight className="h-4 w-4 text-[#2d6a4f] opacity-50 transition-transform group-hover:translate-x-0.5" />
               </button>
 
               <button
                 onClick={() => withTap("/round-setup")}
-                className="calm-pro-press group flex w-full items-center gap-4 rounded-[20px] border border-[rgba(31,106,74,0.35)] bg-[rgba(18,64,47,0.45)] p-4 backdrop-blur-md transition-all hover:bg-[rgba(18,64,47,0.65)]"
+                className="calm-pro-press group flex w-full items-center gap-4 rounded-[20px] border border-[rgba(31,106,74,0.35)] bg-[rgba(45,106,79,0.06)] p-4 backdrop-blur-md transition-all hover:bg-[rgba(45,106,79,0.06)]"
               >
                 <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-[rgba(31,180,100,0.2)] text-[rgba(31,180,100,0.9)]">
                   <Flag className="h-5 w-5" />
                 </div>
                 <div className="flex-1 text-left">
-                  <p className="font-serif text-lg text-[var(--text-0)]">Full Round</p>
-                  <p className="text-xs text-[var(--text-1)]">Setup · Track · Reflect after</p>
+                  <p className="font-serif text-lg text-[#1a1a1a]">Full Round</p>
+                  <p className="text-xs text-[rgba(26,26,26,0.6)]">Setup · Track · Reflect after</p>
                 </div>
-                <ChevronRight className="h-4 w-4 text-[var(--sand-0)] opacity-50 transition-transform group-hover:translate-x-0.5" />
+                <ChevronRight className="h-4 w-4 text-[#2d6a4f] opacity-50 transition-transform group-hover:translate-x-0.5" />
               </button>
             </div>
 
             {/* Swipe hint */}
-            <div className="absolute bottom-[calc(100px+env(safe-area-inset-bottom))] left-0 right-0 flex items-center justify-center gap-2 text-[var(--text-1)] opacity-40">
+            <div className="absolute bottom-[calc(100px+env(safe-area-inset-bottom))] left-0 right-0 flex items-center justify-center gap-2 text-[rgba(26,26,26,0.6)] opacity-40">
               <p className="text-xs tracking-wide">Swipe for Close Strong</p>
               <ArrowRight className="h-3 w-3" />
             </div>
@@ -609,7 +609,7 @@ const Home = () => {
             {/* Gold/amber orbs */}
             <div className="absolute -left-20 top-[15%] h-[380px] w-[380px] rounded-full bg-[rgba(180,140,50,0.25)] blur-[100px] animate-liquid-4" />
             <div className="absolute -right-20 bottom-[25%] h-[300px] w-[300px] rounded-full bg-[rgba(160,120,40,0.2)] blur-[90px] animate-liquid-1" />
-            <div className="absolute left-[40%] top-[60%] h-[200px] w-[200px] rounded-full bg-[rgba(203,184,146,0.12)] blur-[70px] animate-liquid-2" />
+            <div className="absolute left-[40%] top-[60%] h-[200px] w-[200px] rounded-full bg-[rgba(45,106,79,0.06)] blur-[70px] animate-liquid-2" />
             {/* Light sweep */}
             <div className="absolute inset-0 overflow-hidden pointer-events-none">
               <div className="absolute -left-[50%] top-0 h-full w-[200%] bg-gradient-to-r from-transparent via-[rgba(203,184,146,0.04)] to-transparent animate-light-sweep" />
@@ -625,7 +625,7 @@ const Home = () => {
           <div className="relative z-10 flex h-full flex-col items-center justify-center px-8">
             {/* Top label */}
             <div className="absolute left-0 right-0 top-[max(60px,env(safe-area-inset-top))] flex justify-center">
-              <span className="text-[10px] uppercase tracking-[0.3em] text-[var(--sand-0)] opacity-60">
+              <span className="text-[10px] uppercase tracking-[0.3em] text-[#2d6a4f] opacity-60">
                 The Caddie
               </span>
             </div>
@@ -633,12 +633,12 @@ const Home = () => {
             {/* Main title */}
             <div className="text-center space-y-4 mb-12">
               <div className="inline-flex items-center justify-center h-16 w-16 rounded-3xl border border-[rgba(180,140,50,0.4)] bg-[rgba(160,120,40,0.25)] mx-auto mb-4">
-                <Crosshair className="h-7 w-7 text-[var(--sand-0)]" />
+                <Crosshair className="h-7 w-7 text-[#2d6a4f]" />
               </div>
-              <h2 className="font-serif text-[44px] leading-[1.05] tracking-[0.04em] text-[var(--text-0)]">
+              <h2 className="font-serif text-[44px] leading-[1.05] tracking-[0.04em] text-[#1a1a1a]">
                 Close<br />Strong
               </h2>
-              <p className="text-base leading-relaxed text-[var(--text-1)] max-w-[280px] mx-auto">
+              <p className="text-base leading-relaxed text-[rgba(26,26,26,0.6)] max-w-[280px] mx-auto">
                 Lock in. Execute when it matters most. No thinking — just trust.
               </p>
             </div>
@@ -653,25 +653,25 @@ const Home = () => {
                   }
                   withTap("/round/close-strong");
                 }}
-                className="calm-pro-press group relative w-full overflow-hidden rounded-2xl border border-[rgba(203,184,146,0.25)] bg-[rgba(180,140,50,0.18)] px-6 py-5 text-center backdrop-blur-md transition-all hover:bg-[rgba(180,140,50,0.28)]"
+                className="calm-pro-press group relative w-full overflow-hidden rounded-2xl border border-[rgba(45,106,79,0.12)] bg-[rgba(180,140,50,0.18)] px-6 py-5 text-center backdrop-blur-md transition-all hover:bg-[rgba(180,140,50,0.28)]"
               >
                 {/* Shimmer effect */}
                 <span className="absolute inset-0 bg-gradient-to-r from-transparent via-[rgba(203,184,146,0.08)] to-transparent animate-light-sweep pointer-events-none" />
                 <span className="relative flex items-center justify-center gap-3">
-                  <Flame className="h-5 w-5 text-[var(--sand-0)]" />
-                  <span className="font-serif text-xl tracking-wide text-[var(--text-0)]">
+                  <Flame className="h-5 w-5 text-[#2d6a4f]" />
+                  <span className="font-serif text-xl tracking-wide text-[#1a1a1a]">
                     Enter Close Strong
                   </span>
                 </span>
                 {!isPro && (
-                  <span className="absolute top-3 right-3 rounded-full border border-[rgba(203,184,146,0.4)] bg-[rgba(203,184,146,0.15)] px-2 py-0.5 text-[9px] font-bold uppercase tracking-[0.14em] text-[var(--sand-0)]">
+                  <span className="absolute top-3 right-3 rounded-full border border-[rgba(45,106,79,0.12)] bg-[rgba(45,106,79,0.06)] px-2 py-0.5 text-[9px] font-bold uppercase tracking-[0.14em] text-[#2d6a4f]">
                     Pro
                   </span>
                 )}
               </button>
 
               {/* Micro-message */}
-              <p className="text-center text-xs text-[var(--text-1)] opacity-50 italic">
+              <p className="text-center text-xs text-[rgba(26,26,26,0.6)] opacity-50 italic">
                 "The last three holes define the round."
               </p>
             </div>
@@ -681,7 +681,7 @@ const Home = () => {
 
       {/* ── Page indicator dots ──────────────────────────── */}
       <div className="fixed bottom-[calc(var(--bottom-dock-h)+var(--sab)+16px)] left-0 right-0 z-30 flex items-center justify-center gap-3 pointer-events-none">
-        <div className="pointer-events-auto flex items-center gap-2 rounded-full border border-[var(--border)] bg-[rgba(5,8,7,0.7)] px-3 py-1.5 backdrop-blur-md">
+        <div className="pointer-events-auto flex items-center gap-2 rounded-full border border-[rgba(45,106,79,0.12)] bg-white/90 px-3 py-1.5 backdrop-blur-md">
           {PAGE_LABELS.map((label, i) => (
             <button
               key={label}
@@ -689,14 +689,14 @@ const Home = () => {
               className={cn(
                 "flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-medium uppercase tracking-[0.12em] transition-all duration-300",
                 activePage === i
-                  ? "bg-[rgba(203,184,146,0.18)] text-[var(--sand-0)]"
-                  : "text-[var(--text-1)] opacity-50 hover:opacity-80"
+                  ? "bg-[rgba(45,106,79,0.06)] text-[#2d6a4f]"
+                  : "text-[rgba(26,26,26,0.6)] opacity-50 hover:opacity-80"
               )}
             >
               <span
                 className={cn(
                   "h-1.5 w-1.5 rounded-full transition-all duration-300",
-                  activePage === i ? "bg-[var(--sand-0)]" : "bg-[var(--text-1)]"
+                  activePage === i ? "bg-[#2d6a4f]" : "bg-[rgba(26,26,26,0.25)]"
                 )}
               />
               {label}
@@ -716,25 +716,25 @@ const Home = () => {
           style={{ background: "rgba(3,8,6,0.72)" }}
         >
           <div
-            className="pointer-events-auto mx-4 w-full max-w-sm rounded-3xl border border-[rgba(203,184,146,0.2)] bg-[rgba(9,19,15,0.96)] p-6 backdrop-blur-xl animate-slide-up"
+            className="pointer-events-auto mx-4 w-full max-w-sm rounded-3xl border border-[rgba(45,106,79,0.12)] bg-white p-6 backdrop-blur-xl animate-slide-up"
           >
-            <p className="text-[10px] uppercase tracking-[0.22em] text-[var(--sand-0)] opacity-60 mb-3">
+            <p className="text-[10px] uppercase tracking-[0.22em] text-[#2d6a4f] opacity-60 mb-3">
               Quick tour
             </p>
-            <h2 className="font-serif text-xl text-[var(--text-0)] mb-2">
+            <h2 className="font-serif text-xl text-[#1a1a1a] mb-2">
               Three pages, one swipe away
             </h2>
             <div className="space-y-3 mt-4">
               {[
-                { dot: "bg-[var(--sand-0)]", label: "Today", desc: "Your dashboard — focus, patterns, quick coach" },
+                { dot: "bg-[#2d6a4f]", label: "Today", desc: "Your dashboard — focus, patterns, quick coach" },
                 { dot: "bg-[rgba(31,180,100,0.85)]", label: "Play", desc: "Start a full round or pre-game talk" },
                 { dot: "bg-[rgba(203,184,146,0.55)]", label: "Finish", desc: "Enter Close Strong for your last 3 holes" },
               ].map(({ dot, label, desc }) => (
                 <div key={label} className="flex items-start gap-3">
                   <div className={`mt-1.5 h-2 w-2 shrink-0 rounded-full ${dot}`} />
                   <div>
-                    <span className="text-sm font-medium text-[var(--text-0)]">{label}</span>
-                    <span className="text-sm text-[var(--text-1)]"> — {desc}</span>
+                    <span className="text-sm font-medium text-[#1a1a1a]">{label}</span>
+                    <span className="text-sm text-[rgba(26,26,26,0.6)]"> — {desc}</span>
                   </div>
                 </div>
               ))}
@@ -745,7 +745,7 @@ const Home = () => {
                 setShowSwipeTutorial(false);
                 try { localStorage.setItem(HOME_TUTORED_KEY, "1"); } catch { /* silent */ }
               }}
-              className="mt-6 w-full rounded-2xl border border-[rgba(203,184,146,0.2)] bg-[rgba(203,184,146,0.1)] py-3.5 text-sm font-medium tracking-wide text-[var(--sand-0)] transition-all hover:bg-[rgba(203,184,146,0.18)]"
+              className="mt-6 w-full rounded-2xl border border-[rgba(45,106,79,0.12)] bg-[rgba(45,106,79,0.06)] py-3.5 text-sm font-medium tracking-wide text-[#2d6a4f] transition-all hover:bg-[rgba(45,106,79,0.06)]"
             >
               Got it →
             </button>

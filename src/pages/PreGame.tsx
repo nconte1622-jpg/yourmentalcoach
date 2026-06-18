@@ -241,7 +241,7 @@ const PreGame = () => {
           <button
             type="button"
             onClick={handleBack}
-            className="inline-flex items-center gap-2 rounded-xl px-3 py-2.5 text-sm font-medium text-[var(--text-1)] transition-all duration-200 hover:bg-white/5 active:scale-95"
+            className="inline-flex items-center gap-2 rounded-xl px-3 py-2.5 text-sm font-medium text-[rgba(26,26,26,0.6)] transition-all duration-200 hover:bg-[rgba(0,0,0,0.03)] active:scale-95"
           >
             <ArrowLeft className="h-4 w-4" />
             Home
@@ -253,21 +253,21 @@ const PreGame = () => {
           <div className="max-w-md w-full space-y-8">
             {/* Title section */}
             <div className="text-center space-y-3">
-              <h2 className="text-[32px] font-serif text-[var(--text-0)] tracking-wide leading-tight">
+              <h2 className="text-[32px] font-serif text-[#1a1a1a] tracking-wide leading-tight">
                 Pre-Game Talk
               </h2>
-              <p className="text-sm text-[var(--text-1)] tracking-wide">
+              <p className="text-sm text-[rgba(26,26,26,0.6)] tracking-wide">
                 Before you step to the first tee.
               </p>
 
               {dailyFocusText && (
-                <p className="text-xs tracking-wide text-[var(--sand-0)] pt-1">
+                <p className="text-xs tracking-wide text-[#2d6a4f] pt-1">
                   Today&apos;s focus: {dailyFocusText}
                 </p>
               )}
 
               {recallLine && (
-                <p className="text-[11px] text-[var(--text-1)] opacity-60 font-light italic pt-1">
+                <p className="text-[11px] text-[rgba(26,26,26,0.6)] opacity-60 font-light italic pt-1">
                   {recallLine}
                 </p>
               )}
@@ -276,26 +276,26 @@ const PreGame = () => {
             {/* Coach talk card */}
             <div
               className={cn(
-                "rounded-[20px] border border-[var(--border)] p-6 min-h-[160px] backdrop-blur-md transition-all duration-500",
-                "bg-[rgba(14,42,31,0.35)]",
+                "rounded-[20px] border border-[rgba(45,106,79,0.12)] p-6 min-h-[160px] backdrop-blur-md transition-all duration-500",
+                "bg-[rgba(45,106,79,0.06)]",
                 isGenerating && !talk && "flex items-center justify-center"
               )}
             >
               {isGenerating && !talk ? (
                 <div className="flex gap-2">
-                  <span className="w-2.5 h-2.5 bg-[var(--sand-0)] rounded-full opacity-30 animate-pulse" />
-                  <span className="w-2.5 h-2.5 bg-[var(--sand-0)] rounded-full opacity-30 animate-pulse" style={{ animationDelay: "0.2s" }} />
-                  <span className="w-2.5 h-2.5 bg-[var(--sand-0)] rounded-full opacity-30 animate-pulse" style={{ animationDelay: "0.4s" }} />
+                  <span className="w-2.5 h-2.5 bg-[#2d6a4f] rounded-full opacity-30 animate-pulse" />
+                  <span className="w-2.5 h-2.5 bg-[#2d6a4f] rounded-full opacity-30 animate-pulse" style={{ animationDelay: "0.2s" }} />
+                  <span className="w-2.5 h-2.5 bg-[#2d6a4f] rounded-full opacity-30 animate-pulse" style={{ animationDelay: "0.4s" }} />
                 </div>
               ) : (
                 <div className="space-y-3">
                   {talk.split("\n").filter(Boolean).map((line, index) => (
-                    <p key={`${line}-${index}`} className="text-[15px] leading-relaxed text-[var(--text-0)]">
+                    <p key={`${line}-${index}`} className="text-[15px] leading-relaxed text-[#1a1a1a]">
                       {renderContent(line)}
                     </p>
                   ))}
                   {status === "error" && (
-                    <p className="text-[11px] text-[var(--text-1)] opacity-50 pt-2">
+                    <p className="text-[11px] text-[rgba(26,26,26,0.6)] opacity-50 pt-2">
                       Personalized brief unavailable — showing a stable cue.
                     </p>
                   )}
@@ -309,7 +309,7 @@ const PreGame = () => {
                 type="button"
                 onClick={handleAnotherCue}
                 disabled={isGenerating || featureLoading}
-                className="flex-1 inline-flex items-center justify-center gap-2 min-h-[48px] rounded-2xl border border-[var(--border)] bg-[rgba(14,42,31,0.4)] text-sm font-medium text-[var(--text-0)] transition-all duration-200 hover:bg-[rgba(14,42,31,0.6)] active:scale-[0.97] disabled:opacity-40"
+                className="flex-1 inline-flex items-center justify-center gap-2 min-h-[48px] rounded-2xl border border-[rgba(45,106,79,0.12)] bg-[rgba(45,106,79,0.06)] text-sm font-medium text-[#1a1a1a] transition-all duration-200 hover:bg-[rgba(45,106,79,0.06)] active:scale-[0.97] disabled:opacity-40"
               >
                 <RefreshCw className={cn("h-4 w-4", isGenerating && "animate-spin")} />
                 Another Cue
@@ -319,7 +319,7 @@ const PreGame = () => {
                 type="button"
                 onClick={handleContinue}
                 disabled={isGenerating}
-                className="flex-1 inline-flex items-center justify-center gap-2 min-h-[48px] rounded-2xl bg-[rgba(31,106,74,0.6)] border border-[rgba(31,180,100,0.25)] text-sm font-medium text-[var(--text-0)] shadow-[0_8px_24px_rgba(0,0,0,0.2)] transition-all duration-200 hover:bg-[rgba(31,106,74,0.75)] active:scale-[0.97] disabled:opacity-40"
+                className="flex-1 inline-flex items-center justify-center gap-2 min-h-[48px] rounded-2xl bg-[rgba(31,106,74,0.6)] border border-[rgba(31,180,100,0.25)] text-sm font-medium text-[#1a1a1a] shadow-[0_8px_24px_rgba(0,0,0,0.2)] transition-all duration-200 hover:bg-[rgba(31,106,74,0.75)] active:scale-[0.97] disabled:opacity-40"
               >
                 Let&apos;s Go
                 <ArrowRight className="h-4 w-4" />

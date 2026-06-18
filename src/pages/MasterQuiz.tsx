@@ -61,15 +61,15 @@ function OptionGrid({
             className={cn(
               "rounded-2xl border p-4 text-left transition-all duration-200 active:scale-[0.97]",
               selected
-                ? "border-[rgba(203,184,146,0.35)] bg-[rgba(203,184,146,0.12)] shadow-[0_0_20px_rgba(203,184,146,0.08)]"
-                : "border-[var(--border)] bg-[rgba(14,42,31,0.3)] hover:bg-[rgba(14,42,31,0.5)]"
+                ? "border-[rgba(45,106,79,0.12)] bg-[rgba(45,106,79,0.06)] shadow-[0_0_20px_rgba(45,106,79,0.08)]"
+                : "border-[rgba(45,106,79,0.12)] bg-[rgba(45,106,79,0.06)] hover:bg-[rgba(45,106,79,0.06)]"
             )}
           >
-            <p className={cn("text-sm font-medium", selected ? "text-[var(--sand-0)]" : "text-[var(--text-0)]")}>
+            <p className={cn("text-sm font-medium", selected ? "text-[#2d6a4f]" : "text-[#1a1a1a]")}>
               {opt.label}
             </p>
             {opt.description && (
-              <p className="text-[11px] text-[var(--text-1)] mt-1">{opt.description}</p>
+              <p className="text-[11px] text-[rgba(26,26,26,0.6)] mt-1">{opt.description}</p>
             )}
           </button>
         );
@@ -103,7 +103,7 @@ function NumberInput({
 
   return (
     <div className="space-y-2">
-      <label className="text-xs font-medium uppercase tracking-[0.14em] text-[var(--sand-0)]">
+      <label className="text-xs font-medium uppercase tracking-[0.14em] text-[#2d6a4f]">
         {label}
       </label>
       <input
@@ -124,7 +124,7 @@ function NumberInput({
           }
         }}
         placeholder={placeholder}
-        className="w-full rounded-xl border border-[var(--border)] bg-[rgba(14,42,31,0.4)] px-4 py-3 text-[var(--text-0)] placeholder:text-[var(--text-1)] placeholder:opacity-40 outline-none focus:border-[rgba(203,184,146,0.3)] transition-colors"
+        className="w-full rounded-xl border border-[rgba(45,106,79,0.12)] bg-[rgba(45,106,79,0.06)] px-4 py-3 text-[#1a1a1a] placeholder:text-[rgba(26,26,26,0.6)] placeholder:opacity-40 outline-none focus:border-[rgba(45,106,79,0.12)] transition-colors"
       />
     </div>
   );
@@ -146,7 +146,7 @@ function TextInput({
 }) {
   return (
     <div className="space-y-2">
-      <label className="text-xs font-medium uppercase tracking-[0.14em] text-[var(--sand-0)]">
+      <label className="text-xs font-medium uppercase tracking-[0.14em] text-[#2d6a4f]">
         {label}
       </label>
       <input
@@ -154,7 +154,7 @@ function TextInput({
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
-        className="w-full rounded-xl border border-[var(--border)] bg-[rgba(14,42,31,0.4)] px-4 py-3 text-[var(--text-0)] placeholder:text-[var(--text-1)] placeholder:opacity-40 outline-none focus:border-[rgba(203,184,146,0.3)] transition-colors"
+        className="w-full rounded-xl border border-[rgba(45,106,79,0.12)] bg-[rgba(45,106,79,0.06)] px-4 py-3 text-[#1a1a1a] placeholder:text-[rgba(26,26,26,0.6)] placeholder:opacity-40 outline-none focus:border-[rgba(45,106,79,0.12)] transition-colors"
       />
     </div>
   );
@@ -221,20 +221,20 @@ export default function MasterQuiz() {
             <button
               type="button"
               onClick={goBack}
-              className="inline-flex items-center gap-2 rounded-xl px-3 py-2.5 text-sm font-medium text-[var(--text-1)] transition-all duration-200 hover:bg-white/5 active:scale-95"
+              className="inline-flex items-center gap-2 rounded-xl px-3 py-2.5 text-sm font-medium text-[rgba(26,26,26,0.6)] transition-all duration-200 hover:bg-[rgba(0,0,0,0.03)] active:scale-95"
             >
               <ArrowLeft className="h-4 w-4" />
               {currentStep === 0 ? "Back" : "Previous"}
             </button>
-            <span className="text-[11px] uppercase tracking-[0.2em] text-[var(--text-1)]">
+            <span className="text-[11px] uppercase tracking-[0.2em] text-[rgba(26,26,26,0.6)]">
               {currentStep + 1} / {totalSteps}
             </span>
           </div>
 
           {/* Progress bar */}
-          <div className="mt-3 h-1 w-full overflow-hidden rounded-full bg-[rgba(255,255,255,0.06)]">
+          <div className="mt-3 h-1 w-full overflow-hidden rounded-full bg-[rgba(0,0,0,0.03)]">
             <div
-              className="h-full rounded-full bg-[var(--sand-0)] transition-all duration-500 ease-out"
+              className="h-full rounded-full bg-[#2d6a4f] transition-all duration-500 ease-out"
               style={{ width: `${progress}%` }}
             />
           </div>
@@ -245,11 +245,11 @@ export default function MasterQuiz() {
           <div className="max-w-md mx-auto space-y-8">
             {/* Step header */}
             <div className="text-center space-y-3">
-              <div className="inline-flex items-center justify-center h-14 w-14 rounded-2xl border border-[rgba(203,184,146,0.2)] bg-[rgba(203,184,146,0.08)] mx-auto">
-                <Icon className="h-6 w-6 text-[var(--sand-0)]" />
+              <div className="inline-flex items-center justify-center h-14 w-14 rounded-2xl border border-[rgba(45,106,79,0.12)] bg-[rgba(45,106,79,0.06)] mx-auto">
+                <Icon className="h-6 w-6 text-[#2d6a4f]" />
               </div>
-              <h2 className="text-2xl font-serif text-[var(--text-0)] tracking-wide">{step.title}</h2>
-              <p className="text-sm text-[var(--text-1)]">{step.subtitle}</p>
+              <h2 className="text-2xl font-serif text-[#1a1a1a] tracking-wide">{step.title}</h2>
+              <p className="text-sm text-[rgba(26,26,26,0.6)]">{step.subtitle}</p>
             </div>
 
             {/* Step content */}
@@ -333,7 +333,7 @@ export default function MasterQuiz() {
                   max={30}
                 />
                 <div>
-                  <p className="text-xs font-medium uppercase tracking-[0.14em] text-[var(--sand-0)] mb-3">Playing style</p>
+                  <p className="text-xs font-medium uppercase tracking-[0.14em] text-[#2d6a4f] mb-3">Playing style</p>
                   <OptionGrid
                     options={[
                       { value: "aggressive", label: "Aggressive", description: "Go for it, take risks" },
@@ -346,7 +346,7 @@ export default function MasterQuiz() {
                   />
                 </div>
                 <div>
-                  <p className="text-xs font-medium uppercase tracking-[0.14em] text-[var(--sand-0)] mb-3">Best part of your game</p>
+                  <p className="text-xs font-medium uppercase tracking-[0.14em] text-[#2d6a4f] mb-3">Best part of your game</p>
                   <OptionGrid
                     options={[
                       { value: "driving", label: "Driving" },
@@ -359,7 +359,7 @@ export default function MasterQuiz() {
                   />
                 </div>
                 <div>
-                  <p className="text-xs font-medium uppercase tracking-[0.14em] text-[var(--sand-0)] mb-3">Weakest part of your game</p>
+                  <p className="text-xs font-medium uppercase tracking-[0.14em] text-[#2d6a4f] mb-3">Weakest part of your game</p>
                   <OptionGrid
                     options={[
                       { value: "driving", label: "Driving" },
@@ -377,7 +377,7 @@ export default function MasterQuiz() {
             {currentStep === 2 && (
               <div className="space-y-6">
                 <div>
-                  <p className="text-xs font-medium uppercase tracking-[0.14em] text-[var(--sand-0)] mb-3">Biggest mental challenge</p>
+                  <p className="text-xs font-medium uppercase tracking-[0.14em] text-[#2d6a4f] mb-3">Biggest mental challenge</p>
                   <OptionGrid
                     options={[
                       { value: "first-tee-nerves", label: "First-Tee Nerves", description: "Anxiety before the round starts" },
@@ -393,7 +393,7 @@ export default function MasterQuiz() {
                   />
                 </div>
                 <div>
-                  <p className="text-xs font-medium uppercase tracking-[0.14em] text-[var(--sand-0)] mb-3">After a bad shot, you usually...</p>
+                  <p className="text-xs font-medium uppercase tracking-[0.14em] text-[#2d6a4f] mb-3">After a bad shot, you usually...</p>
                   <OptionGrid
                     options={[
                       { value: "dwell", label: "Dwell on it", description: "Can't let it go" },
@@ -406,7 +406,7 @@ export default function MasterQuiz() {
                   />
                 </div>
                 <div>
-                  <p className="text-xs font-medium uppercase tracking-[0.14em] text-[var(--sand-0)] mb-3">Under pressure, you tend to...</p>
+                  <p className="text-xs font-medium uppercase tracking-[0.14em] text-[#2d6a4f] mb-3">Under pressure, you tend to...</p>
                   <OptionGrid
                     options={[
                       { value: "thrive", label: "Thrive", description: "Love the pressure" },
@@ -419,7 +419,7 @@ export default function MasterQuiz() {
                   />
                 </div>
                 <div>
-                  <p className="text-xs font-medium uppercase tracking-[0.14em] text-[var(--sand-0)] mb-3">How do you practice?</p>
+                  <p className="text-xs font-medium uppercase tracking-[0.14em] text-[#2d6a4f] mb-3">How do you practice?</p>
                   <OptionGrid
                     options={[
                       { value: "range-grinder", label: "Range Grinder", description: "Hit balls regularly" },
@@ -437,7 +437,7 @@ export default function MasterQuiz() {
             {currentStep === 3 && (
               <div className="space-y-6">
                 <div>
-                  <p className="text-xs font-medium uppercase tracking-[0.14em] text-[var(--sand-0)] mb-3">Primary golf goal</p>
+                  <p className="text-xs font-medium uppercase tracking-[0.14em] text-[#2d6a4f] mb-3">Primary golf goal</p>
                   <OptionGrid
                     options={[
                       { value: "break-80", label: "Break 80", description: "Single digits, here I come" },
@@ -453,7 +453,7 @@ export default function MasterQuiz() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-xs font-medium uppercase tracking-[0.14em] text-[var(--sand-0)]">
+                  <label className="text-xs font-medium uppercase tracking-[0.14em] text-[#2d6a4f]">
                     What&apos;s your #1 mental goal?
                   </label>
                   <textarea
@@ -461,16 +461,16 @@ export default function MasterQuiz() {
                     onChange={(e) => update("mentalGoal", e.target.value || null)}
                     placeholder="e.g. I want to stop getting angry after a bad hole and just focus on the next shot..."
                     rows={3}
-                    className="w-full rounded-xl border border-[var(--border)] bg-[rgba(14,42,31,0.4)] px-4 py-3 text-[var(--text-0)] placeholder:text-[var(--text-1)] placeholder:opacity-40 outline-none focus:border-[rgba(203,184,146,0.3)] transition-colors resize-none"
+                    className="w-full rounded-xl border border-[rgba(45,106,79,0.12)] bg-[rgba(45,106,79,0.06)] px-4 py-3 text-[#1a1a1a] placeholder:text-[rgba(26,26,26,0.6)] placeholder:opacity-40 outline-none focus:border-[rgba(45,106,79,0.12)] transition-colors resize-none"
                   />
                 </div>
 
                 {/* Summary preview */}
-                <div className="rounded-2xl border border-[rgba(203,184,146,0.15)] bg-[rgba(203,184,146,0.06)] p-5 space-y-3">
-                  <p className="text-xs font-medium uppercase tracking-[0.14em] text-[var(--sand-0)]">
+                <div className="rounded-2xl border border-[rgba(45,106,79,0.12)] bg-[rgba(45,106,79,0.06)] p-5 space-y-3">
+                  <p className="text-xs font-medium uppercase tracking-[0.14em] text-[#2d6a4f]">
                     Your coaching profile
                   </p>
-                  <div className="space-y-1.5 text-sm text-[var(--text-0)]">
+                  <div className="space-y-1.5 text-sm text-[#1a1a1a]">
                     {profile.firstName && <p>{profile.firstName}</p>}
                     {profile.handicap != null && <p>Handicap: {profile.handicap}</p>}
                     {profile.averageScore != null && <p>Avg score: {profile.averageScore}</p>}
@@ -483,12 +483,12 @@ export default function MasterQuiz() {
                     )}
                   </div>
                   <div className="flex items-center gap-2 pt-2">
-                    <div className="h-8 w-8 rounded-full bg-[rgba(203,184,146,0.15)] flex items-center justify-center">
-                      <span className="text-xs font-medium text-[var(--sand-0)]">N/A</span>
+                    <div className="h-8 w-8 rounded-full bg-[rgba(45,106,79,0.06)] flex items-center justify-center">
+                      <span className="text-xs font-medium text-[#2d6a4f]">N/A</span>
                     </div>
                     <div>
-                      <p className="text-[11px] text-[var(--text-1)]">Mental Coach Rating</p>
-                      <p className="text-[10px] text-[var(--text-1)] opacity-60">Unlocks after 3 rounds</p>
+                      <p className="text-[11px] text-[rgba(26,26,26,0.6)]">Mental Coach Rating</p>
+                      <p className="text-[10px] text-[rgba(26,26,26,0.6)] opacity-60">Unlocks after 3 rounds</p>
                     </div>
                   </div>
                 </div>
@@ -498,12 +498,12 @@ export default function MasterQuiz() {
         </div>
 
         {/* Bottom CTA */}
-        <div className="shrink-0 fixed bottom-0 left-0 right-0 z-20 px-6 pb-[calc(16px+env(safe-area-inset-bottom))] pt-4 bg-gradient-to-t from-[var(--bg-0)] via-[var(--bg-0)] to-transparent">
+        <div className="shrink-0 fixed bottom-0 left-0 right-0 z-20 px-6 pb-[calc(16px+env(safe-area-inset-bottom))] pt-4 bg-gradient-to-t from-[#f5f2ea] via-[#f5f2ea] to-transparent">
           <div className="max-w-md mx-auto">
             <button
               type="button"
               onClick={goNext}
-              className="w-full inline-flex items-center justify-center gap-2 min-h-[52px] rounded-2xl bg-[rgba(31,106,74,0.6)] border border-[rgba(31,180,100,0.25)] text-base font-medium text-[var(--text-0)] shadow-[0_8px_24px_rgba(0,0,0,0.25)] transition-all duration-200 hover:bg-[rgba(31,106,74,0.75)] active:scale-[0.97]"
+              className="w-full inline-flex items-center justify-center gap-2 min-h-[52px] rounded-2xl bg-[rgba(31,106,74,0.6)] border border-[rgba(31,180,100,0.25)] text-base font-medium text-[#1a1a1a] shadow-[0_8px_24px_rgba(0,0,0,0.25)] transition-all duration-200 hover:bg-[rgba(31,106,74,0.75)] active:scale-[0.97]"
             >
               {currentStep === totalSteps - 1 ? (
                 <>

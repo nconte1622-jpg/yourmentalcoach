@@ -22,9 +22,9 @@ export function FrostedSandCard({
         }
       : {
           background:
-            "linear-gradient(180deg, var(--glass-sand-bg) 0%, rgba(235,222,195,0.66) 100%)",
-          borderColor: "var(--glass-sand-border)",
-          boxShadow: "var(--glass-sand-shadow)",
+            "linear-gradient(180deg, rgba(245,236,216,0.68) 0%, rgba(235,222,195,0.66) 100%)",
+          borderColor: "rgba(45,106,79,0.12)",
+          boxShadow: "0 2px 16px rgba(0,0,0,0.06)",
         };
 
   return (

@@ -74,7 +74,7 @@ export function InfoHint({ title, children, label = "More info", className }: In
         onClick={() => setOpen((v) => !v)}
         className={
           className ??
-          "ml-1 inline-flex h-4 w-4 items-center justify-center rounded-full text-[var(--text-1)] opacity-50 transition-opacity hover:opacity-90"
+          "ml-1 inline-flex h-4 w-4 items-center justify-center rounded-full text-[rgba(26,26,26,0.6)] opacity-50 transition-opacity hover:opacity-90"
         }
         aria-label={label}
         aria-expanded={open}
@@ -89,7 +89,7 @@ export function InfoHint({ title, children, label = "More info", className }: In
             <div className="fixed inset-0 z-[110]" onClick={() => setOpen(false)} />
             <div
               role="dialog"
-              className="fixed z-[111] rounded-2xl border border-[rgba(203,184,146,0.18)] bg-[rgba(9,19,15,0.97)] p-3.5 shadow-[0_12px_36px_rgba(0,0,0,0.5)] backdrop-blur-xl animate-fade-in"
+              className="fixed z-[111] rounded-2xl border border-[rgba(45,106,79,0.12)] bg-white/95 p-3.5 shadow-[0_12px_36px_rgba(0,0,0,0.1)] backdrop-blur-xl animate-fade-in"
               style={{
                 width: POPOVER_WIDTH,
                 left: coords.left,
@@ -98,15 +98,15 @@ export function InfoHint({ title, children, label = "More info", className }: In
               }}
             >
               {title && (
-                <p className="mb-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--sand-0)]">
+                <p className="mb-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-[#2d6a4f]">
                   {title}
                 </p>
               )}
-              <div className="text-xs leading-5 text-[var(--text-1)]">{children}</div>
+              <div className="text-xs leading-5 text-[rgba(26,26,26,0.6)]">{children}</div>
               <button
                 type="button"
                 onClick={() => setOpen(false)}
-                className="mt-2 w-full rounded-xl bg-white/[0.06] py-1.5 text-xs text-[var(--text-1)] transition-colors hover:bg-white/10"
+                className="mt-2 w-full rounded-xl bg-[rgba(45,106,79,0.06)] py-1.5 text-xs text-[rgba(26,26,26,0.6)] transition-colors hover:bg-[rgba(45,106,79,0.1)]"
               >
                 Got it
               </button>

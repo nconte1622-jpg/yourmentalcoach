@@ -203,7 +203,7 @@ const RoundSetup = () => {
               </h1>
               <p
                 className="text-sm font-light tracking-wide helper-text"
-                style={{ color: '#C9D2CF' }}
+                style={{ color: 'rgba(26,26,26,0.55)' }}
               >
                 Define the mental context for this round
               </p>
@@ -213,14 +213,14 @@ const RoundSetup = () => {
                 <button
                   type="button"
                   onClick={() => setShowBeginnerGuide(!showBeginnerGuide)}
-                  className="w-full flex items-center justify-between gap-2 rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-left transition-all hover:bg-white/8"
+                  className="w-full flex items-center justify-between gap-2 rounded-2xl border border-[rgba(45,106,79,0.12)] bg-[rgba(0,0,0,0.03)] px-4 py-3 text-left transition-all hover:bg-[rgba(0,0,0,0.04)]"
                 >
-                  <span className="text-xs text-[var(--text-1)]">New to golf? Tap for a quick glossary</span>
-                  <span className="text-[var(--text-2)] text-xs shrink-0">{showBeginnerGuide ? "▲" : "▼"}</span>
+                  <span className="text-xs text-[rgba(26,26,26,0.6)]">New to golf? Tap for a quick glossary</span>
+                  <span className="text-[rgba(26,26,26,0.4)] text-xs shrink-0">{showBeginnerGuide ? "▲" : "▼"}</span>
                 </button>
                 {showBeginnerGuide && (
-                  <div className="mt-2 rounded-2xl border border-white/10 bg-[rgba(203,184,146,0.05)] px-4 py-4 space-y-3 animate-fade-in text-left">
-                    <p className="text-[10px] uppercase tracking-wider text-[var(--sand-0)] font-medium">Quick glossary</p>
+                  <div className="mt-2 rounded-2xl border border-[rgba(45,106,79,0.12)] bg-[rgba(45,106,79,0.04)] px-4 py-4 space-y-3 animate-fade-in text-left">
+                    <p className="text-[10px] uppercase tracking-wider text-[#2d6a4f] font-medium">Quick glossary</p>
                     {[
                       { term: "On Course", def: "Playing real golf outside on a golf course" },
                       { term: "Simulator", def: "Playing indoors on a screen-based golf simulator" },
@@ -232,8 +232,8 @@ const RoundSetup = () => {
                       { term: "Handicap", def: "A number showing your skill level — lower is better" },
                     ].map(({ term, def }) => (
                       <div key={term} className="flex gap-2">
-                        <span className="text-xs font-medium text-[var(--sand-0)] min-w-[90px] shrink-0">{term}</span>
-                        <span className="text-xs text-[var(--text-1)] leading-5">{def}</span>
+                        <span className="text-xs font-medium text-[#2d6a4f] min-w-[90px] shrink-0">{term}</span>
+                        <span className="text-xs text-[rgba(26,26,26,0.6)] leading-5">{def}</span>
                       </div>
                     ))}
                   </div>
@@ -244,7 +244,7 @@ const RoundSetup = () => {
               {recallLine && (
                 <p 
                   className="text-xs font-light italic mt-3 animate-fade-in" 
-                  style={{ animationDelay: '0.3s', color: '#9AA6A2' }}
+                  style={{ animationDelay: '0.3s', color: 'rgba(26,26,26,0.4)' }}
                 >
                   {recallLine}
                 </p>
@@ -280,14 +280,14 @@ const RoundSetup = () => {
                             type="button"
                             onClick={() => void handleDiscardRound()}
                             disabled={isDiscarding}
-                            className="inline-flex min-h-11 items-center justify-center rounded-full border border-[rgba(203,184,146,0.18)] bg-[rgba(203,184,146,0.08)] px-4 py-2 text-xs font-medium tracking-wide text-[var(--sand-0)] transition-all duration-300 hover:bg-[rgba(203,184,146,0.14)] disabled:opacity-60"
+                            className="inline-flex min-h-11 items-center justify-center rounded-full border border-[rgba(45,106,79,0.12)] bg-[rgba(45,106,79,0.06)] px-4 py-2 text-xs font-medium tracking-wide text-[#2d6a4f] transition-all duration-300 hover:bg-[rgba(45,106,79,0.06)] disabled:opacity-60"
                           >
                             {isDiscarding ? "Ending..." : "End current round"}
                           </button>
                         </>
                       ) : (
                         <>
-                          <p className="w-full text-xs text-[var(--sand-0)] mb-1">
+                          <p className="w-full text-xs text-[#2d6a4f] mb-1">
                             This will discard the round and clear its chat history. Continue?
                           </p>
                           <button
@@ -301,7 +301,7 @@ const RoundSetup = () => {
                             type="button"
                             onClick={() => void handleDiscardRound()}
                             disabled={isDiscarding}
-                            className="inline-flex min-h-11 items-center justify-center rounded-full border border-[rgba(203,184,146,0.18)] bg-[rgba(203,184,146,0.08)] px-4 py-2 text-xs font-medium tracking-wide text-[var(--sand-0)] transition-all duration-300 hover:bg-[rgba(203,184,146,0.14)] disabled:opacity-60"
+                            className="inline-flex min-h-11 items-center justify-center rounded-full border border-[rgba(45,106,79,0.12)] bg-[rgba(45,106,79,0.06)] px-4 py-2 text-xs font-medium tracking-wide text-[#2d6a4f] transition-all duration-300 hover:bg-[rgba(45,106,79,0.06)] disabled:opacity-60"
                           >
                             {isDiscarding ? "Ending..." : "Yes, discard"}
                           </button>
@@ -313,7 +313,7 @@ const RoundSetup = () => {
               )}
 
               {dailyFocusText && (
-                <div className="mx-auto max-w-sm rounded-2xl border border-[rgba(203,184,146,0.14)] bg-[rgba(203,184,146,0.08)] px-4 py-3 text-left shadow-[0_10px_25px_rgba(0,0,0,0.12)]">
+                <div className="mx-auto max-w-sm rounded-2xl border border-[rgba(45,106,79,0.12)] bg-[rgba(45,106,79,0.06)] px-4 py-3 text-left shadow-[0_10px_25px_rgba(0,0,0,0.12)]">
                   <p className="text-[10px] uppercase tracking-[0.18em]" style={{ color: "#A89268" }}>
                     Active Focus
                   </p>
@@ -485,17 +485,17 @@ const RoundSetup = () => {
                   }}
                   className={`w-full flex items-center justify-between gap-3 rounded-2xl border px-4 py-4 transition-all duration-200 active:scale-[0.98] ${
                     gpsMode
-                      ? "border-[rgba(203,184,146,0.35)] bg-[rgba(203,184,146,0.1)]"
+                      ? "border-[rgba(45,106,79,0.12)] bg-[rgba(45,106,79,0.06)]"
                       : "border-white/10 bg-white/5"
                   }`}
                 >
                   <div className="flex items-center gap-3">
                     <span className="text-lg">📍</span>
                     <div className="text-left">
-                      <p className={`text-sm font-medium ${gpsMode ? "text-[var(--sand-0)]" : "text-[var(--text-1)]"}`}>
+                      <p className={`text-sm font-medium ${gpsMode ? "text-[#2d6a4f]" : "text-[rgba(26,26,26,0.6)]"}`}>
                         GPS Smart Mode
                       </p>
-                      <p className="text-xs text-[var(--text-2)] mt-0.5">
+                      <p className="text-xs text-[rgba(26,26,26,0.4)] mt-0.5">
                         {gpsMode
                           ? "On — your caddie will check in hole by hole"
                           : "Detects hole transitions, asks how each hole went"}
@@ -504,7 +504,7 @@ const RoundSetup = () => {
                   </div>
                   <div
                     className={`relative h-6 w-11 rounded-full transition-all duration-200 ${
-                      gpsMode ? "bg-[rgba(203,184,146,0.6)]" : "bg-white/15"
+                      gpsMode ? "bg-[rgba(45,106,79,0.5)]" : "bg-[rgba(0,0,0,0.08)]"
                     }`}
                   >
                     <div

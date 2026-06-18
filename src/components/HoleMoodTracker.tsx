@@ -23,27 +23,27 @@ const MOOD_OPTIONS: MoodOption[] = [
     type: 'locked',
     emoji: '🔥',
     label: 'Locked In',
-    activeBg: 'rgba(18,64,47,0.72)',
-    activeBorder: 'rgba(58,160,100,0.65)',
-    activeText: 'rgba(130,230,170,0.95)',
+    activeBg: 'rgba(45,106,79,0.1)',
+    activeBorder: 'rgba(45,106,79,0.3)',
+    activeText: '#2d6a4f',
     dotColor: '#4eb87a',
   },
   {
     type: 'steady',
     emoji: '😐',
     label: 'Steady',
-    activeBg: 'rgba(203,184,146,0.18)',
-    activeBorder: 'rgba(203,184,146,0.55)',
-    activeText: 'rgba(245,236,216,0.92)',
-    dotColor: 'rgba(203,184,146,0.8)',
+    activeBg: 'rgba(140,130,100,0.1)',
+    activeBorder: 'rgba(140,130,100,0.3)',
+    activeText: '#6b6040',
+    dotColor: '#a09060',
   },
   {
     type: 'frustrated',
     emoji: '😤',
     label: 'Off',
-    activeBg: 'rgba(190,120,20,0.32)',
-    activeBorder: 'rgba(215,150,40,0.6)',
-    activeText: 'rgba(240,185,80,0.95)',
+    activeBg: 'rgba(200,120,30,0.1)',
+    activeBorder: 'rgba(200,120,30,0.3)',
+    activeText: '#b06820',
     dotColor: '#d4922a',
   },
 ];
@@ -81,7 +81,7 @@ export function HoleMoodTracker({ roundId, className }: HoleMoodTrackerProps) {
     <div
       className={cn(
         'rounded-2xl border px-3 py-2.5',
-        'bg-[rgba(9,19,15,0.55)] border-[var(--sand-border)] backdrop-blur-sm',
+        'bg-white/80 border-[rgba(45,106,79,0.12)] backdrop-blur-sm',
         className
       )}
     >
@@ -92,12 +92,12 @@ export function HoleMoodTracker({ roundId, className }: HoleMoodTrackerProps) {
           onClick={prevHole}
           disabled={currentHole === 1}
           aria-label="Previous hole"
-          className="w-7 h-7 flex items-center justify-center rounded-full text-[var(--sand-0)] opacity-70 hover:opacity-100 disabled:opacity-25 transition-opacity"
+          className="w-7 h-7 flex items-center justify-center rounded-full text-[#2d6a4f] opacity-70 hover:opacity-100 disabled:opacity-25 transition-opacity"
         >
           ‹
         </button>
 
-        <span className="text-[11px] font-medium tracking-[0.14em] uppercase text-[var(--sand-0)] select-none">
+        <span className="text-[11px] font-medium tracking-[0.14em] uppercase text-[#2d6a4f] select-none">
           Hole {currentHole}
         </span>
 
@@ -106,7 +106,7 @@ export function HoleMoodTracker({ roundId, className }: HoleMoodTrackerProps) {
           onClick={nextHole}
           disabled={currentHole === 18}
           aria-label="Next hole"
-          className="w-7 h-7 flex items-center justify-center rounded-full text-[var(--sand-0)] opacity-70 hover:opacity-100 disabled:opacity-25 transition-opacity"
+          className="w-7 h-7 flex items-center justify-center rounded-full text-[#2d6a4f] opacity-70 hover:opacity-100 disabled:opacity-25 transition-opacity"
         >
           ›
         </button>
@@ -140,9 +140,9 @@ export function HoleMoodTracker({ roundId, className }: HoleMoodTrackerProps) {
                       color: opt.activeText,
                     }
                   : {
-                      background: 'rgba(255,255,255,0.04)',
-                      borderColor: 'rgba(255,255,255,0.1)',
-                      color: 'rgba(233,241,236,0.65)',
+                      background: 'rgba(45,106,79,0.03)',
+                      borderColor: 'rgba(45,106,79,0.1)',
+                      color: 'rgba(26,26,26,0.5)',
                     }
               }
             >
@@ -180,9 +180,9 @@ export function HoleMoodTracker({ roundId, className }: HoleMoodTrackerProps) {
                 background: moodOpt
                   ? moodOpt.dotColor
                   : isCurrent
-                    ? 'rgba(245,236,216,0.5)'
-                    : 'rgba(255,255,255,0.12)',
-                border: isCurrent ? '1px solid rgba(245,236,216,0.4)' : 'none',
+                    ? 'rgba(45,106,79,0.4)'
+                    : 'rgba(26,26,26,0.12)',
+                border: isCurrent ? '1px solid rgba(45,106,79,0.3)' : 'none',
                 boxSizing: 'border-box',
               }}
             />

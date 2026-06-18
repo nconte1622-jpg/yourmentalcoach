@@ -41,21 +41,21 @@ function parseScorecardText(raw: string): number[] | null {
 
 // Score color relative to par
 function scoreColor(score: number | null, par: number): string {
-  if (score === null) return "text-[var(--text-2)]";
+  if (score === null) return "text-[rgba(26,26,26,0.4)]";
   const diff = score - par;
-  if (diff <= -2) return "text-yellow-300"; // eagle+
-  if (diff === -1) return "text-[var(--sand-0)]"; // birdie
-  if (diff === 0) return "text-[var(--text-0)]"; // par
-  if (diff === 1) return "text-orange-400"; // bogey
-  return "text-red-400"; // double+
+  if (diff <= -2) return "text-yellow-600"; // eagle+
+  if (diff === -1) return "text-[#2d6a4f]"; // birdie
+  if (diff === 0) return "text-[#1a1a1a]"; // par
+  if (diff === 1) return "text-orange-500"; // bogey
+  return "text-red-500"; // double+
 }
 
 function scoreBg(score: number | null, par: number): string {
-  if (score === null) return "bg-white/5 border-white/10";
+  if (score === null) return "bg-[rgba(0,0,0,0.03)] border-[rgba(45,106,79,0.1)]";
   const diff = score - par;
   if (diff <= -2) return "bg-yellow-400/20 border-yellow-400/30";
-  if (diff === -1) return "bg-[rgba(203,184,146,0.18)] border-[rgba(203,184,146,0.3)]";
-  if (diff === 0) return "bg-white/8 border-white/15";
+  if (diff === -1) return "bg-[rgba(45,106,79,0.1)] border-[rgba(45,106,79,0.2)]";
+  if (diff === 0) return "bg-[rgba(0,0,0,0.04)] border-[rgba(45,106,79,0.12)]";
   if (diff === 1) return "bg-orange-500/12 border-orange-400/25";
   return "bg-red-500/12 border-red-400/25";
 }
@@ -116,10 +116,10 @@ function HoleRow({ hole, onChangePar, onChangeScore, onClearScore }: HoleRowProp
   };
 
   return (
-    <div className="flex items-center gap-2 px-4 py-2.5 border-b border-white/5 last:border-b-0">
+    <div className="flex items-center gap-2 px-4 py-2.5 border-b border-[rgba(45,106,79,0.08)] last:border-b-0">
       {/* Hole number */}
       <div className="w-7 shrink-0 text-center">
-        <span className="text-[11px] text-[var(--text-2)] font-medium tracking-wide">{hole.hole}</span>
+        <span className="text-[11px] text-[rgba(26,26,26,0.4)] font-medium tracking-wide">{hole.hole}</span>
       </div>
 
       {/* Par selector */}
@@ -135,8 +135,8 @@ function HoleRow({ hole, onChangePar, onChangeScore, onClearScore }: HoleRowProp
             className={cn(
               "w-7 h-7 rounded-lg text-[11px] font-medium transition-all duration-150",
               hole.par === p
-                ? "bg-[rgba(203,184,146,0.22)] text-[var(--sand-0)] border border-[rgba(203,184,146,0.3)]"
-                : "bg-white/5 text-[var(--text-2)] border border-white/8 hover:bg-white/10"
+                ? "bg-[rgba(45,106,79,0.12)] text-[#2d6a4f] border border-[rgba(45,106,79,0.2)]"
+                : "bg-[rgba(0,0,0,0.03)] text-[rgba(26,26,26,0.4)] border border-[rgba(45,106,79,0.1)] hover:bg-[rgba(0,0,0,0.05)]"
             )}
           >
             {p}
@@ -151,7 +151,7 @@ function HoleRow({ hole, onChangePar, onChangeScore, onClearScore }: HoleRowProp
           type="button"
           onPointerDown={() => triggerHaptic("soft")}
           onClick={() => onChangeScore(hole.hole, -1)}
-          className="w-9 h-9 rounded-xl border border-white/12 bg-white/5 text-[var(--text-1)] text-lg font-light hover:bg-white/12 active:scale-95 transition-all duration-100 flex items-center justify-center"
+          className="w-9 h-9 rounded-xl border border-[rgba(45,106,79,0.12)] bg-[rgba(0,0,0,0.03)] text-[rgba(26,26,26,0.6)] text-lg font-light hover:bg-[rgba(0,0,0,0.06)] active:scale-95 transition-all duration-100 flex items-center justify-center"
         >
           −
         </button>
@@ -184,7 +184,7 @@ function HoleRow({ hole, onChangePar, onChangeScore, onClearScore }: HoleRowProp
           type="button"
           onPointerDown={() => triggerHaptic("soft")}
           onClick={() => onChangeScore(hole.hole, 1)}
-          className="w-9 h-9 rounded-xl border border-white/12 bg-white/5 text-[var(--text-1)] text-lg font-light hover:bg-white/12 active:scale-95 transition-all duration-100 flex items-center justify-center"
+          className="w-9 h-9 rounded-xl border border-[rgba(45,106,79,0.12)] bg-[rgba(0,0,0,0.03)] text-[rgba(26,26,26,0.6)] text-lg font-light hover:bg-[rgba(0,0,0,0.06)] active:scale-95 transition-all duration-100 flex items-center justify-center"
         >
           +
         </button>
@@ -192,7 +192,7 @@ function HoleRow({ hole, onChangePar, onChangeScore, onClearScore }: HoleRowProp
 
       {/* Score vs par pill */}
       <div className="w-9 text-right shrink-0">
-        <span className={cn("text-[11px] font-medium", diff !== null ? scoreColor(hole.score, hole.par) : "text-[var(--text-2)]")}>
+        <span className={cn("text-[11px] font-medium", diff !== null ? scoreColor(hole.score, hole.par) : "text-[rgba(26,26,26,0.4)]")}>
           {diff !== null ? formatScoreToPar(diff) : ""}
         </span>
       </div>
@@ -283,14 +283,14 @@ const Scorecard = () => {
     return (
       <PageShell backgroundVariant="default">
         <div className="flex-1 flex flex-col items-center justify-center px-6 text-center gap-4">
-          <ClipboardList className="w-10 h-10 text-[var(--text-2)]" />
-          <p className="text-sm text-[var(--text-1)]">
+          <ClipboardList className="w-10 h-10 text-[rgba(26,26,26,0.4)]" />
+          <p className="text-sm text-[rgba(26,26,26,0.6)]">
             No active round found. Start a round first, then come back to track your score.
           </p>
           <button
             type="button"
             onClick={() => navigate(-1)}
-            className="text-sm text-[var(--sand-0)] underline underline-offset-4"
+            className="text-sm text-[#2d6a4f] underline underline-offset-4"
           >
             ← Go back
           </button>
@@ -321,14 +321,14 @@ const Scorecard = () => {
               </button>
             }
             center={
-              <span className="text-[11px] uppercase tracking-[0.16em] text-[var(--text-1)]">Scorecard</span>
+              <span className="text-[11px] uppercase tracking-[0.16em] text-[rgba(26,26,26,0.6)]">Scorecard</span>
             }
             right={
               hasScores ? (
                 <button
                   type="button"
                   onClick={handleClearAll}
-                  className="header-hit-button tap-44 text-[11px] uppercase tracking-[0.12em] text-[var(--text-2)] hover:text-red-400 transition-colors"
+                  className="header-hit-button tap-44 text-[11px] uppercase tracking-[0.12em] text-[rgba(26,26,26,0.4)] hover:text-red-400 transition-colors"
                 >
                   Clear
                 </button>
@@ -343,15 +343,15 @@ const Scorecard = () => {
           <div className="px-4 pt-4 pb-2 space-y-2">
 
             {/* Paste scores section */}
-            <div className="rounded-2xl border border-[rgba(203,184,146,0.15)] bg-[rgba(203,184,146,0.05)] px-4 py-4 space-y-3">
+            <div className="rounded-2xl border border-[rgba(45,106,79,0.15)] bg-[rgba(45,106,79,0.04)] px-4 py-4 space-y-3">
               <div className="flex items-center gap-2">
-                <Info className="w-3.5 h-3.5 text-[var(--sand-0)] shrink-0" />
-                <p className="text-xs font-medium text-[var(--sand-0)] uppercase tracking-wider">Paste scores instantly</p>
+                <Info className="w-3.5 h-3.5 text-[#2d6a4f] shrink-0" />
+                <p className="text-xs font-medium text-[#2d6a4f] uppercase tracking-wider">Paste scores instantly</p>
               </div>
-              <p className="text-xs text-[var(--text-1)] leading-5">
+              <p className="text-xs text-[rgba(26,26,26,0.6)] leading-5">
                 Paste a row of scores separated by spaces, commas, or dashes — e.g. from your 18Birdies email or notes.
               </p>
-              <p className="text-[10px] text-[var(--text-2)] font-mono tracking-wide">
+              <p className="text-[10px] text-[rgba(26,26,26,0.4)] font-mono tracking-wide">
                 Example: 4 5 3 4 4 5 3 5 4  5 4 3 5 4 4 5 3 4
               </p>
               <textarea
@@ -359,7 +359,7 @@ const Scorecard = () => {
                 onChange={(e) => { setPasteText(e.target.value); setPasteError(null); }}
                 placeholder="Paste your scores here…"
                 rows={2}
-                className="w-full rounded-xl border border-white/10 bg-white/6 px-3 py-2.5 text-sm text-[var(--text-0)] placeholder:text-[var(--text-2)] resize-none focus:outline-none focus:ring-1 focus:ring-[rgba(203,184,146,0.3)] transition-all"
+                className="w-full rounded-xl border border-[rgba(45,106,79,0.12)] bg-[rgba(0,0,0,0.03)] px-3 py-2.5 text-sm text-[#1a1a1a] placeholder:text-[rgba(26,26,26,0.4)] resize-none focus:outline-none focus:ring-1 focus:ring-[rgba(45,106,79,0.3)] transition-all"
               />
               {pasteError && (
                 <p className="text-xs text-red-400 leading-5">{pasteError}</p>
@@ -371,7 +371,7 @@ const Scorecard = () => {
                 type="button"
                 onClick={handlePasteImport}
                 disabled={!pasteText.trim()}
-                className="w-full rounded-xl border border-[rgba(203,184,146,0.2)] bg-[rgba(203,184,146,0.1)] py-2.5 text-xs font-medium text-[var(--sand-0)] transition-all hover:bg-[rgba(203,184,146,0.18)] disabled:opacity-40 disabled:cursor-not-allowed"
+                className="w-full rounded-xl border border-[rgba(45,106,79,0.2)] bg-[rgba(45,106,79,0.08)] py-2.5 text-xs font-medium text-[#2d6a4f] transition-all hover:bg-[rgba(45,106,79,0.14)] disabled:opacity-40 disabled:cursor-not-allowed"
               >
                 Import scores
               </button>
@@ -381,22 +381,22 @@ const Scorecard = () => {
             <button
               type="button"
               onClick={() => setShowImportTip(!showImportTip)}
-              className="w-full flex items-center gap-3 rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-left transition-all hover:bg-white/8"
+              className="w-full flex items-center gap-3 rounded-2xl border border-[rgba(45,106,79,0.12)] bg-[rgba(0,0,0,0.03)] px-4 py-3 text-left transition-all hover:bg-[rgba(0,0,0,0.05)]"
             >
-              <span className="text-xs text-[var(--text-1)] flex-1">
+              <span className="text-xs text-[rgba(26,26,26,0.6)] flex-1">
                 How to get scores from 18Birdies
               </span>
-              <span className="text-[var(--text-2)] text-xs">{showImportTip ? "▲" : "▼"}</span>
+              <span className="text-[rgba(26,26,26,0.4)] text-xs">{showImportTip ? "▲" : "▼"}</span>
             </button>
 
             {showImportTip && (
-              <div className="rounded-2xl border border-white/10 bg-[rgba(203,184,146,0.06)] px-4 py-4 space-y-2 animate-fade-in">
-                <ol className="text-xs text-[var(--text-1)] leading-6 space-y-1.5 list-decimal list-inside">
+              <div className="rounded-2xl border border-[rgba(45,106,79,0.12)] bg-[rgba(45,106,79,0.04)] px-4 py-4 space-y-2 animate-fade-in">
+                <ol className="text-xs text-[rgba(26,26,26,0.6)] leading-6 space-y-1.5 list-decimal list-inside">
                   <li>Finish your round in 18Birdies as normal.</li>
                   <li>Open your scorecard → tap Share → Email to yourself.</li>
                   <li>From the email, copy the row of scores and paste above.</li>
                 </ol>
-                <p className="text-[10px] text-[var(--text-2)] pt-1">
+                <p className="text-[10px] text-[rgba(26,26,26,0.4)] pt-1">
                   Native 18Birdies sync is on our roadmap.
                 </p>
               </div>
@@ -406,23 +406,23 @@ const Scorecard = () => {
           {/* Column headers */}
           <div className="flex items-center gap-2 px-4 py-2">
             <div className="w-7 text-center">
-              <span className="text-[10px] text-[var(--text-2)] uppercase tracking-wider">Hole</span>
+              <span className="text-[10px] text-[rgba(26,26,26,0.4)] uppercase tracking-wider">Hole</span>
             </div>
             <div className="flex gap-1 shrink-0">
-              <span className="text-[10px] text-[var(--text-2)] uppercase tracking-wider w-[73px] text-center">Par</span>
+              <span className="text-[10px] text-[rgba(26,26,26,0.4)] uppercase tracking-wider w-[73px] text-center">Par</span>
             </div>
             <div className="ml-auto flex items-center gap-2">
-              <span className="text-[10px] text-[var(--text-2)] uppercase tracking-wider w-[122px] text-center">Score</span>
+              <span className="text-[10px] text-[rgba(26,26,26,0.4)] uppercase tracking-wider w-[122px] text-center">Score</span>
             </div>
             <div className="w-9 text-right">
-              <span className="text-[10px] text-[var(--text-2)] uppercase tracking-wider">±</span>
+              <span className="text-[10px] text-[rgba(26,26,26,0.4)] uppercase tracking-wider">±</span>
             </div>
           </div>
 
           {/* Front 9 */}
-          <div className="mx-4 mb-3 rounded-2xl border border-white/8 bg-white/3 overflow-hidden">
-            <div className="px-4 py-2 border-b border-white/8 bg-white/3">
-              <span className="text-[10px] uppercase tracking-[0.18em] text-[var(--text-2)]">Front 9</span>
+          <div className="mx-4 mb-3 rounded-2xl border border-[rgba(45,106,79,0.1)] bg-white/90 overflow-hidden">
+            <div className="px-4 py-2 border-b border-[rgba(45,106,79,0.1)] bg-white/90">
+              <span className="text-[10px] uppercase tracking-[0.18em] text-[rgba(26,26,26,0.4)]">Front 9</span>
             </div>
             {scorecard.holes.slice(0, 9).map((hole) => (
               <HoleRow
@@ -434,17 +434,17 @@ const Scorecard = () => {
               />
             ))}
             {/* Front 9 total */}
-            <div className="flex items-center justify-between px-4 py-2.5 bg-white/4 border-t border-white/8">
-              <span className="text-xs text-[var(--text-2)] uppercase tracking-wider">Front 9</span>
+            <div className="flex items-center justify-between px-4 py-2.5 bg-[rgba(45,106,79,0.04)] border-t border-[rgba(45,106,79,0.1)]">
+              <span className="text-xs text-[rgba(26,26,26,0.4)] uppercase tracking-wider">Front 9</span>
               <div className="flex items-center gap-3">
-                <span className="text-sm font-medium text-[var(--text-0)]">
+                <span className="text-sm font-medium text-[#1a1a1a]">
                   {summary.front9Strokes > 0 ? summary.front9Strokes : "—"}
                 </span>
                 {summary.front9Strokes > 0 && (
                   <span className={cn(
                     "text-xs font-medium min-w-[28px] text-right",
-                    summary.front9Strokes - summary.front9Par < 0 ? "text-[var(--sand-0)]" :
-                    summary.front9Strokes - summary.front9Par > 0 ? "text-orange-400" : "text-[var(--text-1)]"
+                    summary.front9Strokes - summary.front9Par < 0 ? "text-[#2d6a4f]" :
+                    summary.front9Strokes - summary.front9Par > 0 ? "text-orange-400" : "text-[rgba(26,26,26,0.6)]"
                   )}>
                     {formatScoreToPar(summary.front9Strokes - summary.front9Par)}
                   </span>
@@ -454,9 +454,9 @@ const Scorecard = () => {
           </div>
 
           {/* Back 9 */}
-          <div className="mx-4 mb-3 rounded-2xl border border-white/8 bg-white/3 overflow-hidden">
-            <div className="px-4 py-2 border-b border-white/8 bg-white/3">
-              <span className="text-[10px] uppercase tracking-[0.18em] text-[var(--text-2)]">Back 9</span>
+          <div className="mx-4 mb-3 rounded-2xl border border-[rgba(45,106,79,0.1)] bg-white/90 overflow-hidden">
+            <div className="px-4 py-2 border-b border-[rgba(45,106,79,0.1)] bg-white/90">
+              <span className="text-[10px] uppercase tracking-[0.18em] text-[rgba(26,26,26,0.4)]">Back 9</span>
             </div>
             {scorecard.holes.slice(9).map((hole) => (
               <HoleRow
@@ -468,17 +468,17 @@ const Scorecard = () => {
               />
             ))}
             {/* Back 9 total */}
-            <div className="flex items-center justify-between px-4 py-2.5 bg-white/4 border-t border-white/8">
-              <span className="text-xs text-[var(--text-2)] uppercase tracking-wider">Back 9</span>
+            <div className="flex items-center justify-between px-4 py-2.5 bg-[rgba(45,106,79,0.04)] border-t border-[rgba(45,106,79,0.1)]">
+              <span className="text-xs text-[rgba(26,26,26,0.4)] uppercase tracking-wider">Back 9</span>
               <div className="flex items-center gap-3">
-                <span className="text-sm font-medium text-[var(--text-0)]">
+                <span className="text-sm font-medium text-[#1a1a1a]">
                   {summary.back9Strokes > 0 ? summary.back9Strokes : "—"}
                 </span>
                 {summary.back9Strokes > 0 && (
                   <span className={cn(
                     "text-xs font-medium min-w-[28px] text-right",
-                    summary.back9Strokes - summary.back9Par < 0 ? "text-[var(--sand-0)]" :
-                    summary.back9Strokes - summary.back9Par > 0 ? "text-orange-400" : "text-[var(--text-1)]"
+                    summary.back9Strokes - summary.back9Par < 0 ? "text-[#2d6a4f]" :
+                    summary.back9Strokes - summary.back9Par > 0 ? "text-orange-400" : "text-[rgba(26,26,26,0.6)]"
                   )}>
                     {formatScoreToPar(summary.back9Strokes - summary.back9Par)}
                   </span>
@@ -489,22 +489,22 @@ const Scorecard = () => {
 
           {/* Total bar */}
           {hasScores && (
-            <div className="mx-4 mb-4 rounded-2xl border border-[rgba(203,184,146,0.2)] bg-[rgba(203,184,146,0.06)] px-5 py-4">
+            <div className="mx-4 mb-4 rounded-2xl border border-[rgba(45,106,79,0.15)] bg-[rgba(45,106,79,0.04)] px-5 py-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-[10px] uppercase tracking-[0.18em] text-[var(--text-2)]">
+                  <p className="text-[10px] uppercase tracking-[0.18em] text-[rgba(26,26,26,0.4)]">
                     Total · {summary.holesCompleted} of 18 holes
                   </p>
-                  <p className="text-2xl font-serif text-[var(--text-0)] mt-0.5">
+                  <p className="text-2xl font-serif text-[#1a1a1a] mt-0.5">
                     {summary.totalStrokes}
                   </p>
                 </div>
                 <div className="text-right">
-                  <p className="text-[10px] uppercase tracking-[0.14em] text-[var(--text-2)]">vs par</p>
+                  <p className="text-[10px] uppercase tracking-[0.14em] text-[rgba(26,26,26,0.4)]">vs par</p>
                   <p className={cn(
                     "text-2xl font-serif mt-0.5",
-                    summary.scoreToPar < 0 ? "text-[var(--sand-0)]" :
-                    summary.scoreToPar > 0 ? "text-orange-400" : "text-[var(--text-0)]"
+                    summary.scoreToPar < 0 ? "text-[#2d6a4f]" :
+                    summary.scoreToPar > 0 ? "text-orange-400" : "text-[#1a1a1a]"
                   )}>
                     {formatScoreToPar(summary.scoreToPar)}
                   </p>
@@ -513,13 +513,13 @@ const Scorecard = () => {
 
               {/* Quick stats row */}
               {summary.holesCompleted >= 9 && (
-                <div className="mt-3 pt-3 border-t border-white/8 flex gap-4">
+                <div className="mt-3 pt-3 border-t border-[rgba(45,106,79,0.1)] flex gap-4">
                   {(summary.birdieOrBetterHoles.length + summary.eagleOrBetterHoles.length) > 0 && (
                     <div>
-                      <p className="text-[10px] text-[var(--sand-0)] uppercase tracking-wider">
+                      <p className="text-[10px] text-[#2d6a4f] uppercase tracking-wider">
                         Birdie{(summary.birdieOrBetterHoles.length + summary.eagleOrBetterHoles.length) > 1 ? "s" : ""}
                       </p>
-                      <p className="text-sm font-medium text-[var(--text-0)]">
+                      <p className="text-sm font-medium text-[#1a1a1a]">
                         {summary.birdieOrBetterHoles.length + summary.eagleOrBetterHoles.length}
                       </p>
                     </div>
@@ -527,13 +527,13 @@ const Scorecard = () => {
                   {summary.bogeyHoles.length > 0 && (
                     <div>
                       <p className="text-[10px] text-orange-400 uppercase tracking-wider">Bogeys</p>
-                      <p className="text-sm font-medium text-[var(--text-0)]">{summary.bogeyHoles.length}</p>
+                      <p className="text-sm font-medium text-[#1a1a1a]">{summary.bogeyHoles.length}</p>
                     </div>
                   )}
                   {summary.doubleOrWorse.length > 0 && (
                     <div>
                       <p className="text-[10px] text-red-400 uppercase tracking-wider">Dbl+</p>
-                      <p className="text-sm font-medium text-[var(--text-0)]">{summary.doubleOrWorse.length}</p>
+                      <p className="text-sm font-medium text-[#1a1a1a]">{summary.doubleOrWorse.length}</p>
                     </div>
                   )}
                 </div>
@@ -541,7 +541,7 @@ const Scorecard = () => {
             </div>
           )}
 
-          <p className="text-center text-[10px] text-[var(--text-2)] pb-6 px-4">
+          <p className="text-center text-[10px] text-[rgba(26,26,26,0.4)] pb-6 px-4">
             Long-press a score cell to clear it. Your coach sees this scorecard automatically.
           </p>
         </div>

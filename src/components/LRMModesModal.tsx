@@ -180,7 +180,7 @@ export function LRMModesModal({ open, onOpenChange, onCloseStrongUpgrade }: LRMM
               </div>
             </div>
             {!isPro && (
-              <span className="absolute top-3 right-3 rounded-full border border-[rgba(203,184,146,0.4)] bg-[rgba(203,184,146,0.12)] px-2 py-0.5 text-[9px] font-bold uppercase tracking-[0.14em] text-[rgba(203,184,146,0.85)]">
+              <span className="absolute top-3 right-3 rounded-full border border-[rgba(45,106,79,0.12)] bg-[rgba(45,106,79,0.06)] px-2 py-0.5 text-[9px] font-bold uppercase tracking-[0.14em] text-[rgba(203,184,146,0.85)]">
                 Pro
               </span>
             )}

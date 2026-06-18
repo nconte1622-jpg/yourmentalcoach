@@ -153,10 +153,10 @@ const Account = () => {
               {/* Email */}
               <div className="flex items-center gap-4">
                 <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ background: "rgba(214,197,163,0.28)" }}>
-                  <Mail className="h-5 w-5" style={{ color: "var(--ink-0)" }} />
+                  <Mail className="h-5 w-5" style={{ color: "#1a1a1a" }} />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-xs uppercase tracking-wider mb-1" style={{ color: "var(--muted-ink)" }}>
+                  <p className="text-xs uppercase tracking-wider mb-1" style={{ color: "rgba(26,26,26,0.6)" }}>
                     Email
                   </p>
                   {accountReady ? (
@@ -164,7 +164,7 @@ const Account = () => {
                       {accountSummary.email}
                     </p>
                   ) : (
-                    <div className="mt-1 h-5 w-40 animate-pulse rounded-full bg-[rgba(14,42,31,0.18)]" />
+                    <div className="mt-1 h-5 w-40 animate-pulse rounded-full bg-[rgba(45,106,79,0.06)]" />
                   )}
                 </div>
               </div>
@@ -176,13 +176,13 @@ const Account = () => {
                   style={{ background: isPro ? "rgba(220,203,168,0.38)" : "rgba(214,197,163,0.22)" }}
                 >
                   {isPro ? (
-                    <Crown className="h-5 w-5" style={{ color: "var(--ink-0)" }} />
+                    <Crown className="h-5 w-5" style={{ color: "#1a1a1a" }} />
                   ) : (
-                    <User className="h-5 w-5" style={{ color: "var(--ink-0)" }} />
+                    <User className="h-5 w-5" style={{ color: "#1a1a1a" }} />
                   )}
                 </div>
                 <div className="flex-1">
-                  <p className="text-xs uppercase tracking-wider mb-1" style={{ color: "var(--muted-ink)" }}>
+                  <p className="text-xs uppercase tracking-wider mb-1" style={{ color: "rgba(26,26,26,0.6)" }}>
                     Plan
                   </p>
                   {accountReady ? (
@@ -191,7 +191,7 @@ const Account = () => {
                         className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium"
                         style={{
                           background: accountSummary.planBackground,
-                          color: "var(--ink-0)",
+                          color: "#1a1a1a",
                         }}
                       >
                         {accountSummary.planLabel}
@@ -208,7 +208,7 @@ const Account = () => {
                       )}
                     </div>
                   ) : (
-                    <div className="mt-1 h-7 w-24 animate-pulse rounded-full bg-[rgba(14,42,31,0.18)]" />
+                    <div className="mt-1 h-7 w-24 animate-pulse rounded-full bg-[rgba(45,106,79,0.06)]" />
                   )}
                 </div>
               </div>
@@ -219,10 +219,10 @@ const Account = () => {
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ background: "rgba(214,197,163,0.28)" }}>
-                    <Brain className="h-5 w-5" style={{ color: "var(--ink-0)" }} />
+                    <Brain className="h-5 w-5" style={{ color: "#1a1a1a" }} />
                   </div>
                   <div>
-                    <p className="text-xs uppercase tracking-wider" style={{ color: "var(--muted-ink)" }}>
+                    <p className="text-xs uppercase tracking-wider" style={{ color: "rgba(26,26,26,0.6)" }}>
                       Golfer Profile
                     </p>
                     <p className="text-sm font-medium readable-on-sand">
@@ -234,7 +234,7 @@ const Account = () => {
                   type="button"
                   onClick={() => navigate("/master-quiz")}
                   className="inline-flex items-center gap-1 rounded-full px-3 py-1.5 text-xs font-medium transition-colors hover:bg-black/5"
-                  style={{ color: "var(--ink-0)" }}
+                  style={{ color: "#1a1a1a" }}
                 >
                   {golferProfile?.quizCompletedAt ? (
                     <>
@@ -252,7 +252,7 @@ const Account = () => {
 
               {golferProfile?.quizCompletedAt ? (
                 <div className="space-y-2 pt-1">
-                  <div className="grid grid-cols-2 gap-2 text-xs" style={{ color: "var(--muted-ink)" }}>
+                  <div className="grid grid-cols-2 gap-2 text-xs" style={{ color: "rgba(26,26,26,0.6)" }}>
                     {golferProfile.handicap != null && (
                       <div className="rounded-xl px-3 py-2" style={{ background: "rgba(214,197,163,0.12)" }}>
                         <p className="opacity-60">Handicap</p>
@@ -288,7 +288,7 @@ const Account = () => {
                           : "rgba(214,197,163,0.15)",
                         color: golferProfile.mentalCoachRating != null
                           ? "rgba(31,180,100,0.9)"
-                          : "var(--muted-ink)",
+                          : "rgba(26,26,26,0.4)",
                         fontSize: golferProfile.mentalCoachRating != null ? "14px" : "11px",
                       }}
                     >
@@ -296,7 +296,7 @@ const Account = () => {
                     </div>
                     <div>
                       <p className="text-xs font-medium readable-on-sand">Mental Coach Rating</p>
-                      <p className="text-[10px]" style={{ color: "var(--muted-ink)" }}>
+                      <p className="text-[10px]" style={{ color: "rgba(26,26,26,0.6)" }}>
                         {golferProfile.mentalCoachRating != null
                           ? "Based on your last 3 rounds"
                           : "Complete 3 rounds to unlock"}
@@ -305,7 +305,7 @@ const Account = () => {
                   </div>
                 </div>
               ) : (
-                <p className="text-xs" style={{ color: "var(--muted-ink)" }}>
+                <p className="text-xs" style={{ color: "rgba(26,26,26,0.6)" }}>
                   Take the Master Quiz to personalize your coaching experience. The AI will know your game inside and out.
                 </p>
               )}
@@ -349,11 +349,11 @@ const Account = () => {
                     onClick={() => void handleOpenPrivacy()}
                     className="flex min-h-11 w-full items-center justify-between rounded-2xl px-3 py-3 text-left transition-colors hover:bg-black/5"
                   >
-                    <span className="flex items-center gap-3" style={{ color: "var(--ink-0)" }}>
+                    <span className="flex items-center gap-3" style={{ color: "#1a1a1a" }}>
                       <ShieldAlert className="h-4 w-4" />
                       Privacy Policy
                     </span>
-                    <span className="flex items-center gap-2" style={{ color: "var(--muted-ink)" }}>
+                    <span className="flex items-center gap-2" style={{ color: "rgba(26,26,26,0.6)" }}>
                       <FileText className="h-4 w-4" />
                       <span className="text-sm">↗</span>
                     </span>
@@ -363,11 +363,11 @@ const Account = () => {
                     onClick={() => void handleOpenTerms()}
                     className="flex min-h-11 w-full items-center justify-between rounded-2xl px-3 py-3 text-left transition-colors hover:bg-black/5"
                   >
-                    <span className="flex items-center gap-3" style={{ color: "var(--ink-0)" }}>
+                    <span className="flex items-center gap-3" style={{ color: "#1a1a1a" }}>
                       <FileText className="h-4 w-4" />
                       Terms of Service
                     </span>
-                    <span className="flex items-center gap-2" style={{ color: "var(--muted-ink)" }}>
+                    <span className="flex items-center gap-2" style={{ color: "rgba(26,26,26,0.6)" }}>
                       <FileText className="h-4 w-4" />
                       <span className="text-sm">↗</span>
                     </span>
@@ -379,7 +379,7 @@ const Account = () => {
                         type="button"
                         onClick={() => setIsConfirmingDelete(false)}
                         className="min-h-10 rounded-xl px-3 py-2 text-sm transition-colors hover:bg-black/5"
-                        style={{ color: "var(--ink-0)" }}
+                        style={{ color: "#1a1a1a" }}
                       >
                         Cancel
                       </button>
@@ -468,12 +468,12 @@ const Account = () => {
             {import.meta.env.DEV && (
               <FrostedSandCard className="rounded-2xl p-5 space-y-3" style={{ borderColor: "rgba(60, 90, 78, 0.16)" }}>
                 <div className="flex items-center gap-2">
-                  <Bug className="h-4 w-4" style={{ color: "var(--ink-0)" }} />
-                  <p className="text-xs uppercase tracking-wider font-medium" style={{ color: "var(--muted-ink)" }}>
+                  <Bug className="h-4 w-4" style={{ color: "#1a1a1a" }} />
+                  <p className="text-xs uppercase tracking-wider font-medium" style={{ color: "rgba(26,26,26,0.6)" }}>
                     Debug Auth
                   </p>
                 </div>
-                <div className="space-y-1 text-xs font-mono" style={{ color: "var(--muted-ink)" }}>
+                <div className="space-y-1 text-xs font-mono" style={{ color: "rgba(26,26,26,0.6)" }}>
                   <p>email: <span className="readable-on-sand">{user?.email || "(none)"}</span></p>
                   <p>auth: <span className="readable-on-sand">{user ? "signed in" : "signed out"}</span></p>
                   <p>isAdmin: <span className="readable-on-sand">{String(isAdmin)}</span></p>

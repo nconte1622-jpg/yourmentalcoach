@@ -17,17 +17,17 @@ export function ModeRow({ title, description, supportingLine, icon: Icon, onClic
     >
       <GlassCard className="min-h-11 px-4 py-3">
         <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-[var(--border)] bg-[rgba(18,64,47,0.5)] text-[var(--sand-0)]">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-[rgba(45,106,79,0.12)] bg-[rgba(45,106,79,0.08)] text-[#2d6a4f]">
             <Icon className="h-5 w-5" />
           </div>
           <div className="min-w-0 flex-1">
-            <p className="text-base font-medium text-[var(--text-0)]">{title}</p>
-            <p className="truncate text-sm text-[var(--text-1)]">{description}</p>
+            <p className="text-base font-medium text-[#1a1a1a]">{title}</p>
+            <p className="truncate text-sm text-[rgba(26,26,26,0.6)]">{description}</p>
             {supportingLine && (
-              <p className="mt-1 text-[11px] tracking-[0.08em] text-[var(--sand-0)]">{supportingLine}</p>
+              <p className="mt-1 text-[11px] tracking-[0.08em] text-[#2d6a4f]">{supportingLine}</p>
             )}
           </div>
-          <span className="rounded-full border border-[var(--border)] bg-[rgba(203,184,146,0.12)] px-3 py-1 text-xs font-medium text-[var(--sand-0)]">
+          <span className="rounded-full border border-[rgba(45,106,79,0.12)] bg-[rgba(45,106,79,0.06)] px-3 py-1 text-xs font-medium text-[#2d6a4f]">
             Start
           </span>
         </div>

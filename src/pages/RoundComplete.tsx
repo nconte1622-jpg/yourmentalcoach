@@ -181,16 +181,16 @@ const RoundComplete = () => {
             {/* Hero round-word reveal — fades in + scales 0.8→1.0 with a gold glow */}
             {roundWord && (
               <div className="text-center space-y-1.5">
-                <p className="text-[10px] uppercase tracking-[0.28em] text-[var(--sand-0)] opacity-50">
+                <p className="text-[10px] uppercase tracking-[0.28em] text-[#2d6a4f] opacity-50">
                   You kept yourself
                 </p>
                 <p
                   key={roundWord}
-                  className="round-word-reveal font-serif text-[44px] leading-none tracking-wide text-[var(--sand-0)]"
+                  className="round-word-reveal font-serif text-[44px] leading-none tracking-wide text-[#2d6a4f]"
                 >
                   {roundWord}
                 </p>
-                <p className="text-[10px] uppercase tracking-[0.28em] text-[var(--sand-0)] opacity-50">
+                <p className="text-[10px] uppercase tracking-[0.28em] text-[#2d6a4f] opacity-50">
                   today
                 </p>
               </div>

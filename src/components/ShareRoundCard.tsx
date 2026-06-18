@@ -266,7 +266,7 @@ export function ShareRoundCard({
 
       {/* Preview */}
       {shareState === "ready" && previewUrl && (
-        <div className="relative overflow-hidden rounded-2xl border border-[rgba(203,184,146,0.15)]">
+        <div className="relative overflow-hidden rounded-2xl border border-[rgba(45,106,79,0.12)]">
           <img src={previewUrl} alt="Round card" className="w-full rounded-2xl" />
           <button
             type="button"
@@ -284,7 +284,7 @@ export function ShareRoundCard({
           <button
             type="button"
             onClick={handleGenerate}
-            className="flex flex-1 items-center justify-center gap-2 rounded-2xl border border-[rgba(203,184,146,0.3)] bg-[rgba(203,184,146,0.1)] py-3 text-sm font-medium text-[var(--sand-0)] transition-all active:scale-[0.97]"
+            className="flex flex-1 items-center justify-center gap-2 rounded-2xl border border-[rgba(45,106,79,0.12)] bg-[rgba(45,106,79,0.06)] py-3 text-sm font-medium text-[#2d6a4f] transition-all active:scale-[0.97]"
           >
             <Share2 className="h-4 w-4" />
             {roundWord
@@ -294,8 +294,8 @@ export function ShareRoundCard({
         )}
 
         {shareState === "generating" && (
-          <div className="flex flex-1 items-center justify-center gap-2 rounded-2xl border border-[rgba(203,184,146,0.15)] py-3 text-sm text-[var(--text-1)]">
-            <div className="h-4 w-4 animate-spin rounded-full border-2 border-[rgba(203,184,146,0.2)] border-t-[var(--sand-0)]" />
+          <div className="flex flex-1 items-center justify-center gap-2 rounded-2xl border border-[rgba(45,106,79,0.12)] py-3 text-sm text-[rgba(26,26,26,0.6)]">
+            <div className="h-4 w-4 animate-spin rounded-full border-2 border-[rgba(45,106,79,0.12)] border-t-[#2d6a4f]" />
             Creating card…
           </div>
         )}
@@ -305,7 +305,7 @@ export function ShareRoundCard({
             <button
               type="button"
               onClick={handleShare}
-              className="flex flex-1 items-center justify-center gap-2 rounded-2xl border border-[rgba(203,184,146,0.4)] bg-[rgba(203,184,146,0.15)] py-3 text-sm font-medium text-[var(--sand-0)] transition-all active:scale-[0.97]"
+              className="flex flex-1 items-center justify-center gap-2 rounded-2xl border border-[rgba(45,106,79,0.12)] bg-[rgba(45,106,79,0.06)] py-3 text-sm font-medium text-[#2d6a4f] transition-all active:scale-[0.97]"
             >
               <Share2 className="h-4 w-4" />
               Share to Story / Feed
@@ -324,7 +324,7 @@ export function ShareRoundCard({
                 a.click();
                 URL.revokeObjectURL(url);
               }}
-              className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-[rgba(255,255,255,0.1)] bg-[rgba(255,255,255,0.04)] text-[var(--text-1)] transition-all active:scale-[0.97]"
+              className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-[rgba(45,106,79,0.12)] bg-white/70 text-[rgba(26,26,26,0.6)] transition-all active:scale-[0.97]"
               aria-label="Download"
             >
               <Download className="h-4 w-4" />

@@ -412,10 +412,10 @@ const PostRound = () => {
           }
         >
           <main className="flex flex-1 items-center justify-center px-5 pb-12">
-            <div className="max-w-md rounded-[28px] border border-[var(--border)] bg-[rgba(14,42,31,0.52)] p-6 text-center shadow-[0_16px_40px_rgba(0,0,0,0.32)] backdrop-blur-xl">
-              <p className="text-xs uppercase tracking-[0.18em] text-[var(--sand-0)]">Pro Feature</p>
-              <h1 className="mt-3 text-2xl font-serif text-[var(--text-0)]">Post-Round Reflection</h1>
-              <p className="mt-3 text-sm leading-6 text-[var(--text-1)]">
+            <div className="max-w-md rounded-[28px] border border-[rgba(45,106,79,0.12)] bg-[rgba(45,106,79,0.06)] p-6 text-center shadow-[0_16px_40px_rgba(0,0,0,0.32)] backdrop-blur-xl">
+              <p className="text-xs uppercase tracking-[0.18em] text-[#2d6a4f]">Pro Feature</p>
+              <h1 className="mt-3 text-2xl font-serif text-[#1a1a1a]">Post-Round Reflection</h1>
+              <p className="mt-3 text-sm leading-6 text-[rgba(26,26,26,0.6)]">
                 Structured post-round reflection is available on Pro. You can still end the round from the round screen without reflection.
               </p>
               <Button className="mt-5 min-h-11 w-full rounded-2xl" onClick={() => navigate("/upgrade")}>

@@ -72,16 +72,16 @@ export function MentalCoachRatingCard({
     <div
       className={cn(
         "rounded-[20px]",
-        "border border-[var(--border)]",
-        "bg-[rgba(14,42,31,0.35)]",
+        "border border-[rgba(45,106,79,0.12)]",
+        "bg-[rgba(45,106,79,0.06)]",
         "p-6",
         "space-y-6",
         className
       )}
     >
       {/* Plain-language explainer */}
-      <div className="rounded-2xl border border-[var(--border)] bg-white/[0.04] px-4 py-3.5 text-sm text-[var(--text-1)] leading-relaxed">
-        Your <span className="text-[var(--text-0)] font-medium">Mental Coach Rating</span> tracks how consistently you use mental tools, manage emotions, and bounce back under pressure. It improves automatically — just keep showing up, tapping how you feel, and using your coach during rounds.
+      <div className="rounded-2xl border border-[rgba(45,106,79,0.12)] bg-white/[0.04] px-4 py-3.5 text-sm text-[rgba(26,26,26,0.6)] leading-relaxed">
+        Your <span className="text-[#1a1a1a] font-medium">Mental Coach Rating</span> tracks how consistently you use mental tools, manage emotions, and bounce back under pressure. It improves automatically — just keep showing up, tapping how you feel, and using your coach during rounds.
       </div>
 
       {/* Header with score and label */}
@@ -90,7 +90,7 @@ export function MentalCoachRatingCard({
           <p className="text-xs uppercase tracking-[0.18em] text-primary/70 mb-2">
             Mental Coach Rating
           </p>
-          <p className="text-[var(--text-1)] text-sm mb-3">
+          <p className="text-[rgba(26,26,26,0.6)] text-sm mb-3">
             Your overall mental game strength
           </p>
         </div>
@@ -134,7 +134,7 @@ export function MentalCoachRatingCard({
           </svg>
           <div className="absolute inset-0 flex items-center justify-center">
             <div className="text-center">
-              <p className="text-sm text-[var(--text-1)]">Score</p>
+              <p className="text-sm text-[rgba(26,26,26,0.6)]">Score</p>
               <p className="text-2xl font-bold text-[rgba(132,204,22,0.92)]">
                 {mcr.total}%
               </p>
@@ -144,7 +144,7 @@ export function MentalCoachRatingCard({
       </div>
 
       {/* Components breakdown with progress guidance */}
-      <div className="space-y-5 border-t border-[var(--border)] pt-6">
+      <div className="space-y-5 border-t border-[rgba(45,106,79,0.12)] pt-6">
         <p className="text-xs uppercase tracking-[0.18em] text-primary/70 mb-4">
           Component Breakdown
         </p>
@@ -157,20 +157,20 @@ export function MentalCoachRatingCard({
             <div key={comp.name} className="space-y-2">
               <div className="flex items-start gap-3">
                 <div className="mt-0.5 flex-shrink-0 w-7 h-7 rounded-lg flex items-center justify-center bg-white/5">
-                  <Icon className="w-3.5 h-3.5 text-[var(--text-1)]" />
+                  <Icon className="w-3.5 h-3.5 text-[rgba(26,26,26,0.6)]" />
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center justify-between">
-                    <p className="text-sm font-medium text-[var(--text-0)]">
+                    <p className="text-sm font-medium text-[#1a1a1a]">
                       {comp.name}
                     </p>
-                    <p className="text-sm font-semibold text-[var(--text-0)] ml-4 min-w-fit">
+                    <p className="text-sm font-semibold text-[#1a1a1a] ml-4 min-w-fit">
                       {comp.score}/{comp.max}
                     </p>
                   </div>
 
                   {/* Current status */}
-                  <p className="text-xs text-[var(--text-1)] opacity-70 mt-0.5">
+                  <p className="text-xs text-[rgba(26,26,26,0.6)] opacity-70 mt-0.5">
                     {comp.current}
                   </p>
 
@@ -205,7 +205,7 @@ export function MentalCoachRatingCard({
       </div>
 
       {/* Footer */}
-      <p className="text-xs text-[var(--text-1)] opacity-60 border-t border-[var(--border)] pt-4">
+      <p className="text-xs text-[rgba(26,26,26,0.6)] opacity-60 border-t border-[rgba(45,106,79,0.12)] pt-4">
         Your MCR updates as you complete rounds, use mental tools, and track your
         insights.
       </p>

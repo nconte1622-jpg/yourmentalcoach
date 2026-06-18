@@ -162,14 +162,14 @@ const MemoryBank = () => {
                 <div 
                   className="w-20 h-20 rounded-full flex items-center justify-center border"
                   style={{
-                    background: "linear-gradient(180deg, var(--sand-1) 0%, rgba(220,203,168,0.92) 100%)",
-                    borderColor: "var(--glass-sand-border)",
-                    boxShadow: "var(--elev-2)",
+                    background: "linear-gradient(180deg, rgba(45,106,79,0.15) 0%, rgba(220,203,168,0.92) 100%)",
+                    borderColor: "rgba(45,106,79,0.12)",
+                    boxShadow: "0 2px 12px rgba(0,0,0,0.06)",
                   }}
                 >
                   <Brain 
                     className="w-10 h-10" 
-                    style={{ color: "var(--ink-0)" }}
+                    style={{ color: "#1a1a1a" }}
                   />
                 </div>
               </div>
@@ -178,13 +178,13 @@ const MemoryBank = () => {
               <div className="text-center space-y-4">
                 <h1 
                   className="text-3xl font-serif font-semibold tracking-[0.5px]"
-                  style={{ color: "var(--text-strong)", textShadow: "0 1px 8px rgba(0,0,0,0.4)" }}
+                  style={{ color: "#1a1a1a" }}
                 >
                   Memory Bank
                 </h1>
                 <p 
                   className="text-base leading-relaxed font-light"
-                  style={{ color: "var(--text-secondary)" }}
+                  style={{ color: "rgba(26,26,26,0.6)" }}
                 >
                   Long-term memory recall helps your coach remember what works for you — 
                   across rounds, over time.
@@ -195,7 +195,7 @@ const MemoryBank = () => {
               <FrostedSandCard className="space-y-4">
                 <p 
                   className="text-sm leading-relaxed text-center"
-                  style={{ color: "var(--ink-1)" }}
+                  style={{ color: "rgba(26,26,26,0.7)" }}
                 >
                   With Pro, your coach recalls patterns, cue words, and breakthroughs 
                   from past rounds to personalize every response.
@@ -213,9 +213,9 @@ const MemoryBank = () => {
               <FrostedSandCard className="space-y-3">
                 <div className="flex items-center gap-2">
                   <Lock className="h-4 w-4 text-primary" />
-                  <p className="text-sm font-medium tracking-wide" style={{ color: "var(--ink-0)" }}>Round DNA</p>
+                  <p className="text-sm font-medium tracking-wide" style={{ color: "#1a1a1a" }}>Round DNA</p>
                 </div>
-                <p className="text-sm leading-relaxed" style={{ color: "var(--ink-1)" }}>
+                <p className="text-sm leading-relaxed" style={{ color: "rgba(26,26,26,0.7)" }}>
                   Unlock Pro to see your Round DNA.
                 </p>
               </FrostedSandCard>
@@ -269,13 +269,13 @@ const MemoryBank = () => {
             <div className="text-center space-y-2">
               <h1 
                 className="text-5xl font-serif font-semibold tracking-[0.5px]"
-                style={{ color: "var(--text-strong)", textShadow: "0 1px 8px rgba(0,0,0,0.4)" }}
+                style={{ color: "#1a1a1a" }}
               >
                 Memory Bank
               </h1>
               <p 
                 className="text-sm font-light tracking-wide"
-                style={{ color: "var(--text-secondary)" }}
+                style={{ color: "rgba(26,26,26,0.6)" }}
               >
                 What your coach remembers
               </p>
@@ -287,17 +287,17 @@ const MemoryBank = () => {
                 <div 
                   className="w-16 h-16 mx-auto rounded-full flex items-center justify-center border"
                   style={{
-                    background: "linear-gradient(180deg, var(--sand-1) 0%, rgba(220,203,168,0.92) 100%)",
-                    borderColor: "var(--glass-sand-border)",
-                    boxShadow: "var(--elev-2)",
+                    background: "linear-gradient(180deg, rgba(45,106,79,0.15) 0%, rgba(220,203,168,0.92) 100%)",
+                    borderColor: "rgba(45,106,79,0.12)",
+                    boxShadow: "0 2px 12px rgba(0,0,0,0.06)",
                   }}
                 >
                   <Brain 
                     className="w-8 h-8" 
-                    style={{ color: "var(--ink-0)" }}
+                    style={{ color: "#1a1a1a" }}
                   />
                 </div>
-                <p style={{ color: "var(--ink-1)" }} className="font-light">
+                <p style={{ color: "rgba(26,26,26,0.7)" }} className="font-light">
                   No memories yet. Complete a Post-Round reflection to start building your memory bank.
                 </p>
               </FrostedSandCard>
@@ -307,13 +307,13 @@ const MemoryBank = () => {
             <div className="space-y-1">
                 <h2
                   className="text-[32px] font-serif font-medium tracking-[0.5px]"
-                  style={{ color: "var(--text-primary)", textShadow: "0 1px 8px rgba(0,0,0,0.35)" }}
+                  style={{ color: "#1a1a1a" }}
                 >
                   Round DNA
                 </h2>
                 <p
                   className="text-sm font-light tracking-wide"
-                  style={{ color: "var(--text-secondary)" }}
+                  style={{ color: "rgba(26,26,26,0.6)" }}
                 >
                   AI pattern summaries from your completed Post-Round reflections.
                 </p>
@@ -321,7 +321,7 @@ const MemoryBank = () => {
 
               {completedRoundsWithDna.length === 0 && (
                 <FrostedSandCard>
-                  <p className="text-sm font-light" style={{ color: "var(--ink-1)" }}>
+                  <p className="text-sm font-light" style={{ color: "rgba(26,26,26,0.7)" }}>
                     Complete a Post-Round reflection to generate your first Round DNA card.
                   </p>
                 </FrostedSandCard>
@@ -355,28 +355,28 @@ const MemoryBank = () => {
                     {dna ? (
                       <div className="grid gap-3">
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                          <div className="rounded-2xl border p-4" style={{ borderColor: "var(--glass-sand-border)", background: "rgba(255,255,255,0.18)" }}>
-                            <p className="text-[10px] uppercase tracking-[0.18em]" style={{ color: "var(--muted-ink)" }}>Strongest Quality</p>
+                          <div className="rounded-2xl border p-4" style={{ borderColor: "rgba(45,106,79,0.12)", background: "rgba(255,255,255,0.18)" }}>
+                            <p className="text-[10px] uppercase tracking-[0.18em]" style={{ color: "rgba(26,26,26,0.6)" }}>Strongest Quality</p>
                             <p className="mt-2 text-sm readable-on-sand">{dna.strongest_quality}</p>
                           </div>
-                          <div className="rounded-2xl border p-4" style={{ borderColor: "var(--glass-sand-border)", background: "rgba(255,255,255,0.18)" }}>
-                            <p className="text-[10px] uppercase tracking-[0.18em]" style={{ color: "var(--muted-ink)" }}>Biggest Trigger</p>
+                          <div className="rounded-2xl border p-4" style={{ borderColor: "rgba(45,106,79,0.12)", background: "rgba(255,255,255,0.18)" }}>
+                            <p className="text-[10px] uppercase tracking-[0.18em]" style={{ color: "rgba(26,26,26,0.6)" }}>Biggest Trigger</p>
                             <p className="mt-2 text-sm readable-on-sand">{dna.biggest_trigger}</p>
                           </div>
                         </div>
 
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                          <div className="rounded-2xl border p-4" style={{ borderColor: "var(--glass-sand-border)", background: "rgba(255,255,255,0.18)" }}>
-                            <p className="text-[10px] uppercase tracking-[0.18em]" style={{ color: "var(--muted-ink)" }}>Resilience Score</p>
+                          <div className="rounded-2xl border p-4" style={{ borderColor: "rgba(45,106,79,0.12)", background: "rgba(255,255,255,0.18)" }}>
+                            <p className="text-[10px] uppercase tracking-[0.18em]" style={{ color: "rgba(26,26,26,0.6)" }}>Resilience Score</p>
                             <p className="mt-2 text-sm readable-on-sand">{dna.resilience_score}/10</p>
                           </div>
-                          <div className="rounded-2xl border p-4" style={{ borderColor: "var(--glass-sand-border)", background: "rgba(255,255,255,0.18)" }}>
-                            <p className="text-[10px] uppercase tracking-[0.18em]" style={{ color: "var(--muted-ink)" }}>Most Effective Cue</p>
+                          <div className="rounded-2xl border p-4" style={{ borderColor: "rgba(45,106,79,0.12)", background: "rgba(255,255,255,0.18)" }}>
+                            <p className="text-[10px] uppercase tracking-[0.18em]" style={{ color: "rgba(26,26,26,0.6)" }}>Most Effective Cue</p>
                             <p className="mt-2 text-sm readable-on-sand">{dna.most_effective_cue}</p>
                           </div>
                         </div>
 
-                        <div className="rounded-2xl border p-4" style={{ borderColor: "rgba(18,64,47,0.16)", background: "rgba(214,197,163,0.22)" }}>
+                        <div className="rounded-2xl border p-4" style={{ borderColor: "rgba(45,106,79,0.12)", background: "rgba(45,106,79,0.04)" }}>
                           <p className="text-[10px] uppercase tracking-[0.18em] text-primary/70">Growth Insight</p>
                           <p className="mt-2 text-sm leading-relaxed readable-on-sand">
                             {dna.growth_insight}
@@ -384,15 +384,15 @@ const MemoryBank = () => {
                         </div>
                       </div>
                     ) : (
-                      <div className="rounded-2xl border p-4" style={{ borderColor: "var(--glass-sand-border)", background: "rgba(255,255,255,0.18)" }}>
-                        <p className="text-sm font-light" style={{ color: "var(--ink-1)" }}>
+                      <div className="rounded-2xl border p-4" style={{ borderColor: "rgba(45,106,79,0.12)", background: "rgba(255,255,255,0.18)" }}>
+                        <p className="text-sm font-light" style={{ color: "rgba(26,26,26,0.7)" }}>
                           Round DNA was not generated for this round.
                         </p>
                       </div>
                     )}
 
-                    <div className="rounded-2xl border p-4" style={{ borderColor: "var(--glass-sand-border)", background: "rgba(255,255,255,0.18)" }}>
-                      <p className="text-[10px] uppercase tracking-[0.18em]" style={{ color: "var(--muted-ink)" }}>Reflection Snapshot</p>
+                    <div className="rounded-2xl border p-4" style={{ borderColor: "rgba(45,106,79,0.12)", background: "rgba(255,255,255,0.18)" }}>
+                      <p className="text-[10px] uppercase tracking-[0.18em]" style={{ color: "rgba(26,26,26,0.6)" }}>Reflection Snapshot</p>
                       <p className="mt-2 text-sm readable-on-sand">
                         {reflection?.emotional_start} to {reflection?.emotional_finish} · {reflection?.effective_cue}
                       </p>
@@ -417,19 +417,19 @@ const MemoryBank = () => {
                     <div className="w-8 h-8 rounded-full flex items-center justify-center" style={{ background: "rgba(214,197,163,0.3)" }}>
                       <Icon 
                         className="w-4 h-4" 
-                        style={{ color: "var(--ink-0)" }}
+                        style={{ color: "#1a1a1a" }}
                       />
                     </div>
                     <div>
                       <h2 
                         className="text-base font-medium tracking-wide"
-                        style={{ color: "var(--ink-0)" }}
+                        style={{ color: "#1a1a1a" }}
                       >
                         {config.label}
                       </h2>
                       <p 
                         className="text-xs font-light"
-                        style={{ color: "var(--muted-ink)" }}
+                        style={{ color: "rgba(26,26,26,0.6)" }}
                       >
                         {config.description}
                       </p>
@@ -453,13 +453,13 @@ const MemoryBank = () => {
                           )}
                           style={{
                             background: "linear-gradient(180deg, rgba(245,236,216,0.68) 0%, rgba(235,222,195,0.58) 100%)",
-                            borderColor: isExpanded ? "var(--sand-border)" : "var(--glass-sand-border)",
-                            boxShadow: "var(--elev-2)",
+                            borderColor: isExpanded ? "rgba(45,106,79,0.12)" : "rgba(45,106,79,0.12)",
+                            boxShadow: "0 2px 12px rgba(0,0,0,0.06)",
                           }}
                         >
                           <p 
                             className="text-sm leading-relaxed font-light"
-                            style={{ color: "var(--ink-1)" }}
+                            style={{ color: "rgba(26,26,26,0.7)" }}
                           >
                             {memory.content}
                           </p>
@@ -469,7 +469,7 @@ const MemoryBank = () => {
                             <div className="mt-3 pt-3 border-t border-foreground/5 flex items-center justify-between">
                               <span 
                                 className="text-xs"
-                                style={{ color: "var(--muted-ink)" }}
+                                style={{ color: "rgba(26,26,26,0.6)" }}
                               >
                                 {date.toLocaleDateString("en-US", { 
                                   month: "short", 
@@ -479,7 +479,7 @@ const MemoryBank = () => {
                               </span>
                               <span 
                                 className="text-xs"
-                                style={{ color: "var(--muted-ink)" }}
+                                style={{ color: "rgba(26,26,26,0.6)" }}
                               >
                                 Confidence: {Math.round(memory.confidence * 100)}%
                               </span>

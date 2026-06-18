@@ -102,17 +102,17 @@ export function ProUpgradeModal({ open, onOpenChange }: ProUpgradeModalProps) {
         <div
           className="max-h-[calc(100vh-var(--sat)-24px)] overflow-y-auto rounded-[28px] border"
           style={{
-            background: "linear-gradient(180deg, var(--sand-surface) 0%, rgba(240,229,203,0.96) 100%)",
-            borderColor: "var(--sand-border)",
+            background: "linear-gradient(180deg, rgba(255,255,255,0.95) 0%, rgba(240,229,203,0.96) 100%)",
+            borderColor: "rgba(45,106,79,0.12)",
             backdropFilter: "blur(14px)",
-            boxShadow: "var(--card-shadow)",
+            boxShadow: "0 8px 32px rgba(0,0,0,0.08)",
           }}
         >
           <div
             className="sticky top-0 z-0 h-0"
             aria-hidden="true"
             style={{
-              boxShadow: "0 0 0 9999px var(--overlay)",
+              boxShadow: "0 0 0 9999px rgba(0,0,0,0.4)",
               backdropFilter: "blur(6px)",
             }}
           />
@@ -122,25 +122,25 @@ export function ProUpgradeModal({ open, onOpenChange }: ProUpgradeModalProps) {
                 <div
                   className="w-14 h-14 rounded-full flex items-center justify-center border"
                   style={{
-                    background: "linear-gradient(180deg, var(--sand-surface-2) 0%, rgba(221,205,170,0.96) 100%)",
-                    borderColor: "var(--sand-border)",
-                    boxShadow: "inset 0 1px 0 rgba(255,255,255,0.25), var(--elev-2)",
+                    background: "linear-gradient(180deg, rgba(245,242,234,0.9) 0%, rgba(221,205,170,0.96) 100%)",
+                    borderColor: "rgba(45,106,79,0.12)",
+                    boxShadow: "inset 0 1px 0 rgba(255,255,255,0.25), 0 2px 12px rgba(0,0,0,0.06)",
                   }}
                 >
-                  <Brain className="w-7 h-7" style={{ color: "var(--ink)" }} />
+                  <Brain className="w-7 h-7" style={{ color: "#1a1a1a" }} />
                 </div>
               </div>
 
               <DialogTitle
                 className="text-2xl font-serif tracking-wide"
-                style={{ color: "var(--ink)", textShadow: "none" }}
+                style={{ color: "#1a1a1a", textShadow: "none" }}
               >
                 The Caddie Pro
               </DialogTitle>
 
               <p
                 className="text-base font-medium leading-7 max-w-[28ch] mx-auto"
-                style={{ color: "var(--ink-1)" }}
+                style={{ color: "rgba(26,26,26,0.7)" }}
               >
                 Unlock your mental edge with smarter round memory, live emotional support, and personalized insights.
               </p>
@@ -160,14 +160,14 @@ export function ProUpgradeModal({ open, onOpenChange }: ProUpgradeModalProps) {
                     <div
                       className="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0"
                       style={{
-                        backgroundColor: "var(--sand-surface-2)",
-                        border: "1px solid var(--sand-border)",
+                        backgroundColor: "rgba(245,242,234,0.9)",
+                        border: "1px solid rgba(45,106,79,0.12)",
                         boxShadow: "inset 0 1px 0 rgba(255,255,255,0.22)",
                       }}
                     >
-                      <Check className="w-3 h-3" style={{ color: "var(--ink)" }} />
+                      <Check className="w-3 h-3" style={{ color: "#1a1a1a" }} />
                     </div>
-                    <span className="text-base font-medium" style={{ color: "var(--ink)" }}>
+                    <span className="text-base font-medium" style={{ color: "#1a1a1a" }}>
                       {benefit}
                     </span>
                   </div>
@@ -188,7 +188,7 @@ export function ProUpgradeModal({ open, onOpenChange }: ProUpgradeModalProps) {
                       ? {
                           background: "linear-gradient(180deg, rgba(220,203,168,0.88) 0%, rgba(208,190,152,0.94) 100%)",
                           borderColor: "rgba(132, 111, 72, 0.32)",
-                          boxShadow: "inset 0 1px 0 rgba(255,255,255,0.28), 0 0 0 1px rgba(132,111,72,0.08), var(--elev-2)",
+                          boxShadow: "inset 0 1px 0 rgba(255,255,255,0.28), 0 0 0 1px rgba(132,111,72,0.08), 0 2px 12px rgba(0,0,0,0.06)",
                         }
                       : {
                           background: "linear-gradient(180deg, rgba(236,228,206,0.76) 0%, rgba(224,213,187,0.72) 100%)",
@@ -200,15 +200,15 @@ export function ProUpgradeModal({ open, onOpenChange }: ProUpgradeModalProps) {
                   <div className="flex items-center justify-between">
                     <div>
                       <div className="flex items-center gap-2">
-                        <span className="font-medium" style={{ color: "var(--ink)" }}>Annual</span>
+                        <span className="font-medium" style={{ color: "#1a1a1a" }}>Annual</span>
                         <span
                           className="text-[10px] px-2 py-0.5 rounded-full"
-                          style={{ backgroundColor: "rgba(17,33,25,0.08)", color: "var(--ink)" }}
+                          style={{ backgroundColor: "rgba(17,33,25,0.08)", color: "#1a1a1a" }}
                         >
                           2 months free
                         </span>
                       </div>
-                      <p className="text-sm mt-0.5" style={{ color: "var(--ink)" }}>$99/year</p>
+                      <p className="text-sm mt-0.5" style={{ color: "#1a1a1a" }}>$99/year</p>
                     </div>
                     <div
                       className="w-5 h-5 rounded-full border-2 flex items-center justify-center transition-colors"
@@ -239,7 +239,7 @@ export function ProUpgradeModal({ open, onOpenChange }: ProUpgradeModalProps) {
                       ? {
                           background: "linear-gradient(180deg, rgba(220,203,168,0.88) 0%, rgba(208,190,152,0.94) 100%)",
                           borderColor: "rgba(132, 111, 72, 0.32)",
-                          boxShadow: "inset 0 1px 0 rgba(255,255,255,0.28), 0 0 0 1px rgba(132,111,72,0.08), var(--elev-2)",
+                          boxShadow: "inset 0 1px 0 rgba(255,255,255,0.28), 0 0 0 1px rgba(132,111,72,0.08), 0 2px 12px rgba(0,0,0,0.06)",
                         }
                       : {
                           background: "linear-gradient(180deg, rgba(236,228,206,0.76) 0%, rgba(224,213,187,0.72) 100%)",
@@ -250,8 +250,8 @@ export function ProUpgradeModal({ open, onOpenChange }: ProUpgradeModalProps) {
                 >
                   <div className="flex items-center justify-between">
                     <div>
-                      <span className="font-medium" style={{ color: "var(--ink)" }}>Monthly</span>
-                      <p className="text-sm mt-0.5" style={{ color: "var(--ink)" }}>$9.99/month</p>
+                      <span className="font-medium" style={{ color: "#1a1a1a" }}>Monthly</span>
+                      <p className="text-sm mt-0.5" style={{ color: "#1a1a1a" }}>$9.99/month</p>
                     </div>
                     <div
                       className="w-5 h-5 rounded-full border-2 flex items-center justify-center transition-colors"
@@ -299,7 +299,7 @@ export function ProUpgradeModal({ open, onOpenChange }: ProUpgradeModalProps) {
                 )}
               </Button>
 
-              <p className="text-center text-[11px] font-light" style={{ color: "var(--muted-ink)" }}>
+              <p className="text-center text-[11px] font-light" style={{ color: "rgba(26,26,26,0.6)" }}>
                 Subscriptions renew automatically. Cancel anytime in Settings.
               </p>
             </div>

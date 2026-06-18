@@ -182,7 +182,7 @@ export function PreShotReset({ open, onClose }: PreShotResetProps) {
         >
           {/* Cue word */}
           <span
-            className="text-2xl font-serif tracking-wider text-[var(--sand-0)] transition-opacity duration-1000"
+            className="text-2xl font-serif tracking-wider text-[#2d6a4f] transition-opacity duration-1000"
             style={{ opacity: phase === "in" ? 1 : 0.5 }}
           >
             {cueWord}

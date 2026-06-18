@@ -135,7 +135,7 @@ export default function RoundCloseStrong() {
   const recentMessages = messages.slice(-4);
 
   return (
-    <PageShell backgroundVariant="pressure">
+    <PageShell backgroundVariant="default">
       <AppShell
         contentClassName="flex flex-col"
         header={
@@ -144,7 +144,7 @@ export default function RoundCloseStrong() {
               <button
                 type="button"
                 onClick={handleBack}
-                className="header-hit-button tap-44 text-white/80 hover:text-white hover:bg-white/10 transition-all duration-300"
+                className="header-hit-button tap-44 text-[rgba(26,26,26,0.6)] hover:text-[#1a1a1a] hover:bg-[rgba(0,0,0,0.03)] transition-all duration-300"
               >
                 <ArrowLeft className="w-4 h-4 mr-2" />
                 Home
@@ -152,7 +152,7 @@ export default function RoundCloseStrong() {
             }
             center={
               <div className="mx-auto max-w-[240px]">
-                <h1 className="truncate text-base md:text-lg font-serif tracking-wide text-white text-center">
+                <h1 className="truncate text-base md:text-lg font-serif tracking-wide text-[#1a1a1a] text-center">
                   Close Strong
                 </h1>
               </div>
@@ -164,14 +164,14 @@ export default function RoundCloseStrong() {
                   setEndRoundStep("actions");
                   setEndRoundDialogOpen(true);
                 }}
-                className="header-hit-button tap-44 text-[11px] uppercase tracking-[0.16em] text-amber-300/90 transition-all duration-300 hover:bg-white/5"
+                className="header-hit-button tap-44 text-[11px] uppercase tracking-[0.16em] text-[#2d6a4f] transition-all duration-300 hover:bg-[rgba(0,0,0,0.03)]"
               >
                 End
               </button>
             }
             subrow={
               triggerReason ? (
-                <p className="text-[10px] text-white/40 tracking-[0.18em] uppercase">{triggerReason}</p>
+                <p className="text-[10px] text-[rgba(26,26,26,0.4)] tracking-[0.18em] uppercase">{triggerReason}</p>
               ) : null
             }
           />
@@ -189,16 +189,16 @@ export default function RoundCloseStrong() {
                 feedback={message.feedback}
                 onFeedback={setFeedback}
                 showFeedback={!message.isUser}
-                theme="dark"
+                theme="light"
               />
             ))}
             {isTyping && (
               <div className="flex justify-start">
-                <div className="rounded-3xl rounded-bl-xl px-6 py-4 bg-white/10 backdrop-blur-sm border border-white/5">
+                <div className="rounded-3xl rounded-bl-xl px-6 py-4 bg-[rgba(45,106,79,0.06)] backdrop-blur-sm border border-[rgba(45,106,79,0.08)]">
                   <div className="flex gap-1.5">
-                    <span className="w-2 h-2 bg-white/30 rounded-full animate-pulse" />
-                    <span className="w-2 h-2 bg-white/30 rounded-full animate-pulse delay-75" />
-                    <span className="w-2 h-2 bg-white/30 rounded-full animate-pulse delay-150" />
+                    <span className="w-2 h-2 bg-[rgba(26,26,26,0.2)] rounded-full animate-pulse" />
+                    <span className="w-2 h-2 bg-[rgba(26,26,26,0.2)] rounded-full animate-pulse delay-75" />
+                    <span className="w-2 h-2 bg-[rgba(26,26,26,0.2)] rounded-full animate-pulse delay-150" />
                   </div>
                 </div>
               </div>
@@ -209,7 +209,7 @@ export default function RoundCloseStrong() {
             <div className="text-center pt-6 shrink-0">
               <button
                 onClick={handleAnotherCue}
-                className="px-6 py-3 rounded-2xl bg-white/10 text-white/80 text-sm font-medium hover:bg-white/15 transition-all duration-300 border border-white/10"
+                className="px-6 py-3 rounded-2xl bg-[rgba(45,106,79,0.06)] text-[#2d6a4f] text-sm font-medium hover:bg-[rgba(45,106,79,0.1)] transition-all duration-300 border border-[rgba(45,106,79,0.1)]"
               >
                 Another Cue
               </button>
@@ -223,7 +223,7 @@ export default function RoundCloseStrong() {
               onSend={sendMessage}
               disabled={isTyping}
               placeholder="What's the situation?"
-              theme="dark"
+              theme="light"
             />
           </div>
         </div>
@@ -240,13 +240,13 @@ export default function RoundCloseStrong() {
           }
         }}
       >
-        <DialogContent className="max-w-md rounded-[28px] border-[var(--border)] bg-[rgba(9,19,15,0.96)] p-0 text-[var(--text-0)] shadow-[0_24px_60px_rgba(0,0,0,0.38)] backdrop-blur-xl">
+        <DialogContent className="max-w-md rounded-[28px] border-[rgba(45,106,79,0.12)] bg-white p-0 text-[#1a1a1a] shadow-[0_24px_60px_rgba(0,0,0,0.1)] backdrop-blur-xl">
           <div className="p-6">
             <DialogHeader className="space-y-3 text-left">
-              <DialogTitle className="text-2xl font-serif text-[var(--text-0)]">
+              <DialogTitle className="text-2xl font-serif text-[#1a1a1a]">
                 End this round?
               </DialogTitle>
-              <DialogDescription className="text-sm leading-6 text-[var(--text-1)]">
+              <DialogDescription className="text-sm leading-6 text-[rgba(26,26,26,0.6)]">
                 Great finish. Ready to wrap up?
               </DialogDescription>
             </DialogHeader>
@@ -267,7 +267,7 @@ export default function RoundCloseStrong() {
                   type="button"
                   variant="outline"
                   onClick={() => setEndRoundStep("rating")}
-                  className="min-h-11 w-full rounded-2xl border-[var(--border)] bg-[rgba(203,184,146,0.08)] text-[var(--sand-0)] hover:bg-[rgba(203,184,146,0.14)]"
+                  className="min-h-11 w-full rounded-2xl border-[rgba(45,106,79,0.12)] bg-[rgba(45,106,79,0.06)] text-[#2d6a4f] hover:bg-[rgba(45,106,79,0.1)]"
                 >
                   Just end round
                 </Button>
@@ -275,7 +275,7 @@ export default function RoundCloseStrong() {
                   type="button"
                   variant="ghost"
                   onClick={() => setEndRoundDialogOpen(false)}
-                  className="min-h-11 w-full rounded-2xl text-[var(--text-1)] hover:bg-white/5"
+                  className="min-h-11 w-full rounded-2xl text-[rgba(26,26,26,0.6)] hover:bg-[rgba(0,0,0,0.03)]"
                 >
                   Keep Going
                 </Button>
@@ -283,7 +283,7 @@ export default function RoundCloseStrong() {
             ) : (
               <div className="mt-6 space-y-5">
                 <div>
-                  <p className="text-sm text-[var(--text-1)]">How did the round leave you feeling?</p>
+                  <p className="text-sm text-[rgba(26,26,26,0.6)]">How did the round leave you feeling?</p>
                   <div className="mt-3 grid grid-cols-5 gap-2">
                     {Array.from({ length: 10 }, (_, index) => {
                       const score = index + 1;
@@ -296,8 +296,8 @@ export default function RoundCloseStrong() {
                           className={cn(
                             "min-h-11 rounded-2xl border text-sm font-medium transition-all duration-200",
                             selected
-                              ? "border-[rgba(203,184,146,0.28)] bg-[rgba(203,184,146,0.16)] text-[var(--sand-0)]"
-                              : "border-[var(--border)] bg-[rgba(14,42,31,0.46)] text-[var(--text-1)] hover:bg-[rgba(18,64,47,0.58)]"
+                              ? "border-[rgba(45,106,79,0.2)] bg-[rgba(45,106,79,0.1)] text-[#2d6a4f]"
+                              : "border-[rgba(45,106,79,0.12)] bg-[rgba(45,106,79,0.04)] text-[rgba(26,26,26,0.6)] hover:bg-[rgba(45,106,79,0.08)]"
                           )}
                         >
                           {score}
@@ -319,7 +319,7 @@ export default function RoundCloseStrong() {
                     type="button"
                     variant="ghost"
                     onClick={() => setEndRoundStep("actions")}
-                    className="min-h-11 w-full rounded-2xl text-[var(--text-1)] hover:bg-white/5"
+                    className="min-h-11 w-full rounded-2xl text-[rgba(26,26,26,0.6)] hover:bg-[rgba(0,0,0,0.03)]"
                   >
                     Back
                   </Button>

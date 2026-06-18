@@ -315,17 +315,17 @@ const MentalGPS = () => {
             left={
               <button
                 onClick={() => { triggerHaptic("light"); navigate("/round"); }}
-                className="tap-44 flex items-center justify-center text-[var(--text-0)]"
+                className="tap-44 flex items-center justify-center text-[#1a1a1a]"
               >
                 <ArrowLeft className="h-5 w-5" />
               </button>
             }
             center={
               <div>
-                <h1 className="font-serif text-[23px] font-semibold leading-tight tracking-wide text-[var(--text-0)]">
+                <h1 className="font-serif text-[23px] font-semibold leading-tight tracking-wide text-[#1a1a1a]">
                   Mental GPS
                 </h1>
-                <p className="text-[10px] uppercase tracking-[0.16em] text-[var(--text-1)] opacity-70">
+                <p className="text-[10px] uppercase tracking-[0.16em] text-[rgba(26,26,26,0.6)] opacity-70">
                   Rangefinder
                 </p>
               </div>
@@ -341,26 +341,26 @@ const MentalGPS = () => {
             <button
               onClick={() => handleHoleChange(-1)}
               disabled={currentHole <= 1}
-              className="flex h-12 w-12 items-center justify-center rounded-full border border-[rgba(203,184,146,0.25)] bg-[rgba(203,184,146,0.08)] text-[var(--text-0)] shadow-[0_4px_12px_rgba(0,0,0,0.2)] transition-all hover:bg-[rgba(203,184,146,0.14)] hover:shadow-[0_4px_16px_rgba(0,0,0,0.3)] disabled:opacity-30 disabled:shadow-none"
+              className="flex h-12 w-12 items-center justify-center rounded-full border border-[rgba(45,106,79,0.12)] bg-[rgba(45,106,79,0.06)] text-[#1a1a1a] shadow-[0_2px_8px_rgba(0,0,0,0.06)] transition-all hover:bg-[rgba(45,106,79,0.06)] hover:shadow-[0_2px_8px_rgba(0,0,0,0.06)] disabled:opacity-30 disabled:shadow-none"
             >
               <ChevronLeft className="h-6 w-6" />
             </button>
             <div className="text-center">
-              <p className="text-[9px] font-semibold uppercase tracking-[0.2em] text-[var(--text-1)]">Hole</p>
-              <p className="font-serif text-4xl font-semibold text-[var(--text-0)]">{currentHole}</p>
-              <p className="text-[10px] text-[var(--text-1)] opacity-50">{loggedCount} logged</p>
+              <p className="text-[9px] font-semibold uppercase tracking-[0.2em] text-[rgba(26,26,26,0.6)]">Hole</p>
+              <p className="font-serif text-4xl font-semibold text-[#1a1a1a]">{currentHole}</p>
+              <p className="text-[10px] text-[rgba(26,26,26,0.6)] opacity-50">{loggedCount} logged</p>
             </div>
             <button
               onClick={() => handleHoleChange(1)}
               disabled={currentHole >= 18}
-              className="flex h-12 w-12 items-center justify-center rounded-full border border-[rgba(203,184,146,0.25)] bg-[rgba(203,184,146,0.08)] text-[var(--text-0)] shadow-[0_4px_12px_rgba(0,0,0,0.2)] transition-all hover:bg-[rgba(203,184,146,0.14)] hover:shadow-[0_4px_16px_rgba(0,0,0,0.3)] disabled:opacity-30 disabled:shadow-none"
+              className="flex h-12 w-12 items-center justify-center rounded-full border border-[rgba(45,106,79,0.12)] bg-[rgba(45,106,79,0.06)] text-[#1a1a1a] shadow-[0_2px_8px_rgba(0,0,0,0.06)] transition-all hover:bg-[rgba(45,106,79,0.06)] hover:shadow-[0_2px_8px_rgba(0,0,0,0.06)] disabled:opacity-30 disabled:shadow-none"
             >
               <ChevronRight className="h-6 w-6" />
             </button>
           </div>
 
           {/* ── Tab selector ──────────────────────── */}
-          <div className="mx-5 mb-4 flex rounded-2xl border border-[rgba(255,255,255,0.06)] bg-[rgba(255,255,255,0.04)] p-1">
+          <div className="mx-5 mb-4 flex rounded-2xl border border-[rgba(45,106,79,0.12)] bg-white/70 p-1">
             {(["range", "log"] as const).map((t) => (
               <button
                 key={t}
@@ -368,8 +368,8 @@ const MentalGPS = () => {
                 className={cn(
                   "flex-1 rounded-xl py-2.5 text-sm font-medium transition-all",
                   tab === t
-                    ? "bg-[rgba(203,184,146,0.15)] text-[var(--sand-0)] shadow-[0_2px_8px_rgba(0,0,0,0.15)]"
-                    : "text-[var(--text-1)]"
+                    ? "bg-[rgba(45,106,79,0.06)] text-[#2d6a4f] shadow-[0_2px_8px_rgba(0,0,0,0.15)]"
+                    : "text-[rgba(26,26,26,0.6)]"
                 )}
               >
                 {t === "range" ? "Rangefinder" : "Shot Logger"}
@@ -415,18 +415,18 @@ const MentalGPS = () => {
                   </MapContainer>
                   {gpsYards !== null && (
                     <div className="absolute left-1/2 top-4 z-[1000] -translate-x-1/2">
-                      <div className="flex items-center gap-2 rounded-2xl border border-[rgba(203,184,146,0.25)] bg-[rgba(14,42,31,0.92)] px-4 py-2 shadow-[0_8px_24px_rgba(0,0,0,0.4)] backdrop-blur-xl">
+                      <div className="flex items-center gap-2 rounded-2xl border border-[rgba(45,106,79,0.12)] bg-[rgba(45,106,79,0.06)] px-4 py-2 shadow-[0_8px_24px_rgba(0,0,0,0.4)] backdrop-blur-xl">
                         <Navigation className="h-4 w-4 text-[rgba(31,180,100,0.9)]" />
-                        <span className="font-serif text-2xl font-semibold text-[var(--sand-0)]">{gpsYards}</span>
-                        <span className="text-xs text-[var(--text-1)]">yds</span>
+                        <span className="font-serif text-2xl font-semibold text-[#2d6a4f]">{gpsYards}</span>
+                        <span className="text-xs text-[rgba(26,26,26,0.6)]">yds</span>
                       </div>
                     </div>
                   )}
                   {!watching && !coords && (
-                    <div className="absolute inset-0 z-[1000] flex items-center justify-center bg-[rgba(5,8,7,0.6)] backdrop-blur-sm">
+                    <div className="absolute inset-0 z-[1000] flex items-center justify-center bg-[rgba(245,242,234,0.7)] backdrop-blur-sm">
                       <div className="text-center">
-                        <Locate className="mx-auto mb-2 h-8 w-8 text-[var(--sand-0)] opacity-60" />
-                        <p className="text-sm text-[var(--text-1)]">Start GPS to see your position</p>
+                        <Locate className="mx-auto mb-2 h-8 w-8 text-[#2d6a4f] opacity-60" />
+                        <p className="text-sm text-[rgba(26,26,26,0.6)]">Start GPS to see your position</p>
                       </div>
                     </div>
                   )}
@@ -437,22 +437,22 @@ const MentalGPS = () => {
               <GlassCard glow className="p-5">
                 <div className="space-y-4">
                   <div className="text-center">
-                    <p className="text-[9px] font-semibold uppercase tracking-[0.2em] text-[var(--text-1)]">Distance to pin</p>
-                    <p className="font-serif text-5xl font-semibold text-[var(--sand-0)]">
+                    <p className="text-[9px] font-semibold uppercase tracking-[0.2em] text-[rgba(26,26,26,0.6)]">Distance to pin</p>
+                    <p className="font-serif text-5xl font-semibold text-[#2d6a4f]">
                       {displayYards ?? "—"}
                     </p>
-                    <p className="text-sm text-[var(--text-1)] opacity-70">yards</p>
+                    <p className="text-sm text-[rgba(26,26,26,0.6)] opacity-70">yards</p>
                   </div>
 
                   <div>
-                    <label className="mb-1 block text-xs font-medium text-[var(--text-1)]">Enter yardage manually</label>
+                    <label className="mb-1 block text-xs font-medium text-[rgba(26,26,26,0.6)]">Enter yardage manually</label>
                     <input
                       type="number"
                       inputMode="numeric"
                       value={yardageInput}
                       onChange={(e) => setYardageInput(e.target.value)}
                       placeholder="e.g. 165"
-                      className="w-full rounded-xl border border-[rgba(203,184,146,0.2)] bg-[rgba(5,8,7,0.5)] px-4 py-3 text-center text-lg font-medium text-[var(--text-0)] placeholder-[var(--text-1)] focus:outline-none focus:ring-2 focus:ring-[var(--sand-0)]"
+                      className="w-full rounded-xl border border-[rgba(45,106,79,0.12)] bg-white/80 px-4 py-3 text-center text-lg font-medium text-[#1a1a1a] placeholder-[rgba(26,26,26,0.35)] focus:outline-none focus:ring-2 focus:ring-[#2d6a4f]/20"
                     />
                   </div>
                 </div>
@@ -463,7 +463,7 @@ const MentalGPS = () => {
                 {!watching && (
                   <button
                     onClick={startWatching}
-                    className="flex w-full items-center justify-center gap-3 rounded-2xl border border-[rgba(203,184,146,0.2)] bg-[var(--sand-0)] px-6 py-4 text-base font-semibold text-[#1a1e1c] shadow-[0_4px_16px_rgba(203,184,146,0.25)] transition-all hover:shadow-[0_6px_24px_rgba(203,184,146,0.35)]"
+                    className="flex w-full items-center justify-center gap-3 rounded-2xl border border-[rgba(45,106,79,0.12)] bg-[#2d6a4f] px-6 py-4 text-base font-semibold text-[#1a1e1c] shadow-[0_4px_16px_rgba(203,184,146,0.25)] transition-all hover:shadow-[0_6px_24px_rgba(203,184,146,0.35)]"
                   >
                     <Navigation className="h-5 w-5" />
                     Start GPS Tracking
@@ -472,7 +472,7 @@ const MentalGPS = () => {
                 <button
                   onClick={handleSetPin}
                   disabled={!coords}
-                  className="flex w-full items-center justify-center gap-3 rounded-2xl border border-[rgba(31,106,74,0.3)] bg-[rgba(31,106,74,0.95)] px-6 py-4 text-base font-semibold text-[var(--text-0)] shadow-[0_4px_16px_rgba(18,64,47,0.4)] transition-all hover:bg-[rgba(31,106,74,1)] hover:shadow-[0_6px_24px_rgba(18,64,47,0.5)] disabled:opacity-40 disabled:shadow-none"
+                  className="flex w-full items-center justify-center gap-3 rounded-2xl border border-[rgba(45,106,79,0.15)] bg-white px-6 py-4 text-base font-semibold text-[#2d6a4f] shadow-[0_1px_6px_rgba(0,0,0,0.04)] transition-all hover:bg-[rgba(45,106,79,0.04)] disabled:opacity-40 disabled:shadow-none"
                 >
                   <MapPin className="h-5 w-5" />
                   {pinCoords[currentHole] ? "Move Pin Location" : "Set Pin Here"}
@@ -482,14 +482,14 @@ const MentalGPS = () => {
                     <span className="inline-block h-2 w-2 animate-pulse rounded-full bg-[rgba(31,180,100,0.9)]" />
                     GPS Tracking Active
                     {coords && (
-                      <span className="ml-1 text-[var(--text-1)]">
+                      <span className="ml-1 text-[rgba(26,26,26,0.6)]">
                         ({coords.lat.toFixed(4)}, {coords.lng.toFixed(4)})
                       </span>
                     )}
                   </div>
                 )}
                 {gpsError && <p className="text-center text-xs text-[rgba(220,80,60,0.9)]">{gpsError}</p>}
-                <p className="text-center text-[10px] text-[var(--text-1)] opacity-60">
+                <p className="text-center text-[10px] text-[rgba(26,26,26,0.6)] opacity-60">
                   Walk to the pin flag and tap Set Pin. GPS distance updates as you move.
                 </p>
               </div>
@@ -498,8 +498,8 @@ const MentalGPS = () => {
               <GlassCard className="p-4">
                 <div className="space-y-3">
                   <div className="flex items-center gap-2">
-                    <Wind className="h-4 w-4 text-[var(--sand-0)]" />
-                    <p className="text-sm font-semibold text-[var(--text-0)]">Wind</p>
+                    <Wind className="h-4 w-4 text-[#2d6a4f]" />
+                    <p className="text-sm font-semibold text-[#1a1a1a]">Wind</p>
                   </div>
 
                   <div className="flex gap-2">
@@ -510,8 +510,8 @@ const MentalGPS = () => {
                         className={cn(
                           "flex flex-1 flex-col items-center gap-0.5 rounded-xl border py-2 text-xs transition-all",
                           windDir === wd.id
-                            ? "border-[var(--sand-0)] bg-[rgba(203,184,146,0.12)] text-[var(--sand-0)] shadow-[0_2px_8px_rgba(203,184,146,0.15)]"
-                            : "border-[rgba(255,255,255,0.08)] text-[var(--text-1)] hover:bg-[rgba(255,255,255,0.04)]"
+                            ? "border-[#2d6a4f] bg-[rgba(45,106,79,0.06)] text-[#2d6a4f] shadow-[0_2px_8px_rgba(203,184,146,0.15)]"
+                            : "border-[rgba(45,106,79,0.12)] text-[rgba(26,26,26,0.6)] hover:bg-[rgba(45,106,79,0.04)]"
                         )}
                       >
                         <span className="text-base">{wd.icon}</span>
@@ -522,14 +522,14 @@ const MentalGPS = () => {
 
                   {windDir !== "none" && (
                     <div>
-                      <p className="mb-1 text-xs text-[var(--text-1)]">Speed: {windMph} mph</p>
+                      <p className="mb-1 text-xs text-[rgba(26,26,26,0.6)]">Speed: {windMph} mph</p>
                       <input
                         type="range"
                         min={0}
                         max={30}
                         value={windMph}
                         onChange={(e) => setWindMph(parseInt(e.target.value, 10))}
-                        className="w-full accent-[var(--sand-0)]"
+                        className="w-full accent-[#2d6a4f]"
                       />
                     </div>
                   )}
@@ -541,19 +541,19 @@ const MentalGPS = () => {
                 <GlassCard className="p-4">
                   <div className="flex items-center justify-between gap-4">
                     <div className="flex items-center gap-3">
-                      <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[rgba(203,184,146,0.12)]">
-                        <Target className="h-5 w-5 text-[var(--sand-0)]" />
+                      <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[rgba(45,106,79,0.06)]">
+                        <Target className="h-5 w-5 text-[#2d6a4f]" />
                       </div>
                       <div>
-                        <p className="text-[10px] font-medium uppercase tracking-wider text-[var(--text-1)]">Suggested club</p>
-                        <p className="text-xl font-semibold text-[var(--text-0)]">{clubSuggestion}</p>
+                        <p className="text-[10px] font-medium uppercase tracking-wider text-[rgba(26,26,26,0.6)]">Suggested club</p>
+                        <p className="text-xl font-semibold text-[#1a1a1a]">{clubSuggestion}</p>
                       </div>
                     </div>
                     <div className="text-right">
-                      <p className="text-xs text-[var(--text-1)]">
+                      <p className="text-xs text-[rgba(26,26,26,0.6)]">
                         {windDir !== "none" && windMph > 0 ? `${windDir === "headwind" ? "+" : "-"}${Math.round(windMph * 0.75)} adj.` : "no wind adj."}
                       </p>
-                      <p className="text-sm text-[var(--text-1)]">{displayYards} yds</p>
+                      <p className="text-sm text-[rgba(26,26,26,0.6)]">{displayYards} yds</p>
                     </div>
                   </div>
                 </GlassCard>
@@ -566,7 +566,7 @@ const MentalGPS = () => {
             <div className="space-y-4 px-5">
 
               <GlassCard className="p-4">
-                <p className="mb-3 text-sm font-semibold text-[var(--text-0)]">Tee shot</p>
+                <p className="mb-3 text-sm font-semibold text-[#1a1a1a]">Tee shot</p>
                 <div className="flex flex-wrap gap-2">
                   {TEE_OPTIONS.map((opt) => (
                     <button
@@ -576,7 +576,7 @@ const MentalGPS = () => {
                         "rounded-xl border px-3.5 py-2.5 text-sm font-medium transition-all",
                         selectedTee === opt.value
                           ? "border-transparent text-white shadow-[0_2px_10px_rgba(0,0,0,0.2)]"
-                          : "border-[rgba(255,255,255,0.1)] bg-[rgba(255,255,255,0.04)] text-[var(--text-1)] hover:bg-[rgba(255,255,255,0.08)]"
+                          : "border-[rgba(45,106,79,0.12)] bg-white/70 text-[rgba(26,26,26,0.6)] hover:bg-[rgba(45,106,79,0.04)]"
                       )}
                       style={selectedTee === opt.value ? { backgroundColor: opt.color, borderColor: opt.color } : {}}
                     >
@@ -588,7 +588,7 @@ const MentalGPS = () => {
               </GlassCard>
 
               <GlassCard className="p-4">
-                <p className="mb-3 text-sm font-semibold text-[var(--text-0)]">Putting</p>
+                <p className="mb-3 text-sm font-semibold text-[#1a1a1a]">Putting</p>
                 <div className="flex flex-wrap gap-2">
                   {PUTT_OPTIONS.map((opt) => (
                     <button
@@ -598,7 +598,7 @@ const MentalGPS = () => {
                         "rounded-xl border px-3.5 py-2.5 text-sm font-medium transition-all",
                         selectedPutt === opt.value
                           ? "border-transparent text-white shadow-[0_2px_10px_rgba(0,0,0,0.2)]"
-                          : "border-[rgba(255,255,255,0.1)] bg-[rgba(255,255,255,0.04)] text-[var(--text-1)] hover:bg-[rgba(255,255,255,0.08)]"
+                          : "border-[rgba(45,106,79,0.12)] bg-white/70 text-[rgba(26,26,26,0.6)] hover:bg-[rgba(45,106,79,0.04)]"
                       )}
                       style={selectedPutt === opt.value ? { backgroundColor: opt.color, borderColor: opt.color } : {}}
                     >
@@ -610,8 +610,8 @@ const MentalGPS = () => {
               </GlassCard>
 
               <GlassCard className="p-4">
-                <p className="mb-1 text-sm font-semibold text-[var(--text-0)]">Mental state this hole</p>
-                <p className="mb-3 text-xs text-[var(--text-1)] opacity-70">Optional — tap to toggle</p>
+                <p className="mb-1 text-sm font-semibold text-[#1a1a1a]">Mental state this hole</p>
+                <p className="mb-3 text-xs text-[rgba(26,26,26,0.6)] opacity-70">Optional — tap to toggle</p>
                 <div className="flex flex-wrap gap-2">
                   {EMOTION_OPTIONS.map((opt) => (
                     <button
@@ -620,8 +620,8 @@ const MentalGPS = () => {
                       className={cn(
                         "flex items-center gap-1.5 rounded-xl border px-3.5 py-2.5 text-sm font-medium transition-all",
                         selectedEmotion === opt.value
-                          ? "border-[rgba(203,184,146,0.5)] bg-[rgba(203,184,146,0.15)] text-[var(--sand-0)] shadow-[0_2px_10px_rgba(203,184,146,0.15)]"
-                          : "border-[rgba(255,255,255,0.1)] bg-[rgba(255,255,255,0.04)] text-[var(--text-1)] hover:bg-[rgba(255,255,255,0.08)]"
+                          ? "border-[rgba(45,106,79,0.12)] bg-[rgba(45,106,79,0.06)] text-[#2d6a4f] shadow-[0_2px_10px_rgba(203,184,146,0.15)]"
+                          : "border-[rgba(45,106,79,0.12)] bg-white/70 text-[rgba(26,26,26,0.6)] hover:bg-[rgba(45,106,79,0.04)]"
                       )}
                     >
                       <span>{opt.emoji}</span>

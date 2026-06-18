@@ -76,8 +76,8 @@ function FocusDots({ value, onChange }: { value: number; onChange: (v: number) =
           className={cn(
             "h-9 w-9 rounded-full border transition-all duration-200 active:scale-90",
             i <= value
-              ? "border-[rgba(203,184,146,0.6)] bg-[rgba(203,184,146,0.25)] shadow-[0_0_10px_rgba(203,184,146,0.15)]"
-              : "border-[rgba(255,255,255,0.1)] bg-[rgba(255,255,255,0.03)]"
+              ? "border-[rgba(45,106,79,0.5)] bg-[rgba(45,106,79,0.15)] shadow-[0_0_10px_rgba(45,106,79,0.1)]"
+              : "border-[rgba(0,0,0,0.08)] bg-[rgba(0,0,0,0.02)]"
           )}
           aria-label={`Focus level ${i}`}
         />
@@ -140,10 +140,10 @@ export function DailyCheckIn({ savedCueWord, onComplete }: DailyCheckInProps) {
             <Check className="h-4 w-4 text-[rgba(31,180,100,0.9)]" />
           </div>
           <div className="min-w-0 flex-1">
-            <p className="text-[13px] font-medium text-[var(--text-0)]">
+            <p className="text-[13px] font-medium text-[#1a1a1a]">
               {intentionObj?.emoji} {intentionObj?.label ?? completedData.intention}
             </p>
-            <p className="text-[11px] text-[var(--text-1)]">
+            <p className="text-[11px] text-[rgba(26,26,26,0.6)]">
               Focus {completedData.focusLevel}/5 · Checked in for today
               {completedData.cueWord ? ` · "${completedData.cueWord}"` : ""}
             </p>
@@ -158,14 +158,14 @@ export function DailyCheckIn({ savedCueWord, onComplete }: DailyCheckInProps) {
     return (
       <GlassCard className="calm-pro-mount space-y-4 p-5">
         <div className="space-y-1 text-center">
-          <p className="text-[10px] uppercase tracking-[0.18em] text-[var(--sand-0)]">
+          <p className="text-[10px] uppercase tracking-[0.18em] text-[#2d6a4f]">
             Daily Check-In
           </p>
-          <p className="font-serif text-lg text-[var(--text-0)]">
+          <p className="font-serif text-lg text-[#1a1a1a]">
             How&apos;s your mental focus today?
           </p>
           {focusLevel > 0 && (
-            <p className="text-xs text-[var(--text-1)] animate-fade-in">
+            <p className="text-xs text-[rgba(26,26,26,0.6)] animate-fade-in">
               {FOCUS_LABELS[focusLevel - 1]}
             </p>
           )}
@@ -180,8 +180,8 @@ export function DailyCheckIn({ savedCueWord, onComplete }: DailyCheckInProps) {
           className={cn(
             "flex w-full items-center justify-center gap-2 rounded-2xl py-2.5 text-sm font-medium transition-all duration-200",
             focusLevel > 0
-              ? "bg-[rgba(203,184,146,0.12)] border border-[rgba(203,184,146,0.25)] text-[var(--text-0)] hover:bg-[rgba(203,184,146,0.18)] active:scale-[0.97]"
-              : "border border-[rgba(255,255,255,0.06)] text-[var(--text-1)] opacity-40 cursor-not-allowed"
+              ? "bg-[rgba(45,106,79,0.08)] border border-[rgba(45,106,79,0.2)] text-[#1a1a1a] hover:bg-[rgba(45,106,79,0.12)] active:scale-[0.97]"
+              : "border border-[rgba(0,0,0,0.06)] text-[rgba(26,26,26,0.6)] opacity-40 cursor-not-allowed"
           )}
         >
           Next <ChevronRight className="h-4 w-4" />
@@ -194,10 +194,10 @@ export function DailyCheckIn({ savedCueWord, onComplete }: DailyCheckInProps) {
   return (
     <GlassCard className="calm-pro-mount space-y-4 p-5">
       <div className="space-y-1 text-center">
-        <p className="text-[10px] uppercase tracking-[0.18em] text-[var(--sand-0)]">
+        <p className="text-[10px] uppercase tracking-[0.18em] text-[#2d6a4f]">
           Set Your Intention
         </p>
-        <p className="font-serif text-lg text-[var(--text-0)]">
+        <p className="font-serif text-lg text-[#1a1a1a]">
           What&apos;s your focus for today?
         </p>
       </div>
@@ -211,12 +211,12 @@ export function DailyCheckIn({ savedCueWord, onComplete }: DailyCheckInProps) {
             className={cn(
               "flex items-center gap-3 rounded-2xl border p-3.5 text-left transition-all duration-200 active:scale-[0.97]",
               intention === opt.value
-                ? "border-[rgba(203,184,146,0.4)] bg-[rgba(203,184,146,0.12)]"
-                : "border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.02)] hover:bg-[rgba(255,255,255,0.04)]"
+                ? "border-[rgba(45,106,79,0.3)] bg-[rgba(45,106,79,0.08)]"
+                : "border-[rgba(0,0,0,0.06)] bg-[rgba(0,0,0,0.01)] hover:bg-[rgba(0,0,0,0.03)]"
             )}
           >
             <span className="text-xl leading-none">{opt.emoji}</span>
-            <span className="text-sm font-medium text-[var(--text-0)]">{opt.label}</span>
+            <span className="text-sm font-medium text-[#1a1a1a]">{opt.label}</span>
           </button>
         ))}
       </div>

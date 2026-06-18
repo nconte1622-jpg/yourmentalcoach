@@ -46,12 +46,12 @@ const queryClient = new QueryClient();
 
 function AppLoadingScreen() {
   return (
-    <div className="h-[100dvh] bg-[linear-gradient(180deg,rgba(5,8,7,1)_0%,rgba(8,17,14,1)_100%)] text-[var(--text-0)]">
+    <div className="h-[100dvh] bg-[#f5f2ea] text-[#1a1a1a]">
       <div className="flex h-full flex-col items-center justify-center gap-4 px-6 text-center">
-        <div className="h-10 w-10 animate-spin rounded-full border-2 border-[rgba(203,184,146,0.2)] border-t-[var(--sand-0)]" />
+        <div className="h-10 w-10 animate-spin rounded-full border-2 border-[rgba(45,106,79,0.12)] border-t-[#2d6a4f]" />
         <div className="space-y-1">
-          <p className="text-sm uppercase tracking-[0.2em] text-[var(--sand-0)]">Loading</p>
-          <p className="text-sm text-[var(--text-1)]">Loading your round…</p>
+          <p className="text-sm uppercase tracking-[0.2em] text-[#2d6a4f]">Loading</p>
+          <p className="text-sm text-[rgba(26,26,26,0.6)]">Loading your round…</p>
         </div>
       </div>
     </div>

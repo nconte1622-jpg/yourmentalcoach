@@ -40,18 +40,18 @@ function CustomTooltip({
   const score = payload[0].value;
   const band = score >= 75 ? "Strong" : score >= 50 ? "Building" : "Early";
   return (
-    <div className="rounded-xl border border-[rgba(203,184,146,0.2)] bg-[rgba(9,19,15,0.97)] px-3 py-2 shadow-lg backdrop-blur-xl">
-      <p className="text-[10px] uppercase tracking-[0.14em] text-[var(--sand-0)]">{label}</p>
-      <p className="font-serif text-lg text-[var(--text-0)]">
-        {score} <span className="text-[11px] text-[var(--text-1)]">/ 100</span>
+    <div className="rounded-xl border border-[rgba(45,106,79,0.12)] bg-white/95 px-3 py-2 shadow-lg backdrop-blur-xl">
+      <p className="text-[10px] uppercase tracking-[0.14em] text-[#2d6a4f]">{label}</p>
+      <p className="font-serif text-lg text-[#1a1a1a]">
+        {score} <span className="text-[11px] text-[rgba(26,26,26,0.6)]">/ 100</span>
       </p>
       <p
         className={`text-[10px] font-semibold uppercase tracking-[0.12em] ${
           score >= 75
             ? "text-[rgba(31,180,100,0.9)]"
             : score >= 50
-            ? "text-[var(--sand-0)]"
-            : "text-[var(--text-1)]"
+            ? "text-[#2d6a4f]"
+            : "text-[rgba(26,26,26,0.6)]"
         }`}
       >
         {band}
@@ -104,12 +104,12 @@ export function MentalHandicapChart({ maxRounds = 20 }: MentalHandicapChartProps
   if (data.length < 2) {
     return (
       <GlassCard className="flex flex-col items-center gap-3 p-7 text-center">
-        <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-[rgba(203,184,146,0.2)] bg-[rgba(203,184,146,0.06)]">
-          <TrendingUp className="h-5 w-5 text-[var(--sand-0)] opacity-60" />
+        <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-[rgba(45,106,79,0.12)] bg-[rgba(45,106,79,0.06)]">
+          <TrendingUp className="h-5 w-5 text-[#2d6a4f] opacity-60" />
         </div>
         <div className="space-y-1">
-          <p className="text-sm font-medium text-[var(--text-0)]">Your progress chart starts here</p>
-          <p className="text-xs leading-5 text-[var(--text-1)]">
+          <p className="text-sm font-medium text-[#1a1a1a]">Your progress chart starts here</p>
+          <p className="text-xs leading-5 text-[rgba(26,26,26,0.6)]">
             Complete {2 - data.length} more round{2 - data.length !== 1 ? "s" : ""} with emotion tracking to see your Mental Handicap trend.
           </p>
         </div>
@@ -123,17 +123,17 @@ export function MentalHandicapChart({ maxRounds = 20 }: MentalHandicapChartProps
       ? "text-[rgba(31,180,100,0.9)]"
       : trend === "down"
       ? "text-[rgba(220,80,60,0.85)]"
-      : "text-[var(--text-1)]";
+      : "text-[rgba(26,26,26,0.6)]";
 
   return (
     <GlassCard className="calm-pro-mount p-5 space-y-4">
       {/* Header */}
       <div className="flex items-start justify-between">
         <div>
-          <p className="text-[10px] uppercase tracking-[0.18em] text-[var(--sand-0)]">
+          <p className="text-[10px] uppercase tracking-[0.18em] text-[#2d6a4f]">
             Mental Handicap Trend
           </p>
-          <p className="mt-0.5 text-xs text-[var(--text-1)]">
+          <p className="mt-0.5 text-xs text-[rgba(26,26,26,0.6)]">
             Last {data.length} rounds
           </p>
         </div>
@@ -147,7 +147,7 @@ export function MentalHandicapChart({ maxRounds = 20 }: MentalHandicapChartProps
             )}
           </div>
           {latest != null && (
-            <p className="font-serif text-2xl text-[var(--text-0)] tabular-nums">{latest}</p>
+            <p className="font-serif text-2xl text-[#1a1a1a] tabular-nums">{latest}</p>
           )}
         </div>
       </div>
@@ -158,30 +158,30 @@ export function MentalHandicapChart({ maxRounds = 20 }: MentalHandicapChartProps
           <ComposedChart data={data} margin={{ top: 8, right: 4, bottom: 0, left: -20 }}>
             <defs>
               <linearGradient id="mhGradient" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="rgba(203,184,146,0.3)" />
-                <stop offset="100%" stopColor="rgba(203,184,146,0.0)" />
+                <stop offset="0%" stopColor="rgba(45,106,79,0.2)" />
+                <stop offset="100%" stopColor="rgba(45,106,79,0.0)" />
               </linearGradient>
             </defs>
             <CartesianGrid
               strokeDasharray="3 3"
-              stroke="rgba(255,255,255,0.04)"
+              stroke="rgba(0,0,0,0.05)"
               vertical={false}
             />
             <XAxis
               dataKey="date"
-              tick={{ fill: "rgba(203,184,146,0.5)", fontSize: 9 }}
+              tick={{ fill: "rgba(26,26,26,0.4)", fontSize: 9 }}
               tickLine={false}
               axisLine={false}
               interval="preserveStartEnd"
             />
             <YAxis
               domain={[0, 100]}
-              tick={{ fill: "rgba(203,184,146,0.5)", fontSize: 9 }}
+              tick={{ fill: "rgba(26,26,26,0.4)", fontSize: 9 }}
               tickLine={false}
               axisLine={false}
               ticks={[0, 25, 50, 75, 100]}
             />
-            <Tooltip content={<CustomTooltip />} cursor={{ stroke: "rgba(203,184,146,0.2)", strokeWidth: 1 }} />
+            <Tooltip content={<CustomTooltip />} cursor={{ stroke: "rgba(45,106,79,0.15)", strokeWidth: 1 }} />
             {/* Benchmark lines */}
             <ReferenceLine
               y={75}
@@ -191,9 +191,9 @@ export function MentalHandicapChart({ maxRounds = 20 }: MentalHandicapChartProps
             />
             <ReferenceLine
               y={50}
-              stroke="rgba(203,184,146,0.15)"
+              stroke="rgba(45,106,79,0.12)"
               strokeDasharray="4 4"
-              label={{ value: "Building", position: "right", fill: "rgba(203,184,146,0.35)", fontSize: 9 }}
+              label={{ value: "Building", position: "right", fill: "rgba(45,106,79,0.35)", fontSize: 9 }}
             />
             <Area
               type="monotone"
@@ -204,10 +204,10 @@ export function MentalHandicapChart({ maxRounds = 20 }: MentalHandicapChartProps
             <Line
               type="monotone"
               dataKey="score"
-              stroke="rgba(203,184,146,0.9)"
+              stroke="rgba(45,106,79,0.9)"
               strokeWidth={2}
-              dot={{ fill: "rgba(203,184,146,0.9)", r: 3, strokeWidth: 0 }}
-              activeDot={{ fill: "rgba(203,184,146,1)", r: 5, strokeWidth: 0 }}
+              dot={{ fill: "rgba(45,106,79,0.9)", r: 3, strokeWidth: 0 }}
+              activeDot={{ fill: "rgba(45,106,79,1)", r: 5, strokeWidth: 0 }}
             />
           </ComposedChart>
         </ResponsiveContainer>
@@ -216,13 +216,13 @@ export function MentalHandicapChart({ maxRounds = 20 }: MentalHandicapChartProps
       {/* Band legend */}
       <div className="flex gap-4 pt-1">
         {[
-          { label: "Early", color: "bg-[rgba(255,255,255,0.15)]" },
-          { label: "Building (50+)", color: "bg-[rgba(203,184,146,0.4)]" },
+          { label: "Early", color: "bg-[rgba(0,0,0,0.1)]" },
+          { label: "Building (50+)", color: "bg-[rgba(45,106,79,0.4)]" },
           { label: "Strong (75+)", color: "bg-[rgba(31,180,100,0.5)]" },
         ].map(({ label, color }) => (
           <div key={label} className="flex items-center gap-1.5">
             <div className={`h-2 w-2 rounded-full ${color}`} />
-            <span className="text-[10px] text-[var(--text-1)]">{label}</span>
+            <span className="text-[10px] text-[rgba(26,26,26,0.6)]">{label}</span>
           </div>
         ))}
       </div>

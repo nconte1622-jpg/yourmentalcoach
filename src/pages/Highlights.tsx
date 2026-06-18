@@ -74,13 +74,13 @@ const Highlights = () => {
                   >
                     <div className="flex items-start justify-between gap-4 mb-4">
                       <div className="flex items-center gap-2.5 flex-wrap">
-                        <span className="text-xs" style={{ color: "var(--muted-text)" }}>
+                        <span className="text-xs" style={{ color: "rgba(26,26,26,0.5)" }}>
                           {formatDate(highlight.date)}
                         </span>
                         {highlight.contextTag && (
                           <span
                             className="text-xs px-2.5 py-1 rounded-full"
-                            style={{ background: "var(--muted-bg)", color: "var(--muted-text)" }}
+                            style={{ background: "rgba(0,0,0,0.04)", color: "rgba(26,26,26,0.5)" }}
                           >
                             {highlight.contextTag}
                           </span>
@@ -101,7 +101,7 @@ const Highlights = () => {
                       </Button>
                     </div>
 
-                    <p className="text-sm leading-relaxed font-light" style={{ color: "var(--text-secondary)" }}>
+                    <p className="text-sm leading-relaxed font-light" style={{ color: "rgba(26,26,26,0.6)" }}>
                       {highlight.mentalRule}
                     </p>
                   </FrostedSandCard>

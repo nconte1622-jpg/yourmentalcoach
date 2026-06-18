@@ -145,12 +145,12 @@ const SwingAnalysis = () => {
       const x0 = 0; const y0 = intercept;
       const x1 = W; const y1 = slope * W + intercept;
 
-      ctx.shadowColor = "rgba(203,184,146,0.5)";
+      ctx.shadowColor = "rgba(45,106,79,0.5)";
       ctx.shadowBlur = 8;
       ctx.beginPath();
       ctx.moveTo(x0, y0);
       ctx.lineTo(x1, y1);
-      ctx.strokeStyle = "rgba(203,184,146,0.85)";
+      ctx.strokeStyle = "rgba(45,106,79,0.85)";
       ctx.lineWidth = 2.5;
       ctx.setLineDash([8, 4]);
       ctx.stroke();
@@ -163,13 +163,13 @@ const SwingAnalysis = () => {
       if (pts.length === 4) {
         const midX = W / 2;
         const midY = slope * (W / 2) + intercept;
-        ctx.fillStyle = "rgba(8,19,13,0.85)";
+        ctx.fillStyle = "rgba(245,242,234,0.9)";
         ctx.beginPath();
         const bx = midX - 38; const by = midY - 28;
         ctx.roundRect?.(bx, by, 76, 22, 6);
         ctx.fill();
         ctx.font = "bold 12px system-ui";
-        ctx.fillStyle = "rgba(203,184,146,0.95)";
+        ctx.fillStyle = "rgba(45,106,79,0.95)";
         ctx.textAlign = "center";
         ctx.fillText(`${angleDeg}° plane`, midX, midY - 12);
       }
@@ -344,10 +344,10 @@ Be specific about what the data or description reveals. Reference the plane angl
     if (!streamingText) return null;
     return (
       <GlassCard className="space-y-3 p-5">
-        <div className="space-y-2 text-sm leading-6 text-[var(--text-0)]">
+        <div className="space-y-2 text-sm leading-6 text-[#1a1a1a]">
           {streamingText.split("\n").map((line, idx) => {
             if (line.startsWith("**") && line.endsWith("**")) {
-              return <p key={idx} className="mt-3 font-semibold text-[var(--sand-0)] first:mt-0">{line.replaceAll("**", "")}</p>;
+              return <p key={idx} className="mt-3 font-semibold text-[#2d6a4f] first:mt-0">{line.replaceAll("**", "")}</p>;
             }
             return line.trim() ? <p key={idx}>{line}</p> : null;
           })}
@@ -363,14 +363,14 @@ Be specific about what the data or description reveals. Reference the plane angl
         header={
           <AppHeader
             left={
-              <button onClick={() => { triggerHaptic("light"); navigate("/"); }} className="tap-44 flex items-center justify-center text-[var(--text-0)]">
+              <button onClick={() => { triggerHaptic("light"); navigate("/"); }} className="tap-44 flex items-center justify-center text-[#1a1a1a]">
                 <ArrowLeft className="h-5 w-5" />
               </button>
             }
             center={
               <div>
-                <h1 className="font-serif text-[23px] leading-tight tracking-wide text-[var(--text-0)]">Swing Breakdown</h1>
-                <p className="truncate text-[11px] uppercase tracking-[0.14em] text-[var(--text-1)]">Plane analysis · mental coaching</p>
+                <h1 className="font-serif text-[23px] leading-tight tracking-wide text-[#1a1a1a]">Swing Breakdown</h1>
+                <p className="truncate text-[11px] uppercase tracking-[0.14em] text-[rgba(26,26,26,0.6)]">Plane analysis · mental coaching</p>
               </div>
             }
             right={<div className="tap-44" />}
@@ -384,38 +384,38 @@ Be specific about what the data or description reveals. Reference the plane angl
             <div className="space-y-4">
               <GlassCard className="p-4">
                 <div className="flex gap-3">
-                  <Eye className="h-5 w-5 shrink-0 text-[var(--sand-0)]" />
+                  <Eye className="h-5 w-5 shrink-0 text-[#2d6a4f]" />
                   <div className="space-y-1">
-                    <p className="text-sm font-medium text-[var(--text-0)]">Map your swing plane. Get real coaching.</p>
-                    <p className="text-xs text-[var(--text-1)]">Upload a swing video, pause it, then tap 4 positions to draw your plane line. The AI uses the angle data to give targeted mental coaching.</p>
+                    <p className="text-sm font-medium text-[#1a1a1a]">Map your swing plane. Get real coaching.</p>
+                    <p className="text-xs text-[rgba(26,26,26,0.6)]">Upload a swing video, pause it, then tap 4 positions to draw your plane line. The AI uses the angle data to give targeted mental coaching.</p>
                   </div>
                 </div>
               </GlassCard>
 
               <button
                 onClick={() => fileInputRef.current?.click()}
-                className="calm-pro-press group w-full overflow-hidden rounded-2xl border-2 border-dashed border-[rgba(203,184,146,0.3)] bg-[rgba(203,184,146,0.05)] p-8 transition-all hover:border-[rgba(203,184,146,0.5)]"
+                className="calm-pro-press group w-full overflow-hidden rounded-2xl border-2 border-dashed border-[rgba(45,106,79,0.12)] bg-[rgba(45,106,79,0.06)] p-8 transition-all hover:border-[rgba(45,106,79,0.12)]"
               >
                 <div className="flex flex-col items-center gap-3">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[rgba(203,184,146,0.2)]">
-                    <Upload className="h-6 w-6 text-[var(--sand-0)]" />
+                  <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[rgba(45,106,79,0.06)]">
+                    <Upload className="h-6 w-6 text-[#2d6a4f]" />
                   </div>
                   <div className="space-y-1 text-center">
-                    <p className="font-medium text-[var(--text-0)]">Upload swing video</p>
-                    <p className="text-xs text-[var(--text-1)]">From camera roll, or record new</p>
+                    <p className="font-medium text-[#1a1a1a]">Upload swing video</p>
+                    <p className="text-xs text-[rgba(26,26,26,0.6)]">From camera roll, or record new</p>
                   </div>
                 </div>
               </button>
 
               <div className="flex items-center gap-3">
-                <div className="flex-1 border-t border-[rgba(255,255,255,0.08)]" />
-                <p className="text-xs text-[var(--text-1)] opacity-50">or</p>
-                <div className="flex-1 border-t border-[rgba(255,255,255,0.08)]" />
+                <div className="flex-1 border-t border-[rgba(45,106,79,0.12)]" />
+                <p className="text-xs text-[rgba(26,26,26,0.6)] opacity-50">or</p>
+                <div className="flex-1 border-t border-[rgba(45,106,79,0.12)]" />
               </div>
 
               <button
                 onClick={() => { triggerHaptic("soft"); setStatus("video-selected"); }}
-                className="calm-pro-press w-full rounded-2xl border border-[rgba(203,184,146,0.15)] bg-[rgba(203,184,146,0.05)] px-5 py-4 text-center text-sm text-[var(--text-1)]"
+                className="calm-pro-press w-full rounded-2xl border border-[rgba(45,106,79,0.12)] bg-[rgba(45,106,79,0.06)] px-5 py-4 text-center text-sm text-[rgba(26,26,26,0.6)]"
               >
                 Skip video — describe from memory
               </button>
@@ -472,23 +472,23 @@ Be specific about what the data or description reveals. Reference the plane angl
                                 className={cn(
                                   "h-2.5 w-2.5 rounded-full border-2 transition-all",
                                   i < markedPoints.length ? "border-transparent" :
-                                  i === markedPoints.length ? "border-[var(--sand-0)] animate-pulse" :
+                                  i === markedPoints.length ? "border-[#2d6a4f] animate-pulse" :
                                   "border-white/20"
                                 )}
                                 style={{ backgroundColor: i < markedPoints.length ? POINT_COLORS[label] : undefined }}
                               />
-                              <p className={cn("text-[9px] text-center leading-tight", i === markedPoints.length ? "text-[var(--sand-0)] font-medium" : "text-[var(--text-1)] opacity-40")}>
+                              <p className={cn("text-[9px] text-center leading-tight", i === markedPoints.length ? "text-[#2d6a4f] font-medium" : "text-[rgba(26,26,26,0.6)] opacity-40")}>
                                 {label}
                               </p>
                             </div>
                           ))}
                         </div>
-                        <p className="text-center text-sm font-medium text-[var(--sand-0)]">
+                        <p className="text-center text-sm font-medium text-[#2d6a4f]">
                           {nextPointIndex < 4 ? `Tap: ${POINT_LABELS[nextLabel]}` : "All 4 points marked"}
                         </p>
-                        <p className="text-center text-xs text-[var(--text-1)]">Pause the video first, then tap each position</p>
+                        <p className="text-center text-xs text-[rgba(26,26,26,0.6)]">Pause the video first, then tap each position</p>
                         {markedPoints.length > 0 && (
-                          <button onClick={handleUndoLastPoint} className="flex w-full items-center justify-center gap-1.5 py-1 text-xs text-[var(--text-1)]">
+                          <button onClick={handleUndoLastPoint} className="flex w-full items-center justify-center gap-1.5 py-1 text-xs text-[rgba(26,26,26,0.6)]">
                             <RotateCcw className="h-3 w-3" /> Undo last point
                           </button>
                         )}
@@ -500,13 +500,13 @@ Be specific about what the data or description reveals. Reference the plane angl
                   {status === "drawn" && planeAngle !== null && (
                     <GlassCard className="flex items-center justify-between gap-4 p-4">
                       <div>
-                        <p className="text-[10px] uppercase tracking-[0.14em] text-[var(--text-1)]">Swing plane angle</p>
-                        <p className="text-2xl font-serif text-[var(--sand-0)]">{planeAngle}°</p>
-                        <p className="text-xs text-[var(--text-1)]">
+                        <p className="text-[10px] uppercase tracking-[0.14em] text-[rgba(26,26,26,0.6)]">Swing plane angle</p>
+                        <p className="text-2xl font-serif text-[#2d6a4f]">{planeAngle}°</p>
+                        <p className="text-xs text-[rgba(26,26,26,0.6)]">
                           {planeAngle > 35 ? "Steep — over-the-top tendency" : planeAngle < 15 ? "Flat — limited shoulder turn" : "On-plane — solid range"}
                         </p>
                       </div>
-                      <button onClick={handleStartDrawing} className="rounded-xl border border-[rgba(203,184,146,0.2)] px-3 py-2 text-xs text-[var(--text-1)]">
+                      <button onClick={handleStartDrawing} className="rounded-xl border border-[rgba(45,106,79,0.12)] px-3 py-2 text-xs text-[rgba(26,26,26,0.6)]">
                         Redo
                       </button>
                     </GlassCard>
@@ -525,12 +525,12 @@ Be specific about what the data or description reveals. Reference the plane angl
               {/* Observations */}
               {(status === "video-selected" || status === "drawn") && (
                 <div className="space-y-2">
-                  <label className="block text-sm font-medium text-[var(--text-0)]">What did you notice? <span className="text-[var(--text-1)] font-normal">(optional)</span></label>
+                  <label className="block text-sm font-medium text-[#1a1a1a]">What did you notice? <span className="text-[rgba(26,26,26,0.6)] font-normal">(optional)</span></label>
                   <textarea
                     value={userObservations}
                     onChange={(e) => setUserObservations(e.target.value)}
                     placeholder="Felt rushed on takeaway, lost commitment through impact, tension in shoulders..."
-                    className="w-full rounded-xl border border-[rgba(203,184,146,0.2)] bg-[rgba(5,8,7,0.5)] p-3 text-sm text-[var(--text-0)] placeholder-[var(--text-1)] focus:outline-none focus:ring-2 focus:ring-[var(--sand-0)]"
+                    className="w-full rounded-xl border border-[rgba(45,106,79,0.12)] bg-white/80 p-3 text-sm text-[#1a1a1a] placeholder-[rgba(26,26,26,0.35)] focus:outline-none focus:ring-2 focus:ring-[#2d6a4f]/20"
                     rows={4}
                   />
                 </div>
@@ -539,12 +539,12 @@ Be specific about what the data or description reveals. Reference the plane angl
               {/* Text-only path (no video) */}
               {!videoPreviewUrl && status === "video-selected" && (
                 <div className="space-y-2">
-                  <label className="block text-sm font-medium text-[var(--text-0)]">Describe your swing from memory</label>
+                  <label className="block text-sm font-medium text-[#1a1a1a]">Describe your swing from memory</label>
                   <textarea
                     value={userObservations}
                     onChange={(e) => setUserObservations(e.target.value)}
                     placeholder="Rushed takeaway, didn't commit fully, felt tight in shoulders at impact..."
-                    className="w-full rounded-xl border border-[rgba(203,184,146,0.2)] bg-[rgba(5,8,7,0.5)] p-3 text-sm text-[var(--text-0)] placeholder-[var(--text-1)] focus:outline-none focus:ring-2 focus:ring-[var(--sand-0)]"
+                    className="w-full rounded-xl border border-[rgba(45,106,79,0.12)] bg-white/80 p-3 text-sm text-[#1a1a1a] placeholder-[rgba(26,26,26,0.35)] focus:outline-none focus:ring-2 focus:ring-[#2d6a4f]/20"
                     rows={5}
                   />
                 </div>
@@ -570,13 +570,13 @@ Be specific about what the data or description reveals. Reference the plane angl
             <div className="space-y-4">
               {planeAngle !== null && (
                 <GlassCard className="flex items-center gap-3 p-4">
-                  <div className="h-2 w-2 rounded-full bg-[var(--sand-0)] opacity-70" />
-                  <p className="text-sm text-[var(--text-1)]">Analyzing {planeAngle}° plane…</p>
+                  <div className="h-2 w-2 rounded-full bg-[#2d6a4f] opacity-70" />
+                  <p className="text-sm text-[rgba(26,26,26,0.6)]">Analyzing {planeAngle}° plane…</p>
                 </GlassCard>
               )}
               <GlassCard className="flex flex-col items-center gap-3 p-6">
-                <Loader2 className="h-5 w-5 animate-spin text-[var(--sand-0)]" />
-                <p className="text-sm text-[var(--text-1)]">Writing your coaching…</p>
+                <Loader2 className="h-5 w-5 animate-spin text-[#2d6a4f]" />
+                <p className="text-sm text-[rgba(26,26,26,0.6)]">Writing your coaching…</p>
               </GlassCard>
               <PillButton tone="sand" onClick={cancelActiveRequest} className="w-full">Cancel</PillButton>
             </div>
@@ -586,10 +586,10 @@ Be specific about what the data or description reveals. Reference the plane angl
           {status === "complete" && (
             <div className="space-y-4">
               {planeAngle !== null && (
-                <div className="flex items-center gap-2 rounded-xl border border-[rgba(203,184,146,0.2)] bg-[rgba(203,184,146,0.06)] px-4 py-2.5">
-                  <Crosshair className="h-4 w-4 text-[var(--sand-0)]" />
-                  <p className="text-sm text-[var(--text-0)]">
-                    Swing plane: <span className="font-medium text-[var(--sand-0)]">{planeAngle}°</span>
+                <div className="flex items-center gap-2 rounded-xl border border-[rgba(45,106,79,0.12)] bg-[rgba(45,106,79,0.06)] px-4 py-2.5">
+                  <Crosshair className="h-4 w-4 text-[#2d6a4f]" />
+                  <p className="text-sm text-[#1a1a1a]">
+                    Swing plane: <span className="font-medium text-[#2d6a4f]">{planeAngle}°</span>
                     {" — "}{planeAngle > 35 ? "steep" : planeAngle < 15 ? "flat" : "on-plane"}
                   </p>
                 </div>
@@ -603,7 +603,7 @@ Be specific about what the data or description reveals. Reference the plane angl
           {/* ── ERROR ─────────────────────────────── */}
           {status === "error" && (
             <GlassCard className="flex flex-col items-center gap-3 p-6 text-center">
-              <p className="text-sm text-[var(--text-0)]">Something went wrong. Your plane data is still saved.</p>
+              <p className="text-sm text-[#1a1a1a]">Something went wrong. Your plane data is still saved.</p>
               <PillButton tone="green" onClick={handleGetCoaching} className="w-full">Try Again</PillButton>
               <PillButton tone="sand" onClick={resetBreakdown} className="w-full">Start Over</PillButton>
             </GlassCard>

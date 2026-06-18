@@ -138,10 +138,10 @@ const Login = () => {
   };
 
   const inputClass =
-    "py-6 px-4 text-base rounded-2xl border-white/25 bg-white/10 text-white placeholder:text-white/50 shadow-inner shadow-black/10 focus:border-white/40 focus:ring-2 focus:ring-white/20 focus:bg-white/15";
+    "py-6 px-4 text-base rounded-2xl border-[rgba(45,106,79,0.15)] bg-[rgba(45,106,79,0.04)] text-[#1a1a1a] placeholder:text-[rgba(26,26,26,0.4)] shadow-inner shadow-black/5 focus:border-[rgba(45,106,79,0.3)] focus:ring-2 focus:ring-[rgba(45,106,79,0.12)] focus:bg-[rgba(45,106,79,0.06)]";
 
   const btnClass =
-    "w-full py-6 text-base font-medium rounded-2xl bg-white/25 hover:bg-white/35 text-white shadow-md transition-all";
+    "w-full py-6 text-base font-medium rounded-2xl bg-[rgba(45,106,79,0.12)] hover:bg-[rgba(45,106,79,0.18)] text-[#2d6a4f] shadow-md transition-all";
 
   const canSubmit =
     mode === "signup"
@@ -160,8 +160,8 @@ const Login = () => {
   const tabClass = (active: boolean) =>
     `flex-1 py-2.5 text-sm font-medium rounded-xl transition-all duration-200 ${
       active
-        ? "bg-white/20 text-white shadow-sm"
-        : "text-white/50 hover:text-white/70"
+        ? "bg-[rgba(45,106,79,0.1)] text-[#2d6a4f] shadow-sm"
+        : "text-[rgba(26,26,26,0.4)] hover:text-[rgba(26,26,26,0.6)]"
     }`;
 
   if (isLoading) return null;
@@ -172,21 +172,21 @@ const Login = () => {
 
         {/* Social proof — above the card */}
         <div className="w-full max-w-sm mb-5 animate-fade-in">
-          <div className="rounded-2xl border border-white/10 bg-white/6 px-4 py-3.5 text-center">
-            <p className="text-xs text-white/55 leading-5 italic">
+          <div className="rounded-2xl border border-[rgba(45,106,79,0.1)] bg-[rgba(45,106,79,0.04)] px-4 py-3.5 text-center">
+            <p className="text-xs text-[rgba(26,26,26,0.6)] leading-5 italic">
               "I stopped spiraling on bad holes. This thing actually gets the mental side."
             </p>
-            <p className="text-[10px] text-white/30 mt-1.5 uppercase tracking-wider">— Early tester, 14 handicap</p>
+            <p className="text-[10px] text-[rgba(26,26,26,0.35)] mt-1.5 uppercase tracking-wider">— Early tester, 14 handicap</p>
           </div>
         </div>
 
-        <div className="bg-white/15 backdrop-blur-xl border border-white/20 shadow-2xl shadow-black/20 rounded-3xl p-8 w-full max-w-sm">
+        <div className="bg-white/90 backdrop-blur-xl border border-[rgba(45,106,79,0.1)] shadow-2xl shadow-black/8 rounded-3xl p-8 w-full max-w-sm">
           <div className="mb-6 flex justify-center animate-fade-in">
             <Logo size="lg" variant="light" />
           </div>
 
           <h1
-            className="text-2xl md:text-3xl font-serif text-white tracking-wide mb-1 text-center animate-fade-in"
+            className="text-2xl md:text-3xl font-serif text-[#1a1a1a] tracking-wide mb-1 text-center animate-fade-in"
             style={{ animationDelay: "100ms" }}
           >
             The Caddie
@@ -194,7 +194,7 @@ const Login = () => {
 
           {/* Credibility tagline */}
           <p
-            className="text-[11px] text-white/35 text-center uppercase tracking-[0.18em] mb-0 animate-fade-in"
+            className="text-[11px] text-[rgba(26,26,26,0.4)] text-center uppercase tracking-[0.18em] mb-0 animate-fade-in"
             style={{ animationDelay: "110ms" }}
           >
             Sports psychology · Built for golf
@@ -202,7 +202,7 @@ const Login = () => {
 
           {mode !== "forgot" && (
             <div
-              className="flex gap-1 p-1 rounded-2xl bg-white/10 mb-6 mt-6 animate-fade-in"
+              className="flex gap-1 p-1 rounded-2xl bg-[rgba(45,106,79,0.06)] mb-6 mt-6 animate-fade-in"
               style={{ animationDelay: "200ms" }}
             >
               <button
@@ -224,7 +224,7 @@ const Login = () => {
 
           {mode === "forgot" && (
             <p
-              className="text-sm text-white/50 tracking-wide mb-6 mt-6 text-center animate-fade-in"
+              className="text-sm text-[rgba(26,26,26,0.5)] tracking-wide mb-6 mt-6 text-center animate-fade-in"
               style={{ animationDelay: "200ms" }}
             >
               Enter your email to receive a reset link.
@@ -232,13 +232,13 @@ const Login = () => {
           )}
 
           {error && (
-            <div className="bg-red-500/20 border border-red-400/30 rounded-xl px-4 py-3 mb-4 text-sm text-red-200 animate-fade-in">
+            <div className="bg-red-50 border border-red-200 rounded-xl px-4 py-3 mb-4 text-sm text-red-700 animate-fade-in">
               {error}
             </div>
           )}
 
           {success && (
-            <div className="bg-emerald-500/20 border border-emerald-400/30 rounded-xl px-4 py-3 mb-4 text-sm text-emerald-200 animate-fade-in">
+            <div className="bg-emerald-50 border border-emerald-200 rounded-xl px-4 py-3 mb-4 text-sm text-emerald-700 animate-fade-in">
               {success}
             </div>
           )}
@@ -277,22 +277,22 @@ const Login = () => {
                   className={inputClass}
                 />
 
-                <div className="space-y-3 rounded-2xl border border-white/16 bg-white/8 p-4 shadow-inner shadow-black/10">
+                <div className="space-y-3 rounded-2xl border border-[rgba(45,106,79,0.12)] bg-[rgba(45,106,79,0.03)] p-4 shadow-inner shadow-black/3">
                   <div className="flex items-start gap-3">
                     <Checkbox
                       id="privacy-consent"
                       checked={privacyAccepted}
                       onCheckedChange={(checked) => setPrivacyAccepted(checked === true)}
-                      className="mt-0.5 h-5 w-5 rounded border-white/35 data-[state=checked]:bg-[var(--sand-0)] data-[state=checked]:text-[var(--ink-0)]"
+                      className="mt-0.5 h-5 w-5 rounded border-[rgba(45,106,79,0.25)] data-[state=checked]:bg-[#2d6a4f] data-[state=checked]:text-white"
                     />
-                    <div className="flex-1 text-sm leading-6 text-white/85">
+                    <div className="flex-1 text-sm leading-6 text-[rgba(26,26,26,0.8)]">
                       <label htmlFor="privacy-consent" className="cursor-pointer">
                         I agree to the{" "}
                       </label>
                       <button
                         type="button"
                         onClick={() => void openLegalLink("privacy")}
-                        className="font-medium text-[var(--sand-0)] underline underline-offset-4"
+                        className="font-medium text-[#2d6a4f] underline underline-offset-4"
                       >
                         Privacy Policy
                       </button>
@@ -304,16 +304,16 @@ const Login = () => {
                       id="terms-consent"
                       checked={termsAccepted}
                       onCheckedChange={(checked) => setTermsAccepted(checked === true)}
-                      className="mt-0.5 h-5 w-5 rounded border-white/35 data-[state=checked]:bg-[var(--sand-0)] data-[state=checked]:text-[var(--ink-0)]"
+                      className="mt-0.5 h-5 w-5 rounded border-[rgba(45,106,79,0.25)] data-[state=checked]:bg-[#2d6a4f] data-[state=checked]:text-white"
                     />
-                    <div className="flex-1 text-sm leading-6 text-white/85">
+                    <div className="flex-1 text-sm leading-6 text-[rgba(26,26,26,0.8)]">
                       <label htmlFor="terms-consent" className="cursor-pointer">
                         I agree to the{" "}
                       </label>
                       <button
                         type="button"
                         onClick={() => void openLegalLink("terms")}
-                        className="font-medium text-[var(--sand-0)] underline underline-offset-4"
+                        className="font-medium text-[#2d6a4f] underline underline-offset-4"
                       >
                         Terms of Service
                       </button>
@@ -338,16 +338,16 @@ const Login = () => {
           {mode !== "forgot" && (
             <div className="mt-6 space-y-3 animate-fade-in" style={{ animationDelay: "350ms" }}>
               <div className="flex items-center gap-3">
-                <div className="flex-1 h-px bg-white/15" />
-                <span className="text-xs text-white/30 tracking-wider uppercase">or</span>
-                <div className="flex-1 h-px bg-white/15" />
+                <div className="flex-1 h-px bg-[rgba(26,26,26,0.08)]" />
+                <span className="text-xs text-[rgba(26,26,26,0.3)] tracking-wider uppercase">or</span>
+                <div className="flex-1 h-px bg-[rgba(26,26,26,0.08)]" />
               </div>
 
               <button
                 type="button"
                 disabled={!!oauthLoading || submitting}
                 onClick={() => handleOAuth("apple")}
-                className="w-full flex items-center justify-center gap-3 py-3.5 rounded-2xl bg-white text-black font-medium text-sm transition-all hover:bg-white/90 disabled:opacity-50"
+                className="w-full flex items-center justify-center gap-3 py-3.5 rounded-2xl bg-black text-white font-medium text-sm transition-all hover:bg-black/90 disabled:opacity-50"
               >
                 {oauthLoading === "apple" ? (
                   <span className="text-sm">Connecting…</span>
@@ -365,7 +365,7 @@ const Login = () => {
                 type="button"
                 disabled={!!oauthLoading || submitting}
                 onClick={() => handleOAuth("google")}
-                className="w-full flex items-center justify-center gap-3 py-3.5 rounded-2xl bg-white/15 border border-white/20 text-white font-medium text-sm transition-all hover:bg-white/25 disabled:opacity-50"
+                className="w-full flex items-center justify-center gap-3 py-3.5 rounded-2xl bg-[rgba(45,106,79,0.06)] border border-[rgba(45,106,79,0.12)] text-[#1a1a1a] font-medium text-sm transition-all hover:bg-[rgba(45,106,79,0.1)] disabled:opacity-50"
               >
                 {oauthLoading === "google" ? (
                   <span className="text-sm">Connecting…</span>
@@ -389,7 +389,7 @@ const Login = () => {
               <button
                 type="button"
                 onClick={() => switchMode("forgot")}
-                className="text-sm text-white/40 hover:text-white/70 transition-all"
+                className="text-sm text-[rgba(26,26,26,0.4)] hover:text-[rgba(26,26,26,0.7)] transition-all"
               >
                 Forgot password?
               </button>
@@ -398,7 +398,7 @@ const Login = () => {
               <button
                 type="button"
                 onClick={() => switchMode("signin")}
-                className="text-sm text-white/40 hover:text-white/70 transition-all"
+                className="text-sm text-[rgba(26,26,26,0.4)] hover:text-[rgba(26,26,26,0.7)] transition-all"
               >
                 ← Back to sign in
               </button>
@@ -406,8 +406,8 @@ const Login = () => {
           </div>
 
           {/* Privacy micro-copy */}
-          <p className="mt-5 text-center text-[10px] text-white/25 leading-5 animate-fade-in" style={{ animationDelay: "450ms" }}>
-            🔒 Your mental data is private and never shared.
+          <p className="mt-5 text-center text-[10px] text-[rgba(26,26,26,0.25)] leading-5 animate-fade-in" style={{ animationDelay: "450ms" }}>
+            Your mental data is private and never shared.
             <br />Mental patterns stay on your device. Coaching is processed securely.
           </p>
         </div>

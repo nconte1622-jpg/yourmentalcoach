@@ -44,7 +44,7 @@ const Upgrade = () => {
       <PageShell backgroundVariant="default">
         <div className="flex flex-col h-full items-center justify-center px-6">
           <div className="max-w-sm w-full text-center space-y-6 animate-fade-in">
-            <div className="w-20 h-20 mx-auto rounded-full bg-accent/20 flex items-center justify-center shadow-[0_0_40px_rgba(203,184,146,0.18)]">
+            <div className="w-20 h-20 mx-auto rounded-full bg-accent/20 flex items-center justify-center shadow-[0_0_40px_rgba(45,106,79,0.1)]">
               <Crown className="h-10 w-10 text-accent" />
             </div>
             <h1 className="text-3xl font-serif tracking-wide text-foreground">You're Pro</h1>
@@ -53,7 +53,7 @@ const Upgrade = () => {
             </p>
             <button
               onClick={() => navigate("/")}
-              className="w-full py-5 text-base font-medium rounded-[28px] bg-[rgba(203,184,146,0.22)] border border-[rgba(203,184,146,0.28)] text-[var(--sand-0)] tracking-wide transition-all duration-300 hover:bg-[rgba(203,184,146,0.32)] active:scale-[0.98]"
+              className="w-full py-5 text-base font-medium rounded-[28px] bg-[rgba(45,106,79,0.1)] border border-[rgba(45,106,79,0.18)] text-[#2d6a4f] tracking-wide transition-all duration-300 hover:bg-[rgba(45,106,79,0.16)] active:scale-[0.98]"
             >
               Back to Home
             </button>
@@ -82,7 +82,7 @@ const Upgrade = () => {
 
             {/* Hero */}
             <div className="text-center space-y-3 pt-2">
-              <div className="w-20 h-20 mx-auto rounded-full bg-[rgba(203,184,146,0.14)] flex items-center justify-center border border-[rgba(203,184,146,0.22)] shadow-[0_0_40px_rgba(203,184,146,0.14)]">
+              <div className="w-20 h-20 mx-auto rounded-full bg-[rgba(45,106,79,0.08)] flex items-center justify-center border border-[rgba(45,106,79,0.14)] shadow-[0_0_40px_rgba(45,106,79,0.08)]">
                 <Crown className="h-9 w-9 text-accent" />
               </div>
               <h1 className="text-3xl font-serif tracking-wide text-foreground">
@@ -100,7 +100,7 @@ const Upgrade = () => {
                 className={cn(
                   "flex-1 py-2.5 rounded-full text-sm font-medium tracking-wide transition-all duration-300",
                   billingCycle === "yearly"
-                    ? "bg-[rgba(203,184,146,0.22)] text-[var(--sand-0)] shadow-sm"
+                    ? "bg-[rgba(45,106,79,0.1)] text-[#2d6a4f] shadow-sm"
                     : "text-muted-foreground/60 hover:text-muted-foreground"
                 )}
               >
@@ -111,7 +111,7 @@ const Upgrade = () => {
                 className={cn(
                   "flex-1 py-2.5 rounded-full text-sm font-medium tracking-wide transition-all duration-300",
                   billingCycle === "monthly"
-                    ? "bg-[rgba(203,184,146,0.22)] text-[var(--sand-0)] shadow-sm"
+                    ? "bg-[rgba(45,106,79,0.1)] text-[#2d6a4f] shadow-sm"
                     : "text-muted-foreground/60 hover:text-muted-foreground"
                 )}
               >
@@ -141,7 +141,7 @@ const Upgrade = () => {
             <div className="space-y-3 pt-1">
               <button
                 onClick={() => setShowModal(true)}
-                className="w-full py-5 rounded-[28px] text-base font-medium tracking-wide transition-all duration-300 active:scale-[0.98] bg-[rgba(203,184,146,0.26)] border border-[rgba(203,184,146,0.36)] text-[var(--sand-0)] hover:bg-[rgba(203,184,146,0.34)] shadow-[0_8px_32px_rgba(203,184,146,0.12)]"
+                className="w-full py-5 rounded-[28px] text-base font-medium tracking-wide transition-all duration-300 active:scale-[0.98] bg-[rgba(45,106,79,0.12)] border border-[rgba(45,106,79,0.2)] text-[#2d6a4f] hover:bg-[rgba(45,106,79,0.18)] shadow-[0_8px_32px_rgba(45,106,79,0.08)]"
               >
                 {billingCycle === "yearly" ? "Start for $99 / year" : "Start for $9.99 / month"}
               </button>

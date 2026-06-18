@@ -33,8 +33,8 @@ export class AppErrorBoundary extends React.Component<
           style={{
             minHeight: "100dvh",
             background:
-              "linear-gradient(180deg, rgba(5,8,7,1) 0%, rgba(8,17,14,1) 100%)",
-            color: "#e9f1ec",
+              "#f5f2ea",
+            color: "#1a1a1a",
             padding: "24px",
             fontFamily: "system-ui, sans-serif",
           }}

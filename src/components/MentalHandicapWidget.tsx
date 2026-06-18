@@ -32,7 +32,7 @@ function TrendArrow({ trend }: { trend: "up" | "down" | "neutral" }) {
     );
   }
   return (
-    <span className="text-[var(--text-1)] text-base leading-none opacity-60" aria-label="stable">
+    <span className="text-[rgba(26,26,26,0.6)] text-base leading-none opacity-60" aria-label="stable">
       →
     </span>
   );
@@ -108,19 +108,19 @@ export function MentalHandicapWidget({ refreshKey }: { refreshKey?: number } = {
           {/* Labels */}
           <div className="flex flex-1 flex-col gap-1">
             <div className="flex items-center gap-1.5">
-              <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[var(--sand-0)]">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#2d6a4f]">
                 Mental Handicap
               </p>
               <TrendArrow trend={trend} />
               <MentalHandicapTooltip />
             </div>
             <div className="flex items-baseline gap-1">
-              <span className="font-serif text-[15px] text-[var(--text-0)]">
+              <span className="font-serif text-[15px] text-[#1a1a1a]">
                 <AnimatedNumber target={score} loading={loading} />
               </span>
-              <span className="text-[11px] text-[var(--text-1)]">/ 100</span>
+              <span className="text-[11px] text-[rgba(26,26,26,0.6)]">/ 100</span>
             </div>
-            <p className="text-[11px] text-[var(--text-1)] opacity-70">
+            <p className="text-[11px] text-[rgba(26,26,26,0.6)] opacity-70">
               {roundsThisMonth === 0
                 ? "Complete a round to build your score"
                 : `${roundsThisMonth} round${roundsThisMonth !== 1 ? "s" : ""} this month`}
@@ -135,8 +135,8 @@ export function MentalHandicapWidget({ refreshKey }: { refreshKey?: number } = {
                 score >= 75
                   ? "bg-[rgba(31,180,100,0.18)] text-[rgba(31,180,100,0.9)]"
                   : score >= 50
-                  ? "bg-[rgba(203,184,146,0.15)] text-[var(--sand-0)]"
-                  : "bg-[rgba(255,255,255,0.06)] text-[var(--text-1)]"
+                  ? "bg-[rgba(45,106,79,0.06)] text-[#2d6a4f]"
+                  : "bg-[rgba(0,0,0,0.03)] text-[rgba(26,26,26,0.6)]"
               )}
             >
               {score >= 75 ? "Strong" : score >= 50 ? "Building" : "Early"}

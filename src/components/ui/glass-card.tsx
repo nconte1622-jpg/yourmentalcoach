@@ -17,12 +17,10 @@ export function GlassCard({ children, className, glow, variant = "default", ...p
         "relative overflow-hidden rounded-[24px] border backdrop-blur-xl",
         // Colour variants
         variant === "sand"
-          ? "border-[rgba(203,184,146,0.18)] bg-[rgba(20,46,34,0.52)]"
-          : "border-[var(--border)] bg-[rgba(14,42,31,0.42)]",
-        // Shadow — inner top highlight + outer depth
-        "shadow-[0_1px_0_rgba(203,184,146,0.07)_inset,_0_16px_40px_rgba(0,0,0,0.36)]",
-        // Optional ambient glow
-        glow && "shadow-[0_1px_0_rgba(203,184,146,0.07)_inset,_0_16px_40px_rgba(0,0,0,0.36),_0_0_36px_rgba(18,64,47,0.45)]",
+          ? "border-[rgba(45,106,79,0.1)] bg-white/90"
+          : "border-[rgba(45,106,79,0.06)] bg-white/85",
+        "shadow-[0_1px_0_rgba(255,255,255,0.5)_inset,_0_2px_16px_rgba(0,0,0,0.05)]",
+        glow && "shadow-[0_1px_0_rgba(255,255,255,0.5)_inset,_0_2px_16px_rgba(0,0,0,0.05),_0_0_24px_rgba(45,106,79,0.06)]",
         className,
       )}
       {...props}
@@ -30,7 +28,7 @@ export function GlassCard({ children, className, glow, variant = "default", ...p
       {/* Glass edge highlight — thin sand-tinted line at top */}
       <span
         aria-hidden
-        className="pointer-events-none absolute inset-x-8 top-0 h-px bg-gradient-to-r from-transparent via-[rgba(203,184,146,0.2)] to-transparent"
+        className="pointer-events-none absolute inset-x-8 top-0 h-px bg-gradient-to-r from-transparent via-[rgba(45,106,79,0.08)] to-transparent"
       />
       {children}
     </div>

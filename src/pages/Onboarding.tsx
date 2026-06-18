@@ -114,13 +114,13 @@ const Onboarding = () => {
             <FrostedSandCard className="space-y-6 p-6 md:p-7">
               <div
                 className="flex h-14 w-14 items-center justify-center rounded-2xl"
-                style={{ background: "rgba(214,197,163,0.24)", color: "var(--ink-0)" }}
+                style={{ background: "rgba(214,197,163,0.24)", color: "#1a1a1a" }}
               >
                 <Icon className="h-7 w-7" />
               </div>
               <div className="space-y-3">
                 <h2 className="text-3xl font-serif tracking-wide readable-on-sand">{step.title}</h2>
-                <p className="text-base leading-7" style={{ color: "var(--ink-1)" }}>
+                <p className="text-base leading-7" style={{ color: "rgba(26,26,26,0.7)" }}>
                   {step.body}
                 </p>
               </div>

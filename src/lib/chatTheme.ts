@@ -27,21 +27,19 @@ interface InputClasses {
 export function getBubbleClasses(theme: ChatTheme): BubbleClasses {
   switch (theme) {
     case "dark":
-      // Close Strong and other dark-themed modes
       return {
-        user: "rounded-3xl rounded-br-xl px-6 py-5 bg-[hsl(260_15%_18%)] border border-white/10",
-        coach: "rounded-3xl rounded-bl-xl px-6 py-5 bg-white/10 backdrop-blur-sm border border-white/5",
-        userText: "text-white",
-        coachText: "text-white/90",
+        user: "rounded-3xl rounded-br-xl px-6 py-5 bg-[rgba(45,106,79,0.06)] border border-[rgba(45,106,79,0.1)]",
+        coach: "rounded-3xl rounded-bl-xl px-6 py-5 bg-white/90 backdrop-blur-sm border border-[rgba(45,106,79,0.06)]",
+        userText: "text-[#1a1a1a]",
+        coachText: "text-[rgba(26,26,26,0.85)]",
       };
-    
+
     case "frustration":
-      // Frustration mode - softer, calmer colors
       return {
-        user: "rounded-3xl rounded-br-xl px-6 py-5 bg-[hsl(160_18%_12%)]",
-        coach: "rounded-3xl rounded-bl-xl px-6 py-5 bg-gradient-to-br from-[hsl(158_25%_14%)] to-[hsl(155_22%_16%)] glow-calm animate-breathe",
-        userText: "text-[hsl(150_12%_88%)]",
-        coachText: "text-[hsl(150_14%_90%)]",
+        user: "rounded-3xl rounded-br-xl px-6 py-5 bg-[rgba(45,106,79,0.08)]",
+        coach: "rounded-3xl rounded-bl-xl px-6 py-5 bg-gradient-to-br from-white to-[rgba(45,106,79,0.04)] border border-[rgba(45,106,79,0.08)] glow-calm animate-breathe",
+        userText: "text-[#1a1a1a]",
+        coachText: "text-[rgba(26,26,26,0.8)]",
       };
     
     default:
@@ -63,21 +61,19 @@ export function getBubbleClasses(theme: ChatTheme): BubbleClasses {
 export function getInputClasses(theme: ChatTheme): InputClasses {
   switch (theme) {
     case "dark":
-      // Close Strong and other dark-themed modes
       return {
-        wrapper: "bg-white/5 backdrop-blur-sm border border-white/10",
-        input: "bg-white/10 text-white placeholder:text-white/40 focus:ring-1 focus:ring-white/20",
-        button: "bg-white/20 hover:bg-white/30 text-white",
-        placeholder: "text-white/40",
+        wrapper: "bg-white/80 backdrop-blur-sm border border-[rgba(45,106,79,0.1)]",
+        input: "bg-white/90 text-[#1a1a1a] placeholder:text-[rgba(26,26,26,0.35)] focus:ring-1 focus:ring-[#2d6a4f]/15",
+        button: "bg-[#2d6a4f] hover:bg-[#245a42] text-white",
+        placeholder: "text-[rgba(26,26,26,0.35)]",
       };
-    
+
     case "frustration":
-      // Frustration mode
       return {
-        wrapper: "bg-[hsl(160_18%_10%)]/60",
-        input: "bg-[hsl(160_15%_12%)]/80 text-[hsl(150_12%_88%)] placeholder:text-white/35 focus:ring-1 focus:ring-[hsl(195_25%_40%)]/30",
-        button: "bg-[hsl(195_25%_32%)] hover:bg-[hsl(195_28%_38%)] text-white shadow-lg shadow-[hsl(195_30%_20%)]/20",
-        placeholder: "text-white/35",
+        wrapper: "bg-white/70 border border-[rgba(45,106,79,0.08)]",
+        input: "bg-white/80 text-[#1a1a1a] placeholder:text-[rgba(26,26,26,0.3)] focus:ring-1 focus:ring-[#2d6a4f]/15",
+        button: "bg-[#2d6a4f] hover:bg-[#245a42] text-white shadow-lg shadow-[#2d6a4f]/15",
+        placeholder: "text-[rgba(26,26,26,0.3)]",
       };
     
     default:

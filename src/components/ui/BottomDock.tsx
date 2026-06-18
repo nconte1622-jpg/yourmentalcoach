@@ -74,7 +74,7 @@ function BottomDockComponent({ highlightDot = false }: BottomDockProps) {
                 <div className="flex flex-col items-center gap-1.5">
                   <Icon className="h-4 w-4" />
                   <span className="text-[11px] leading-none">{item.label}</span>
-                  {showDot && <span className="h-1.5 w-1.5 rounded-full bg-[var(--green-2)]" />}
+                  {showDot && <span className="h-1.5 w-1.5 rounded-full bg-[#2d6a4f]" />}
                 </div>
               </button>
             );

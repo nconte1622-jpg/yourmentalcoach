@@ -24,15 +24,15 @@ export function ResilienceTrendChart({
       <div
         className={cn(
           "rounded-[20px]",
-          "border border-[var(--border)]",
-          "bg-[rgba(14,42,31,0.35)]",
+          "border border-[rgba(45,106,79,0.12)]",
+          "bg-[rgba(45,106,79,0.04)]",
           "p-6",
           "text-center",
           className
         )}
       >
-        <p className="text-sm text-[var(--text-1)] mb-2">Resilience Trend</p>
-        <p className="text-xs text-[var(--text-1)] opacity-70">
+        <p className="text-sm text-[rgba(26,26,26,0.6)] mb-2">Resilience Trend</p>
+        <p className="text-xs text-[rgba(26,26,26,0.6)] opacity-70">
           Play a few more rounds to see your trend
         </p>
       </div>
@@ -105,8 +105,8 @@ export function ResilienceTrendChart({
     <div
       className={cn(
         "rounded-[20px]",
-        "border border-[var(--border)]",
-        "bg-[rgba(14,42,31,0.35)]",
+        "border border-[rgba(45,106,79,0.12)]",
+        "bg-[rgba(45,106,79,0.04)]",
         "p-6",
         "space-y-4",
         className
@@ -115,10 +115,10 @@ export function ResilienceTrendChart({
       {/* Header */}
       <div className="flex items-start justify-between">
         <div>
-          <p className="text-sm font-medium text-[var(--text-0)] mb-1">
+          <p className="text-sm font-medium text-[#1a1a1a] mb-1">
             Resilience Trend
           </p>
-          <p className="text-xs text-[var(--text-1)] opacity-70">
+          <p className="text-xs text-[rgba(26,26,26,0.6)] opacity-70">
             Last {displayData.length} rounds
           </p>
         </div>
@@ -188,7 +188,7 @@ export function ResilienceTrendChart({
                 cx={point.x}
                 cy={point.y}
                 r="4"
-                fill="rgba(14, 42, 31, 0.8)"
+                fill="rgba(255, 255, 255, 0.9)"
                 stroke="rgba(132, 204, 22, 0.8)"
                 strokeWidth="2"
               />
@@ -203,14 +203,14 @@ export function ResilienceTrendChart({
           ))}
 
           {/* Y-axis labels */}
-          <text x="25" y="45" fontSize="11" fill="rgba(233, 241, 236, 0.55)" textAnchor="end">
+          <text x="25" y="45" fontSize="11" fill="rgba(26, 26, 26, 0.4)" textAnchor="end">
             100
           </text>
           <text
             x="25"
             y={chartData.height - 35}
             fontSize="11"
-            fill="rgba(233, 241, 236, 0.55)"
+            fill="rgba(26, 26, 26, 0.4)"
             textAnchor="end"
           >
             0
@@ -223,7 +223,7 @@ export function ResilienceTrendChart({
                 x={chartData.points[0]?.x ?? 0}
                 y={chartData.height - 8}
                 fontSize="10"
-                fill="rgba(233, 241, 236, 0.55)"
+                fill="rgba(26, 26, 26, 0.4)"
                 textAnchor="middle"
               >
                 {formatDateShort(displayData[0].date)}
@@ -233,7 +233,7 @@ export function ResilienceTrendChart({
                   x={chartData.points[chartData.points.length - 1]?.x ?? 0}
                   y={chartData.height - 8}
                   fontSize="10"
-                  fill="rgba(233, 241, 236, 0.55)"
+                  fill="rgba(26, 26, 26, 0.4)"
                   textAnchor="middle"
                 >
                   {formatDateShort(displayData[displayData.length - 1].date)}
@@ -245,14 +245,14 @@ export function ResilienceTrendChart({
       </div>
 
       {/* Score Range Legend */}
-      <div className="flex items-center justify-center gap-6 text-xs border-t border-[var(--border)] pt-4">
+      <div className="flex items-center justify-center gap-6 text-xs border-t border-[rgba(45,106,79,0.12)] pt-4">
         <div className="flex items-center gap-2">
           <div className="w-2 h-2 rounded-full bg-[rgba(132,204,22,0.4)]" />
-          <span className="text-[var(--text-1)] opacity-70">0</span>
+          <span className="text-[rgba(26,26,26,0.6)] opacity-70">0</span>
         </div>
         <div className="flex-1 h-px bg-gradient-to-r from-transparent via-[rgba(132,204,22,0.3)] to-transparent" />
         <div className="flex items-center gap-2">
-          <span className="text-[var(--text-1)] opacity-70">100</span>
+          <span className="text-[rgba(26,26,26,0.6)] opacity-70">100</span>
           <div className="w-2 h-2 rounded-full bg-[rgba(132,204,22,0.8)]" />
         </div>
       </div>

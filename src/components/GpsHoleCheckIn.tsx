@@ -96,7 +96,7 @@ export function GpsHoleCheckIn({ holeNumber, visible, onDismiss, position }: Gps
       />
 
       {/* Sheet */}
-      <div className="relative z-10 mx-auto max-w-lg rounded-t-3xl border-t border-[rgba(203,184,146,0.12)] bg-[#08130d] px-5 pb-10 pt-5 shadow-[0_-20px_60px_rgba(0,0,0,0.5)]">
+      <div className="relative z-10 mx-auto max-w-lg rounded-t-3xl border-t border-[rgba(45,106,79,0.12)] bg-[#08130d] px-5 pb-10 pt-5 shadow-[0_-20px_60px_rgba(0,0,0,0.5)]">
         {/* Drag handle */}
         <div className="mx-auto mb-5 h-1 w-10 rounded-full bg-white/15" />
 
