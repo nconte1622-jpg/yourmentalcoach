@@ -26,6 +26,8 @@ import {
   getHoleNote,
   saveHoleNote,
   fetchHoleAimCue,
+  setActiveHole,
+  clearActiveHole,
   type HoleGeometry,
   type HoleNote,
   type MissTendency,
@@ -297,6 +299,14 @@ export function GpsRangefinderTab() {
     setEditingNote(false);
   }, [courseId, currentHole]);
 
+  // Tell the mid-round coach which hole the player is on, so it can reference
+  // that hole's saved notes (miss tendency / aim cue / personal note).
+  useEffect(() => {
+    if (courseId && selectedCourse) {
+      setActiveHole(courseId, selectedCourse, currentHole);
+    }
+  }, [courseId, selectedCourse, currentHole]);
+
   const persistNote = useCallback(
     (patch: Partial<HoleNote>) => {
       if (!courseId) return;
@@ -379,6 +389,7 @@ export function GpsRangefinderTab() {
                   setCoursePos(null);
                   setHoles([]);
                   setWeather(null);
+                  clearActiveHole();
                 }}
                 className="rounded-full border border-[#c8ddc8] px-3 py-1.5 text-[13px] font-medium text-[#1a5c2e] hover:bg-[#f0f7f1]"
               >

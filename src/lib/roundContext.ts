@@ -11,6 +11,12 @@ import {
 } from "./courseData";
 import { loadGolferProfile } from "./golferProfile";
 import { loadEmotionLog } from "./roundMetrics";
+import {
+  getActiveHole,
+  getHoleNote,
+  courseIdFromName,
+  buildHoleNoteContextString,
+} from "./holeIntel";
 
 const ROUND_CONTEXT_KEY = "golfer-round-context";
 const ROUND_HISTORY_KEY = "golfer-round-history";
@@ -149,6 +155,23 @@ export function buildRoundContextString(): string | null {
           handicap: profile?.handicap ?? null,
         });
         if (courseCtx) parts.push(courseCtx);
+      }
+
+      // Per-hole mental notes from the GPS Hole Intel card. Prefer the hole the
+      // player is actively viewing in GPS; otherwise fall back to the round's
+      // course + the current scorecard hole.
+      const active = getActiveHole();
+      let holeNote = active ? getHoleNote(active.courseId, active.holeNumber) : null;
+      let noteCourseName = active?.courseName;
+      if (!holeNote && courseName) {
+        const scorecard = loadScorecard(session.roundId);
+        const ch = getCurrentHole(scorecard);
+        holeNote = getHoleNote(courseIdFromName(courseName), ch);
+        noteCourseName = courseName;
+      }
+      if (holeNote) {
+        const noteCtx = buildHoleNoteContextString(holeNote, noteCourseName);
+        if (noteCtx) parts.push(noteCtx);
       }
     }
   } catch {

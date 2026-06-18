@@ -38,7 +38,9 @@ export interface HoleNote {
 
 const GEO_PREFIX = "hole-geo-v1";
 const NOTE_PREFIX = "hole-notes-v1";
+const ACTIVE_HOLE_KEY = "gps-active-hole-v1";
 const GEO_TTL_MS = 30 * 24 * 60 * 60 * 1000; // 30 days
+const ACTIVE_HOLE_TTL_MS = 6 * 60 * 60 * 1000; // 6h — so a stale hole never leaks into a new round
 
 export function courseIdFromName(name: string): string {
   return name.toLowerCase().trim().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
@@ -133,6 +135,69 @@ export function saveHoleNote(note: HoleNote): void {
   } catch {
     /* best-effort */
   }
+}
+
+// ─── Active hole pointer ────────────────────────────────────────────────────
+// The GPS tab records the hole the player is currently looking at so the
+// mid-round coach can reference that exact hole's saved notes.
+
+export interface ActiveHole {
+  courseId: string;
+  courseName: string;
+  holeNumber: number;
+  at: string;
+}
+
+export function setActiveHole(courseId: string, courseName: string, holeNumber: number): void {
+  try {
+    const payload: ActiveHole = { courseId, courseName, holeNumber, at: new Date().toISOString() };
+    localStorage.setItem(ACTIVE_HOLE_KEY, JSON.stringify(payload));
+  } catch {
+    /* best-effort */
+  }
+}
+
+export function getActiveHole(): ActiveHole | null {
+  try {
+    const raw = localStorage.getItem(ACTIVE_HOLE_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as ActiveHole;
+    if (Date.now() - new Date(parsed.at).getTime() > ACTIVE_HOLE_TTL_MS) return null;
+    return parsed;
+  } catch {
+    return null;
+  }
+}
+
+export function clearActiveHole(): void {
+  try {
+    localStorage.removeItem(ACTIVE_HOLE_KEY);
+  } catch {
+    /* best-effort */
+  }
+}
+
+/**
+ * Format a saved hole note as an AI context string. Returns null when the note
+ * has no meaningful content (no miss, no cue, no notes) — so we never inject noise.
+ */
+export function buildHoleNoteContextString(note: HoleNote, courseName?: string): string | null {
+  const hasMiss = note.missTendency && note.missTendency !== "none";
+  const hasCue = Boolean(note.aimCue?.trim());
+  const hasNotes = Boolean(note.notes?.trim());
+  if (!hasMiss && !hasCue && !hasNotes) return null;
+
+  const where = courseName ? ` at ${courseName}` : "";
+  const parts: string[] = [
+    `The player has saved personal notes for hole ${note.holeNumber}${where}:`,
+  ];
+  if (hasMiss) parts.push(`their typical miss here is ${note.missTendency}.`);
+  if (hasCue) parts.push(`Their aim/mental plan: "${note.aimCue.trim()}".`);
+  if (hasNotes) parts.push(`Their own note: "${note.notes.trim()}".`);
+  parts.push(
+    `Weave this in naturally when coaching this hole — reinforce the aim plan and guard against the known miss.`
+  );
+  return parts.join(" ");
 }
 
 // ─── AI aim + mental cue ────────────────────────────────────────────────────
