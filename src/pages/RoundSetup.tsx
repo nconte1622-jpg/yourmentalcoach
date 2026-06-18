@@ -254,14 +254,14 @@ const RoundSetup = () => {
                 <GlassCard className="mx-auto max-w-sm p-4 text-left">
                   <div className="space-y-3">
                     <div>
-                      <p className="text-[10px] uppercase tracking-[0.18em]" style={{ color: "#A89268" }}>
+                      <p className="text-[10px] uppercase tracking-[0.18em]" style={{ color: "#1a5c2e" }}>
                         Active Round
                       </p>
-                      <p className="mt-1 text-sm leading-6" style={{ color: "#EAF2EE" }}>
+                      <p className="mt-1 text-sm leading-6" style={{ color: "#0f1f0f" }}>
                         {activeRound.round_type.replace("-", " ")} · {activeRound.environment}
                       </p>
                       {activeRound.goal && (
-                        <p className="text-sm" style={{ color: "#C9D2CF" }}>
+                        <p className="text-sm" style={{ color: "#2d4d2d" }}>
                           Goal: {activeRound.goal}
                         </p>
                       )}
@@ -314,10 +314,10 @@ const RoundSetup = () => {
 
               {dailyFocusText && (
                 <div className="mx-auto max-w-sm rounded-2xl border border-[rgba(45,106,79,0.12)] bg-[rgba(45,106,79,0.06)] px-4 py-3 text-left shadow-[0_10px_25px_rgba(0,0,0,0.12)]">
-                  <p className="text-[10px] uppercase tracking-[0.18em]" style={{ color: "#A89268" }}>
+                  <p className="text-[10px] uppercase tracking-[0.18em]" style={{ color: "#1a5c2e" }}>
                     Active Focus
                   </p>
-                  <p className="mt-1 text-sm leading-6" style={{ color: "#EAF2EE" }}>
+                  <p className="mt-1 text-sm leading-6" style={{ color: "#0f1f0f" }}>
                     {dailyFocusText}
                   </p>
                 </div>
@@ -328,7 +328,7 @@ const RoundSetup = () => {
             <div className="space-y-4">
               <label 
                 className="text-sm tracking-wide font-light helper-text"
-                style={{ color: '#C9D2CF' }}
+                style={{ color: '#2d4d2d' }}
               >
                 Round Type
               </label>
@@ -347,7 +347,7 @@ const RoundSetup = () => {
                   <RadioGroupItem value="on-course" id="on-course" />
                   <span 
                     className={`tracking-wide transition-all duration-300 ${roundType === "on-course" ? "font-medium" : "font-[450]"}`}
-                    style={{ color: roundType === "on-course" ? '#0F172A' : '#D1D5DB' }}
+                    style={{ color: roundType === "on-course" ? '#0F172A' : '#5a7a5a' }}
                   >On Course</span>
                 </label>
                 <label
@@ -360,7 +360,7 @@ const RoundSetup = () => {
                   <RadioGroupItem value="simulator" id="simulator" />
                   <span 
                     className={`tracking-wide transition-all duration-300 ${roundType === "simulator" ? "font-medium" : "font-[450]"}`}
-                    style={{ color: roundType === "simulator" ? '#0F172A' : '#D1D5DB' }}
+                    style={{ color: roundType === "simulator" ? '#0F172A' : '#5a7a5a' }}
                   >Simulator</span>
                 </label>
                 <label
@@ -373,7 +373,7 @@ const RoundSetup = () => {
                   <RadioGroupItem value="practice" id="practice" />
                   <span 
                     className={`tracking-wide transition-all duration-300 ${roundType === "practice" ? "font-medium" : "font-[450]"}`}
-                    style={{ color: roundType === "practice" ? '#0F172A' : '#D1D5DB' }}
+                    style={{ color: roundType === "practice" ? '#0F172A' : '#5a7a5a' }}
                   >Range / Practice</span>
                 </label>
               </RadioGroup>
@@ -383,7 +383,7 @@ const RoundSetup = () => {
             <div className="space-y-4">
               <label 
                 className="text-sm tracking-wide font-light helper-text"
-                style={{ color: '#C9D2CF' }}
+                style={{ color: '#2d4d2d' }}
               >
                 Environment
               </label>
@@ -402,7 +402,7 @@ const RoundSetup = () => {
                   <RadioGroupItem value="casual" id="casual" />
                   <span 
                     className={`tracking-wide transition-all duration-300 ${environment === "casual" ? "font-medium" : "font-[450]"}`}
-                    style={{ color: environment === "casual" ? '#0F172A' : '#D1D5DB' }}
+                    style={{ color: environment === "casual" ? '#0F172A' : '#5a7a5a' }}
                   >Casual</span>
                 </label>
                 <label
@@ -415,7 +415,7 @@ const RoundSetup = () => {
                   <RadioGroupItem value="competitive" id="competitive" />
                   <span 
                     className={`tracking-wide transition-all duration-300 ${environment === "competitive" ? "font-medium" : "font-[450]"}`}
-                    style={{ color: environment === "competitive" ? '#0F172A' : '#D1D5DB' }}
+                    style={{ color: environment === "competitive" ? '#0F172A' : '#5a7a5a' }}
                   >Competitive</span>
                 </label>
                 <label
@@ -428,7 +428,7 @@ const RoundSetup = () => {
                   <RadioGroupItem value="scoring" id="scoring" />
                   <span 
                     className={`tracking-wide transition-all duration-300 ${environment === "scoring" ? "font-medium" : "font-[450]"}`}
-                    style={{ color: environment === "scoring" ? '#0F172A' : '#D1D5DB' }}
+                    style={{ color: environment === "scoring" ? '#0F172A' : '#5a7a5a' }}
                   >Scoring</span>
                 </label>
               </RadioGroup>
@@ -438,10 +438,10 @@ const RoundSetup = () => {
             <div className="space-y-4">
               <label 
                 className="text-sm tracking-wide font-light helper-text"
-                style={{ color: '#C9D2CF' }}
+                style={{ color: '#2d4d2d' }}
               >
                 Course Name{" "}
-                <span style={{ color: '#9AA6A2' }}>(your coach gives hole-specific tips)</span>
+                <span style={{ color: '#5a7a5a' }}>(your coach gives hole-specific tips)</span>
               </label>
               <input
                 type="text"
@@ -457,10 +457,10 @@ const RoundSetup = () => {
             <div className="space-y-4">
               <label 
                 className="text-sm tracking-wide font-light helper-text"
-                style={{ color: '#C9D2CF' }}
+                style={{ color: '#2d4d2d' }}
               >
                 Goal for Today{" "}
-                <span style={{ color: '#9AA6A2' }}>(optional)</span>
+                <span style={{ color: '#5a7a5a' }}>(optional)</span>
               </label>
               <input
                 type="text"
@@ -485,8 +485,8 @@ const RoundSetup = () => {
                   }}
                   className={`w-full flex items-center justify-between gap-3 rounded-2xl border px-4 py-4 transition-all duration-200 active:scale-[0.98] ${
                     gpsMode
-                      ? "border-[rgba(45,106,79,0.12)] bg-[rgba(45,106,79,0.06)]"
-                      : "border-white/10 bg-white/5"
+                      ? "border-[#1a5c2e]/40 bg-[#1a5c2e]/10"
+                      : "border-[#c8ddc8] bg-white/80"
                   }`}
                 >
                   <div className="flex items-center gap-3">

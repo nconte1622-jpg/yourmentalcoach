@@ -15,12 +15,32 @@
   --sand-0: rgba(245, 236, 216, 0.92);
   --sand-1: rgba(235, 222, 195, 0.92);
   --sand-2: rgba(220, 203, 168, 0.9);
-  --ink-0: #1a1a1a;
-  --ink-1: rgba(26, 26, 26, 0.78);
-  --text-strong: #1a1a1a;
-  --text-primary: rgba(26, 26, 26, 0.92);
-  --text-secondary: rgba(26, 26, 26, 0.62);
-  --text-muted: rgba(26, 26, 26, 0.45);
+  --ink-0: #0f1f0f;
+  --ink-1: rgba(15, 31, 15, 0.82);
+  --text-strong: #0f1f0f;
+  --text-primary: #0f1f0f;
+  --text-secondary: #2d4d2d;
+  --text-muted: #5a7a5a;
+
+  /* ── GOLF GREENFIELD palette — bright, premium, high-contrast ── */
+  --page-bg: #e8f0e9;            /* light turf green — feels like a fairway */
+  --surface-card: #ffffff;
+  --surface-secondary: #f0f7f1;
+  --border-default: #c8ddc8;
+  --brand-green: #1a5c2e;        /* deep Augusta green */
+  --brand-green-light: #2d7a4a;
+  --brand-green-muted: #4a9060;
+  --accent-warm: #e8a84c;        /* warm gold */
+  --accent-orange: #d4813a;
+  --btn-primary-bg: #1a5c2e;
+  --btn-primary-text: #ffffff;
+  --btn-secondary-bg: #f0f7f1;
+  --btn-secondary-text: #1a5c2e;
+  --btn-secondary-border: #1a5c2e;
+  --header-bg: rgba(232, 240, 233, 0.94);
+  --header-text: #0f1f0f;
+  --active-round-bg: #1a5c2e;
+  --active-round-text: #ffffff;
   --panel-bg: var(--glass-sand-bg);
   --panel-border: var(--glass-sand-border);
   --muted-bg: rgba(235, 222, 195, 0.42);
@@ -40,39 +60,39 @@
 
 @layer base {
   :root {
-    /* Deep forest green primary - premium, grounded */
-    --background: 156 18% 96%;
-    --foreground: 158 22% 15%;
+    /* GOLF GREENFIELD — bright turf-green page, high-contrast ink */
+    --background: 128 21% 92%;
+    --foreground: 120 35% 9%;
 
-    /* Card surfaces - soft sage tint */
-    --card: 152 14% 98%;
-    --card-foreground: 158 22% 15%;
+    /* Card surfaces - clean white for max legibility */
+    --card: 0 0% 100%;
+    --card-foreground: 120 35% 9%;
 
-    --popover: 152 14% 98%;
-    --popover-foreground: 158 22% 15%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 120 35% 9%;
 
-    /* Deep forest green primary */
-    --primary: 158 38% 22%;
-    --primary-foreground: 150 15% 96%;
+    /* Deep Augusta green primary */
+    --primary: 138 56% 23%;
+    --primary-foreground: 0 0% 100%;
 
-    /* Soft sage secondary */
-    --secondary: 152 12% 92%;
-    --secondary-foreground: 158 28% 20%;
+    /* Light green secondary */
+    --secondary: 132 33% 95%;
+    --secondary-foreground: 138 45% 20%;
 
-    /* Muted tones - sage undertones */
-    --muted: 152 10% 91%;
-    --muted-foreground: 158 10% 48%;
+    /* Muted tones - readable forest green (not washed-out grey) */
+    --muted: 132 24% 92%;
+    --muted-foreground: 120 18% 38%;
 
-    /* Warm earth accent */
-    --accent: 38 35% 55%;
-    --accent-foreground: 158 22% 15%;
+    /* Warm gold accent */
+    --accent: 36 78% 60%;
+    --accent-foreground: 120 35% 9%;
 
-    --destructive: 0 50% 50%;
-    --destructive-foreground: 150 15% 96%;
+    --destructive: 0 60% 45%;
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 152 10% 88%;
-    --input: 152 10% 91%;
-    --ring: 158 38% 22%;
+    --border: 120 24% 83%;
+    --input: 120 24% 83%;
+    --ring: 138 56% 23%;
 
     --radius: 1.25rem;
 
@@ -262,10 +282,10 @@
     position: relative;
     z-index: 81;
     pointer-events: auto;
-    background: rgba(255, 255, 255, 0.92);
+    background: var(--header-bg);
     backdrop-filter: blur(12px);
-    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
-    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+    border-bottom: 1px solid rgba(26, 92, 46, 0.12);
+    box-shadow: 0 1px 4px rgba(15, 31, 15, 0.06);
   }
 
   /* Dark header override — for immersive dark-background pages (e.g. Coach Mode)
@@ -519,9 +539,10 @@
     min-height: 52px;
     max-width: min(250px, calc(100vw - 32px));
     border-radius: 9999px;
-    border: 1px solid rgba(203, 184, 146, 0.16);
-    background: linear-gradient(180deg, rgba(9, 19, 15, 0.88) 0%, rgba(6, 12, 10, 0.94) 100%);
-    box-shadow: 0 14px 32px rgba(0, 0, 0, 0.28);
+    border: 1px solid rgba(232, 168, 76, 0.45);
+    background: linear-gradient(180deg, #1f6a36 0%, var(--active-round-bg) 100%);
+    color: var(--active-round-text);
+    box-shadow: 0 14px 32px rgba(15, 31, 15, 0.32);
     backdrop-filter: blur(14px) saturate(1.08);
     padding: 8px 12px 8px 10px;
     transition: transform 180ms ease, border-color 180ms ease, background-color 180ms ease;
@@ -529,7 +550,7 @@
 
   .active-round-resume-chip:hover {
     transform: translateY(-1px);
-    border-color: rgba(203, 184, 146, 0.22);
+    border-color: rgba(232, 168, 76, 0.7);
   }
 
   .active-round-resume-ball {
@@ -561,7 +582,7 @@
   /* Living gradient background - calm, adaptive, premium */
   /* Use as a fixed/absolute positioned background layer with z-0 */
   .bg-gradient-flow {
-    background: hsl(152 14% 96%);
+    background: #e8f0e9;
   }
 
   .bg-gradient-flow::before {

@@ -43,6 +43,8 @@ import { formatRoundDuration } from "@/lib/roundTime";
 import { DailyCheckIn } from "@/components/DailyCheckIn";
 import { loadPreferredWords as loadCueWords } from "@/lib/memoryStorage";
 import { InAppAlertBanner } from "@/components/InAppAlertBanner";
+import { AccountSlide } from "@/components/AccountSlide";
+import { GolfNewsView } from "@/components/GolfNewsView";
 
 // Daily focus rotates through a curated 30-item library keyed to day-of-year.
 // This keeps the habit loop alive — same phrase every day kills engagement.
@@ -87,7 +89,7 @@ function getDailyFocusText(): string {
 }
 
 const TODAY_FOCUS_TEXT = getDailyFocusText();
-const PAGE_LABELS = ["Today", "Play", "Finish"] as const;
+const PAGE_LABELS = ["Today", "Profile", "Intel"] as const;
 const HOME_TUTORED_KEY = "home-swipe-tutored-v1";
 
 function todayLabel() {
@@ -269,7 +271,7 @@ const Home = () => {
      RENDER
      ══════════════════════════════════════════════════════ */
   return (
-    <main className="relative h-[100dvh] overflow-hidden bg-[#f5f2ea]">
+    <main className="relative h-[100dvh] overflow-hidden bg-[#e8f0e9]">
 
       {/* ── Horizontal swipe container ──────────────────── */}
       <div
@@ -475,6 +477,28 @@ const Home = () => {
                 </button>
               )}
 
+              {/* Start a Round — primary play CTA (replaces the old swipe slide) */}
+              {!activeRoundSummary && (
+                <div className="calm-pro-mount grid grid-cols-2 gap-3">
+                  <button
+                    onClick={() => withTap("/round-setup")}
+                    className="calm-pro-focus calm-pro-press group flex flex-col items-start gap-2 rounded-2xl bg-[#1a5c2e] p-5 text-left text-white shadow-[0_8px_24px_rgba(26,92,46,0.28)]"
+                  >
+                    <Flag className="h-6 w-6 text-[#e8a84c]" />
+                    <span className="font-serif text-xl leading-tight">Start a Round</span>
+                    <span className="text-xs text-white/80">Setup · track · reflect</span>
+                  </button>
+                  <button
+                    onClick={() => withTap("/pre-game")}
+                    className="calm-pro-focus calm-pro-press group flex flex-col items-start gap-2 rounded-2xl border border-[#c8ddc8] bg-white p-5 text-left shadow-[0_1px_6px_rgba(15,31,15,0.05)]"
+                  >
+                    <Timer className="h-6 w-6 text-[#1a5c2e]" />
+                    <span className="font-serif text-xl leading-tight text-[#0f1f0f]">Pre-Game Talk</span>
+                    <span className="text-xs text-[#2d4d2d]">Calm nerves · set intention</span>
+                  </button>
+                </div>
+              )}
+
               {/* Quick Coach */}
               <button
                 onClick={() => withTap("/round")}
@@ -515,7 +539,7 @@ const Home = () => {
 
               {/* Swipe hint */}
               <div className="flex items-center justify-center gap-2 pt-2 text-[rgba(26,26,26,0.6)] opacity-50">
-                <p className="text-xs tracking-wide">Swipe for modes</p>
+                <p className="text-xs tracking-wide">Swipe → Profile &amp; Daily Intel</p>
                 <ArrowRight className="h-3 w-3" />
               </div>
             </div>
@@ -523,8 +547,29 @@ const Home = () => {
         </section>
 
         {/* ════════════════════════════════════════════════
-            SLIDE 2 — PLAY  (Start Round)
+            SLIDE 2 — PROFILE  (Account + Mental Handicap)
             ════════════════════════════════════════════════ */}
+        <section className="relative h-full w-screen shrink-0 snap-center overflow-hidden">
+          <div className="calm-pro-bg absolute inset-0" />
+          <div className="relative z-10 h-full">
+            <AccountSlide refreshKey={widgetRefreshKey} />
+          </div>
+        </section>
+
+        {/* ════════════════════════════════════════════════
+            SLIDE 3 — INTEL  (Daily Golf News)
+            ════════════════════════════════════════════════ */}
+        <section className="relative h-full w-screen shrink-0 snap-center overflow-hidden">
+          <div className="calm-pro-bg absolute inset-0" />
+          <div className="relative z-10 h-full">
+            <GolfNewsView />
+          </div>
+        </section>
+
+        {/* ── retired swipe slides (Start Round / Close Strong) — start a round
+            from the Today tab's actions or the bottom dock instead ── */}
+        {false && (
+        <>
         <section className="relative h-full w-screen shrink-0 snap-center overflow-hidden">
           {/* Liquid background */}
           <div className="liquid-bg-round absolute inset-0">
@@ -677,6 +722,8 @@ const Home = () => {
             </div>
           </div>
         </section>
+        </>
+        )}
       </div>
 
       {/* ── Page indicator dots ──────────────────────────── */}
@@ -726,9 +773,9 @@ const Home = () => {
             </h2>
             <div className="space-y-3 mt-4">
               {[
-                { dot: "bg-[#2d6a4f]", label: "Today", desc: "Your dashboard — focus, patterns, quick coach" },
-                { dot: "bg-[rgba(31,180,100,0.85)]", label: "Play", desc: "Start a full round or pre-game talk" },
-                { dot: "bg-[rgba(203,184,146,0.55)]", label: "Finish", desc: "Enter Close Strong for your last 3 holes" },
+                { dot: "bg-[#1a5c2e]", label: "Today", desc: "Your dashboard — focus, patterns, quick coach" },
+                { dot: "bg-[#2d7a4a]", label: "Profile", desc: "Mental handicap, stats & subscription" },
+                { dot: "bg-[#e8a84c]", label: "Intel", desc: "Daily AI golf news tied to your game" },
               ].map(({ dot, label, desc }) => (
                 <div key={label} className="flex items-start gap-3">
                   <div className={`mt-1.5 h-2 w-2 shrink-0 rounded-full ${dot}`} />

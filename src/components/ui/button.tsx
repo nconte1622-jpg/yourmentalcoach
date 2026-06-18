@@ -34,11 +34,11 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        /** Primary CTA — warm sand/gold, glowing */
+        /** Primary CTA — deep Augusta green, white text, clearly readable */
         default: [
-          "bg-[rgba(45,106,79,0.06)] border border-[rgba(45,106,79,0.12)]",
-          "text-[#2d6a4f] hover:bg-[rgba(45,106,79,0.1)]",
-          "shadow-[0_6px_24px_rgba(203,184,146,0.14)] hover:shadow-[0_8px_32px_rgba(203,184,146,0.22)]",
+          "bg-[#1a5c2e] border border-[#1a5c2e]",
+          "text-white hover:bg-[#2d7a4a]",
+          "shadow-[0_6px_20px_rgba(26,92,46,0.28)] hover:shadow-[0_8px_28px_rgba(26,92,46,0.36)]",
         ].join(" "),
         /** Destructive — muted warm red */
         destructive: [
@@ -50,10 +50,10 @@ const buttonVariants = cva(
           "border border-[rgba(45,106,79,0.12)] bg-transparent",
           "text-foreground/70 hover:border-[rgba(45,106,79,0.12)] hover:text-foreground",
         ].join(" "),
-        /** Secondary — frosted green */
+        /** Secondary — light green surface, deep-green text */
         secondary: [
-          "bg-[rgba(16,40,28,0.55)] border border-[rgba(45,106,79,0.12)]",
-          "text-foreground/80 hover:bg-[rgba(16,40,28,0.72)]",
+          "bg-[#f0f7f1] border border-[#1a5c2e]/30",
+          "text-[#1a5c2e] hover:bg-[#e3f0e6]",
           "backdrop-blur-sm",
         ].join(" "),
         /** Ghost — no background, subtle hover */

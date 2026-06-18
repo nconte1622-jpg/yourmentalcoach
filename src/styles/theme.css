@@ -22,9 +22,9 @@
 /* ── Dashboard background (Slide 1) ────────────────────── */
 .calm-pro-bg {
   background:
-    radial-gradient(1200px 600px at 15% -10%, rgba(45, 106, 79, 0.08), transparent 55%),
-    radial-gradient(1000px 560px at 85% -15%, rgba(203, 184, 146, 0.12), transparent 58%),
-    linear-gradient(160deg, #f5f2ea 0%, #efe9dc 52%, #f5f2ea 100%);
+    radial-gradient(1200px 600px at 15% -10%, rgba(45, 144, 96, 0.16), transparent 55%),
+    radial-gradient(1000px 560px at 85% -15%, rgba(26, 92, 46, 0.12), transparent 58%),
+    linear-gradient(160deg, #eaf3ec 0%, #dfeede 52%, #eaf3ec 100%);
 }
 
 .calm-pro-bg::after {
@@ -42,12 +42,12 @@
 
 /* ── Liquid background (Slide 2 — Start Round) ──────────── */
 .liquid-bg-round {
-  background: linear-gradient(170deg, #f5f2ea 0%, #eef3ee 38%, #e9f0ea 66%, #f5f2ea 100%);
+  background: linear-gradient(170deg, #eaf3ec 0%, #e2efe4 38%, #dceade 66%, #eaf3ec 100%);
 }
 
 /* ── Dramatic background (Slide 3 — Close Strong) ───────── */
 .liquid-bg-close {
-  background: linear-gradient(170deg, #f5f2ea 0%, #f3ecdc 32%, #efe6d2 62%, #f5f2ea 100%);
+  background: linear-gradient(170deg, #eaf3ec 0%, #e6f0e2 32%, #e0ecd6 62%, #eaf3ec 100%);
 }
 
 /* ── Liquid orb animations ──────────────────────────────── */

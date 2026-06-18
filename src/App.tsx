@@ -35,6 +35,7 @@ import AuthCallback from "./pages/AuthCallback";
 import MasterQuiz from "./pages/MasterQuiz";
 import SwingAnalysis from "./pages/SwingAnalysis";
 import MentalGPS from "./pages/MentalGPS";
+import GolfNews from "./pages/GolfNews";
 import Scorecard from "./pages/Scorecard";
 import RoundHistory from "./pages/RoundHistory";
 import Terms from "./pages/TermsOfService";
@@ -46,7 +47,7 @@ const queryClient = new QueryClient();
 
 function AppLoadingScreen() {
   return (
-    <div className="h-[100dvh] bg-[#f5f2ea] text-[#1a1a1a]">
+    <div className="h-[100dvh] bg-[#e8f0e9] text-[#0f1f0f]">
       <div className="flex h-full flex-col items-center justify-center gap-4 px-6 text-center">
         <div className="h-10 w-10 animate-spin rounded-full border-2 border-[rgba(45,106,79,0.12)] border-t-[#2d6a4f]" />
         <div className="space-y-1">
@@ -102,6 +103,7 @@ function AppRoutes({ showSplash, onSplashComplete }: { showSplash: boolean; onSp
           <Route path="/master-quiz" element={<ProtectedRoute><MasterQuiz /></ProtectedRoute>} />
           <Route path="/swing-analysis" element={<ProtectedRoute><SwingAnalysis /></ProtectedRoute>} />
           <Route path="/mental-gps" element={<ProtectedRoute><MentalGPS /></ProtectedRoute>} />
+          <Route path="/golf-news" element={<ProtectedRoute><GolfNews /></ProtectedRoute>} />
           <Route path="/round-history" element={<ProtectedRoute><RoundHistory /></ProtectedRoute>} />
           <Route path="/upgrade" element={<ProtectedRoute><Upgrade /></ProtectedRoute>} />
           <Route path="/upgrade-success" element={<ProtectedRoute><UpgradeSuccess /></ProtectedRoute>} />
@@ -138,7 +140,7 @@ const App = () => {
         // Light theme: dark status-bar icons on a white background.
         // Capacitor's Style.Light == light background with dark content.
         await statusBar.setStyle?.({ style: "LIGHT" });
-        await statusBar.setBackgroundColor?.({ color: "#ffffff" });
+        await statusBar.setBackgroundColor?.({ color: "#e8f0e9" });
       } catch (error) {
         console.warn("Unable to configure status bar:", error);
       }
