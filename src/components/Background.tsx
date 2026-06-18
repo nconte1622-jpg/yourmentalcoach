@@ -12,18 +12,17 @@ interface BackgroundProps {
 export const Background = ({ variant = 'default', className = '' }: BackgroundProps) => {
   const getGradientClass = () => {
     switch (variant) {
+      // Immersive dark pages (Coach Mode, auth) keep a deep background.
       case 'deep':
         return 'bg-gradient-flow-deep';
-      case 'calm':
-        return 'bg-gradient-reset';
       case 'pressure':
         return 'bg-gradient-close-strong';
+      // Light, calm sand background — the default app surface.
+      case 'calm':
       case 'frustration':
-        return 'bg-gradient-flow-deep frustration-breathe';
       case 'muted':
-        return 'bg-gradient-flow-deep opacity-60';
       default:
-        return 'bg-gradient-flow-deep';
+        return 'bg-gradient-flow';
     }
   };
 

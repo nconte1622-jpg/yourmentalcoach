@@ -289,11 +289,11 @@ const Home = () => {
                 className="calm-pro-mount"
                 left={<div className="tap-44" />}
                 center={
-                  <div>
-                    <h1 className="truncate font-serif text-[23px] leading-tight tracking-wide text-[#1a1a1a]">
+                  <div className="text-center">
+                    <h1 className="truncate font-serif text-[30px] font-semibold leading-[1.05] tracking-[0.01em] text-[#1a1a1a]">
                       The Caddie
                     </h1>
-                    <p className="truncate text-[11px] uppercase tracking-[0.14em] text-[rgba(26,26,26,0.6)]">
+                    <p className="truncate text-[11px] font-semibold uppercase tracking-[0.22em] text-[#2d6a4f]">
                       Focus · Commit · Trust
                     </p>
                   </div>

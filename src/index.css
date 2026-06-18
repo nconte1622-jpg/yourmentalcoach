@@ -15,12 +15,12 @@
   --sand-0: rgba(245, 236, 216, 0.92);
   --sand-1: rgba(235, 222, 195, 0.92);
   --sand-2: rgba(220, 203, 168, 0.9);
-  --ink-0: #0b1512;
-  --ink-1: rgba(11, 21, 18, 0.82);
-  --text-strong: #e9f1ec;
-  --text-primary: rgba(233, 241, 236, 0.92);
-  --text-secondary: rgba(233, 241, 236, 0.72);
-  --text-muted: rgba(233, 241, 236, 0.55);
+  --ink-0: #1a1a1a;
+  --ink-1: rgba(26, 26, 26, 0.78);
+  --text-strong: #1a1a1a;
+  --text-primary: rgba(26, 26, 26, 0.92);
+  --text-secondary: rgba(26, 26, 26, 0.62);
+  --text-muted: rgba(26, 26, 26, 0.45);
   --panel-bg: var(--glass-sand-bg);
   --panel-border: var(--glass-sand-border);
   --muted-bg: rgba(235, 222, 195, 0.42);
@@ -222,7 +222,6 @@
     font-family: 'Cormorant Garamond', serif;
     font-weight: 600;
     letter-spacing: 0.02em;
-    text-shadow: 0 1px 6px rgba(0, 0, 0, 0.35);
   }
 }
 
@@ -263,8 +262,16 @@
     position: relative;
     z-index: 81;
     pointer-events: auto;
-    background: rgba(5, 8, 7, 0.56);
+    background: rgba(255, 255, 255, 0.92);
     backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+  }
+
+  /* Dark header override — for immersive dark-background pages (e.g. Coach Mode)
+     that render light text in the header and must keep a dark safe-area zone. */
+  .app-header-dark {
+    background: rgba(5, 8, 7, 0.56);
     border-bottom: 1px solid var(--border);
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.22);
   }
@@ -365,7 +372,7 @@
     z-index: 20;
     padding-top: 12px;
     padding-bottom: calc(12px + var(--sab));
-    background: linear-gradient(180deg, rgba(5, 8, 7, 0) 0%, rgba(5, 8, 7, 0.88) 40%, rgba(5, 8, 7, 0.97) 100%);
+    background: linear-gradient(180deg, rgba(245, 242, 234, 0) 0%, rgba(245, 242, 234, 0.92) 42%, rgba(245, 242, 234, 0.98) 100%);
     backdrop-filter: blur(8px);
   }
 
@@ -401,14 +408,13 @@
   }
 
   .legal-hero-title {
-    color: var(--text-strong);
+    color: #1a1a1a;
     font-weight: 600;
     letter-spacing: 0.03em;
-    text-shadow: 0 1px 10px rgba(0, 0, 0, 0.38);
   }
 
   .legal-subtitle {
-    color: var(--text-secondary);
+    color: rgba(26, 26, 26, 0.7);
     font-size: 0.95rem;
     line-height: 1.75;
   }
@@ -481,14 +487,16 @@
   .bottom-dock-button {
     min-height: 56px;
     border-radius: 18px;
-    color: var(--text-secondary);
+    /* Dock keeps a dark glass surface, so its text stays light explicitly
+       (independent of the now light-theme --text-* tokens). */
+    color: rgba(234, 242, 238, 0.72);
     background: transparent;
     transition: background-color 180ms ease, color 180ms ease, transform 180ms ease, border-color 180ms ease;
     border: 1px solid transparent;
   }
 
   .bottom-dock-button:hover {
-    color: var(--text-strong);
+    color: rgba(234, 242, 238, 0.95);
     background: rgba(203, 184, 146, 0.08);
     border-color: rgba(203, 184, 146, 0.1);
   }

@@ -36,6 +36,7 @@ const RoundCoach = () => {
         contentClassName="flex flex-col"
         header={
           <AppHeader
+            className="app-header-dark"
             left={
               <button
                 type="button"

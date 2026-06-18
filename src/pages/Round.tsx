@@ -33,6 +33,7 @@ import { useCheckIn } from "@/hooks/useCheckIn";
 import { CheckInCard } from "@/components/CheckInCard";
 import { PreShotReset } from "@/components/PreShotReset";
 import { GpsHoleCheckIn } from "@/components/GpsHoleCheckIn";
+import { GpsRangefinderTab } from "@/components/GpsRangefinderTab";
 import { startGpsTracking, stopGpsTracking, resetGpsTracking } from "@/lib/gpsRoundTracker";
 import { RoundBriefingCard } from "@/components/RoundBriefingCard";
 import { HoleMoodTracker } from "@/components/HoleMoodTracker";
@@ -95,6 +96,17 @@ const Round = () => {
   });
   const [gpsCheckInVisible, setGpsCheckInVisible] = useState(false);
   const [gpsHoleNumber, setGpsHoleNumber] = useState(1);
+  // Swipeable tabs: coach chat ↔ GPS rangefinder
+  const [activeTab, setActiveTab] = useState<"coach" | "gps">("coach");
+  const touchStartX = useRef(0);
+  const handleTouchStart = (e: React.TouchEvent) => {
+    touchStartX.current = e.touches[0].clientX;
+  };
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    const dx = e.changedTouches[0].clientX - touchStartX.current;
+    if (dx < -60) setActiveTab("gps");
+    if (dx > 60) setActiveTab("coach");
+  };
   // Stable so GpsHoleCheckIn's 20s auto-dismiss timer isn't restarted on every
   // re-render of this screen (e.g. while the coach is streaming).
   const handleGpsDismiss = useCallback(() => setGpsCheckInVisible(false), []);
@@ -451,10 +463,15 @@ const Round = () => {
                   type="button"
                   onClick={() => {
                     triggerHaptic("light");
-                    navigate("/mental-gps");
+                    setActiveTab((t) => (t === "gps" ? "coach" : "gps"));
                   }}
-                  className="flex h-9 w-9 items-center justify-center rounded-full text-muted-foreground/60 hover:text-foreground hover:bg-foreground/5 transition-all"
-                  title="Mental GPS"
+                  className={cn(
+                    "flex h-9 w-9 items-center justify-center rounded-full transition-all",
+                    activeTab === "gps"
+                      ? "text-[#2d6a4f] bg-[rgba(45,106,79,0.1)]"
+                      : "text-muted-foreground/60 hover:text-foreground hover:bg-foreground/5"
+                  )}
+                  title="GPS Rangefinder"
                 >
                   <Navigation className="w-4 h-4" />
                 </button>
@@ -474,10 +491,45 @@ const Round = () => {
           />
         }
       >
-        <div className="flex-1 flex flex-col min-h-0">
-          {/* Single scrollable area — top cards + messages scroll together.
+        <div
+          className="flex-1 flex flex-col min-h-0"
+          onTouchStart={handleTouchStart}
+          onTouchEnd={handleTouchEnd}
+        >
+          {/* Tab switcher: Coach chat ↔ GPS rangefinder (swipe or tap) */}
+          {!isFrustrationMode && (
+            <div className="shrink-0 flex justify-center pt-2 pb-1">
+              <div className="inline-flex items-center gap-1 rounded-full border border-[rgba(45,106,79,0.12)] bg-white/90 p-1 shadow-[0_1px_4px_rgba(0,0,0,0.06)]">
+                {(["coach", "gps"] as const).map((tab) => (
+                  <button
+                    key={tab}
+                    type="button"
+                    onClick={() => {
+                      triggerHaptic("light");
+                      setActiveTab(tab);
+                    }}
+                    className={cn(
+                      "rounded-full px-6 py-1.5 text-[13px] font-semibold tracking-wide transition-all",
+                      activeTab === tab
+                        ? "bg-[#2d6a4f] text-white shadow-[0_2px_8px_rgba(45,106,79,0.25)]"
+                        : "text-[rgba(26,26,26,0.5)] hover:text-[#1a1a1a]"
+                    )}
+                  >
+                    {tab === "coach" ? "Coach" : "GPS"}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {activeTab === "gps" ? (
+            <div className="flex-1 min-h-0">
+              <GpsRangefinderTab />
+            </div>
+          ) : (
+          /* Single scrollable area — top cards + messages scroll together.
               This prevents the keyboard from crushing the messages view to
-              zero height, since everything competes in the same scroll region. */}
+              zero height, since everything competes in the same scroll region. */
           <main
             className={cn(
               "flex-1 overflow-y-auto min-h-0",
@@ -510,7 +562,7 @@ const Round = () => {
                         </p>
                         <button
                           onClick={() => setRecallDismissed(true)}
-                          className="shrink-0 text-white/20 hover:text-white/50 text-base leading-none transition-all duration-200"
+                          className="shrink-0 text-[rgba(26,26,26,0.3)] hover:text-[rgba(26,26,26,0.6)] text-base leading-none transition-all duration-200"
                         >
                           ✕
                         </button>
@@ -553,9 +605,11 @@ const Round = () => {
               <div ref={messagesEndRef} />
             </div>
           </main>
+          )}
         </div>
 
-        {/* Input Area - docked at bottom */}
+        {/* Input Area - docked at bottom (coach tab only) */}
+        {activeTab === "coach" && (
         <div className="chat-composer-dock shrink-0">
           <div className="max-w-2xl mx-auto w-full space-y-3">
           <div className="rounded-2xl border border-[rgba(45,106,79,0.08)] bg-white/70 px-3 py-2.5 backdrop-blur-sm">
@@ -649,7 +703,7 @@ const Round = () => {
                   className="flex-1 py-3.5 text-sm font-medium rounded-2xl border-[rgba(45,106,79,0.12)] bg-white/80 hover:bg-white/90 hover:border-[rgba(45,106,79,0.12)] hover:shadow-[0_2px_8px_rgba(0,0,0,0.06)]"
                   size="lg"
                 >
-                  <span className="flex items-center gap-3 text-white font-medium drop-shadow-sm">
+                  <span className="flex items-center gap-3 text-[#2d6a4f] font-medium">
                     <span className="relative flex items-center justify-center w-5 h-5">
                       <span className="absolute inset-0 rounded-full bg-primary/30 animate-ping opacity-40" />
                       <span className="w-2 h-2 rounded-full bg-primary" />
@@ -666,7 +720,7 @@ const Round = () => {
                   className="shrink-0 py-3.5 px-5 rounded-2xl border-[rgba(45,106,79,0.12)] bg-white/80 hover:bg-white/90 hover:border-[rgba(45,106,79,0.12)] hover:shadow-[0_2px_8px_rgba(0,0,0,0.06)]"
                   size="lg"
                 >
-                  <span className="flex items-center gap-1.5 text-white font-medium drop-shadow-sm">
+                  <span className="flex items-center gap-1.5 text-[#2d6a4f] font-medium">
                     <Wind className="w-4 h-4" />
                     <span className="text-sm">Breathe</span>
                   </span>
@@ -692,6 +746,7 @@ const Round = () => {
           />
           </div>
         </div>
+        )}
       </AppShell>
       <Dialog
         open={endRoundDialogOpen}

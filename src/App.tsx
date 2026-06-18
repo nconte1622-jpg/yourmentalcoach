@@ -126,13 +126,21 @@ const App = () => {
       if (!Capacitor.isNativePlatform() || Capacitor.getPlatform() !== "ios") return;
       const plugins = (Capacitor as unknown as { Plugins?: Record<string, unknown> }).Plugins;
       const statusBar = plugins?.StatusBar as
-        | { setOverlaysWebView?: (options: { overlay: boolean }) => Promise<void> }
+        | {
+            setOverlaysWebView?: (options: { overlay: boolean }) => Promise<void>;
+            setStyle?: (options: { style: string }) => Promise<void>;
+            setBackgroundColor?: (options: { color: string }) => Promise<void>;
+          }
         | undefined;
       if (!statusBar?.setOverlaysWebView) return;
       try {
         await statusBar.setOverlaysWebView({ overlay: false });
+        // Light theme: dark status-bar icons on a white background.
+        // Capacitor's Style.Light == light background with dark content.
+        await statusBar.setStyle?.({ style: "LIGHT" });
+        await statusBar.setBackgroundColor?.({ color: "#ffffff" });
       } catch (error) {
-        console.warn("Unable to disable status bar overlay:", error);
+        console.warn("Unable to configure status bar:", error);
       }
     };
 

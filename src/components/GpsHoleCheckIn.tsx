@@ -96,19 +96,19 @@ export function GpsHoleCheckIn({ holeNumber, visible, onDismiss, position }: Gps
       />
 
       {/* Sheet */}
-      <div className="relative z-10 mx-auto max-w-lg rounded-t-3xl border-t border-[rgba(45,106,79,0.12)] bg-[#08130d] px-5 pb-10 pt-5 shadow-[0_-20px_60px_rgba(0,0,0,0.5)]">
+      <div className="relative z-10 mx-auto max-w-lg rounded-t-3xl border-t border-[rgba(45,106,79,0.12)] bg-white px-5 pb-10 pt-5 shadow-[0_-20px_60px_rgba(0,0,0,0.18)]">
         {/* Drag handle */}
-        <div className="mx-auto mb-5 h-1 w-10 rounded-full bg-white/15" />
+        <div className="mx-auto mb-5 h-1 w-10 rounded-full bg-[rgba(0,0,0,0.12)]" />
 
         {/* Header */}
         <div className="mb-5 space-y-1 text-center">
-          <p className="text-[10px] uppercase tracking-[0.2em]" style={{ color: "rgba(203,184,146,0.55)" }}>
+          <p className="text-[10px] uppercase tracking-[0.2em]" style={{ color: "#2d6a4f" }}>
             Hole {holeNumber} complete
           </p>
-          <h2 className="text-xl font-serif" style={{ color: "rgba(255,255,255,0.9)" }}>
+          <h2 className="text-xl font-serif" style={{ color: "#1a1a1a" }}>
             How was your mental game?
           </h2>
-          <p className="text-xs" style={{ color: "rgba(255,255,255,0.35)" }}>
+          <p className="text-xs" style={{ color: "rgba(26,26,26,0.45)" }}>
             Quick tap — your coach learns from this
           </p>
         </div>
@@ -120,7 +120,7 @@ export function GpsHoleCheckIn({ holeNumber, visible, onDismiss, position }: Gps
               key={opt.rating}
               type="button"
               onClick={() => handleSelect(opt.rating)}
-              className="group flex w-full items-center gap-4 rounded-2xl border border-white/8 bg-white/5 px-4 py-4 text-left transition-all duration-150 active:scale-[0.97] hover:bg-white/9"
+              className="group flex w-full items-center gap-4 rounded-2xl border border-[rgba(45,106,79,0.1)] bg-[rgba(45,106,79,0.04)] px-4 py-4 text-left transition-all duration-150 active:scale-[0.97] hover:bg-[rgba(45,106,79,0.08)]"
             >
               <span
                 className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-lg font-bold transition-all"
@@ -133,10 +133,10 @@ export function GpsHoleCheckIn({ holeNumber, visible, onDismiss, position }: Gps
                 {opt.icon}
               </span>
               <div>
-                <p className="text-sm font-medium" style={{ color: "rgba(255,255,255,0.9)" }}>
+                <p className="text-sm font-medium" style={{ color: "#1a1a1a" }}>
                   {opt.label}
                 </p>
-                <p className="text-xs" style={{ color: "rgba(255,255,255,0.4)" }}>
+                <p className="text-xs" style={{ color: "rgba(26,26,26,0.5)" }}>
                   {opt.sublabel}
                 </p>
               </div>
@@ -149,7 +149,7 @@ export function GpsHoleCheckIn({ holeNumber, visible, onDismiss, position }: Gps
           type="button"
           onClick={handleSkip}
           className="mt-4 w-full py-3 text-xs"
-          style={{ color: "rgba(255,255,255,0.25)" }}
+          style={{ color: "rgba(26,26,26,0.4)" }}
         >
           Skip — just keep playing
         </button>

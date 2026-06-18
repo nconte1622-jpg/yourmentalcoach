@@ -149,6 +149,12 @@ export function GpsRangefinderTab() {
   }, [pinCoords, currentHole, coords]);
 
   const gpsYards = gpsDistanceToPin();
+  // Approximate front/back of green from the (center) pin distance using a
+  // typical green depth (~16 yds). Honest rangefinder convention when only the
+  // pin is known.
+  const GREEN_HALF_DEPTH = 8;
+  const frontYards = gpsYards !== null ? Math.max(0, gpsYards - GREEN_HALF_DEPTH) : null;
+  const backYards = gpsYards !== null ? gpsYards + GREEN_HALF_DEPTH : null;
 
   const linePositions = useMemo(() => {
     if (!coords || !currentPin) return null;
@@ -246,13 +252,41 @@ export function GpsRangefinderTab() {
         </button>
       </div>
 
-      {/* Yardage display — BIG */}
-      {gpsYards !== null && (
-        <div className="text-center pb-4 px-5">
-          <p className="font-serif text-[72px] font-bold text-[#2d6a4f] leading-none">{gpsYards}</p>
-          <p className="text-[15px] font-medium text-[rgba(26,26,26,0.5)] mt-1">yards to pin</p>
+      {/* Yardage display — FRONT / CENTER / BACK */}
+      <div className="px-5 pb-4">
+        <div className="grid grid-cols-3 gap-2.5">
+          {[
+            { label: "Front", value: frontYards, big: false },
+            { label: "Center", value: gpsYards, big: true },
+            { label: "Back", value: backYards, big: false },
+          ].map(({ label, value, big }) => (
+            <div
+              key={label}
+              className={cn(
+                "rounded-2xl border bg-white text-center shadow-[0_1px_4px_rgba(0,0,0,0.06)]",
+                big
+                  ? "border-[rgba(45,106,79,0.25)] py-4"
+                  : "border-[rgba(45,106,79,0.1)] py-3.5"
+              )}
+            >
+              <p
+                className={cn(
+                  "font-serif font-bold leading-none text-[#2d6a4f]",
+                  big ? "text-[44px]" : "text-[30px] text-[rgba(45,106,79,0.75)]"
+                )}
+              >
+                {value !== null ? value : "—"}
+              </p>
+              <p className="mt-1.5 text-[10px] font-semibold uppercase tracking-[0.16em] text-[rgba(26,26,26,0.45)]">
+                {label}
+              </p>
+            </div>
+          ))}
         </div>
-      )}
+        <p className="mt-2 text-center text-[12px] text-[rgba(26,26,26,0.4)]">
+          {gpsYards !== null ? "yards to pin" : "Set a pin to see yardages"}
+        </p>
+      </div>
 
       {/* Satellite map */}
       <div className="px-5 pb-4">
