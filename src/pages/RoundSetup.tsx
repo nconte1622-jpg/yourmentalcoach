@@ -1,9 +1,12 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { Search, MapPin, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { PageShell } from "@/components/PageShell";
 import { triggerHaptic } from "@/lib/haptics";
+import { setRoundCourse } from "@/lib/holeIntel";
+import { saveRoundContext } from "@/lib/roundContext";
 import { usePreRoundRecall } from "@/hooks/usePreRoundRecall";
 import { useRounds, RoundType, RoundEnvironment } from "@/hooks/useRounds";
 import { toast } from "sonner";
@@ -20,8 +23,15 @@ const RoundSetup = () => {
   const { createRound, getActiveRound, discardRound } = useRounds();
   const [roundType, setRoundType] = useState<RoundType>("on-course");
   const [environment, setEnvironment] = useState<RoundEnvironment>("casual");
-  const [location, setLocation] = useState("");
   const [goal, setGoal] = useState("");
+
+  // Course is chosen by searching + selecting a real course (mandatory for
+  // on-course / simulator rounds) so the GPS tab can load it on the next page.
+  const [courseQuery, setCourseQuery] = useState("");
+  const [courseResults, setCourseResults] = useState<{ name: string; lat: number; lng: number }[]>([]);
+  const [selectedCourse, setSelectedCourse] = useState<{ name: string; lat: number; lng: number } | null>(null);
+  const [isSearchingCourse, setIsSearchingCourse] = useState(false);
+  const courseSearchTimeout = useRef<ReturnType<typeof setTimeout>>();
   const [isCreating, setIsCreating] = useState(false);
   const [activeRound, setActiveRound] = useState<{
     id: string;
@@ -64,6 +74,44 @@ const RoundSetup = () => {
     };
   }, []);
 
+  const courseRequired = roundType === "on-course" || roundType === "simulator";
+
+  const handleCourseSearch = (query: string) => {
+    setCourseQuery(query);
+    if (courseSearchTimeout.current) clearTimeout(courseSearchTimeout.current);
+    if (query.trim().length < 3) {
+      setCourseResults([]);
+      return;
+    }
+    setIsSearchingCourse(true);
+    courseSearchTimeout.current = setTimeout(async () => {
+      try {
+        const res = await fetch(
+          `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query + " golf course")}&limit=5`
+        );
+        const data = (await res.json()) as { display_name: string; lat: string; lon: string }[];
+        setCourseResults(
+          data.map((r) => ({
+            name: r.display_name.split(",").slice(0, 2).join(","),
+            lat: parseFloat(r.lat),
+            lng: parseFloat(r.lon),
+          }))
+        );
+      } catch {
+        setCourseResults([]);
+      } finally {
+        setIsSearchingCourse(false);
+      }
+    }, 500);
+  };
+
+  const selectCourse = (c: { name: string; lat: number; lng: number }) => {
+    triggerHaptic("light");
+    setSelectedCourse(c);
+    setCourseQuery("");
+    setCourseResults([]);
+  };
+
   const handleDiscardRound = async () => {
     if (!activeRound?.id) return;
 
@@ -91,21 +139,44 @@ const RoundSetup = () => {
   };
 
   const handleBeginRound = async () => {
+    // Course is mandatory for on-course / simulator rounds — must be searched + selected.
+    if (courseRequired && !selectedCourse) {
+      triggerHaptic("medium");
+      toast.error("Search and select your course to start the round.");
+      return;
+    }
+
     triggerHaptic("medium");
     setIsCreating(true);
 
     const createPayload = {
       round_type: roundType,
       environment,
-      course_location: location.trim() || undefined,
+      course_location: selectedCourse?.name || undefined,
       goal: goal.trim() || undefined,
       daily_focus: dailyFocusText ?? null,
     };
 
+    // Hand the selected course (with coords) to the round page's GPS tab so it
+    // loads automatically — no second search needed.
+    if (selectedCourse) {
+      setRoundCourse(selectedCourse);
+    }
+
+    // Persist the round context so the mid-round coach is aware of the course,
+    // hole and intent (cleared on round completion in RoundSummary/RoundComplete).
+    saveRoundContext({
+      roundType,
+      environment,
+      location: selectedCourse?.name,
+      intent: goal.trim() || undefined,
+      startedAt: new Date().toISOString(),
+    });
+
     // Pre-fetch course data in the background (non-blocking)
     // so the AI has hole-by-hole data ready during the round
-    if (location.trim()) {
-      const courseName = location.trim();
+    if (selectedCourse?.name) {
+      const courseName = selectedCourse.name;
       const fetchToastId = `course-fetch-${Date.now()}`;
       toast.loading(`Loading hole data for ${courseName}…`, { id: fetchToastId, duration: 10000 });
       fetchAndCacheCourse(courseName).then((result) => {
@@ -434,23 +505,68 @@ const RoundSetup = () => {
               </RadioGroup>
             </div>
 
-            {/* Location (Optional) */}
-            <div className="space-y-4">
-              <label 
-                className="text-sm tracking-wide font-light helper-text"
-                style={{ color: '#2d4d2d' }}
-              >
-                Course Name{" "}
-                <span style={{ color: '#5a7a5a' }}>(your coach gives hole-specific tips)</span>
+            {/* Course — search & select (mandatory for on-course / simulator) */}
+            <div className="space-y-3">
+              <label className="text-sm tracking-wide font-light helper-text" style={{ color: '#2d4d2d' }}>
+                Course{" "}
+                {courseRequired ? (
+                  <span style={{ color: '#1a5c2e' }}>· required</span>
+                ) : (
+                  <span style={{ color: '#5a7a5a' }}>(optional for practice)</span>
+                )}
               </label>
-              <input
-                type="text"
-                value={location}
-                onChange={(e) => setLocation(e.target.value)}
-                placeholder="e.g. Bethpage Black, Pebble Beach, my local muni"
-                maxLength={80}
-                className="w-full p-4 rounded-2xl bg-white/90 border border-foreground/12 shadow-inner shadow-foreground/5 text-foreground placeholder:text-foreground/45 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/40 focus:bg-white/95 focus:shadow-md focus:scale-[1.01] origin-center transition-all duration-300 tracking-wide disabled:bg-white/50 disabled:text-foreground/40 hover:bg-white/95 hover:border-foreground/18"
-              />
+
+              {selectedCourse ? (
+                <div className="flex items-center justify-between gap-3 rounded-2xl border border-[#1a5c2e]/40 bg-white p-4">
+                  <div className="flex min-w-0 items-center gap-3">
+                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#1a5c2e]/10 text-[#1a5c2e]">
+                      <MapPin className="h-5 w-5" />
+                    </div>
+                    <p className="truncate text-[15px] font-medium text-[#0f1f0f]">{selectedCourse.name}</p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => { setSelectedCourse(null); setCourseQuery(""); }}
+                    className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-[#5a7a5a] transition-colors hover:bg-[#f0f7f1]"
+                    aria-label="Change course"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                </div>
+              ) : (
+                <div className="relative">
+                  <div className="flex items-center gap-2 rounded-2xl border border-[#c8ddc8] bg-white px-4 py-3.5">
+                    <Search className="h-4 w-4 text-[#5a7a5a]" />
+                    <input
+                      type="text"
+                      value={courseQuery}
+                      onChange={(e) => handleCourseSearch(e.target.value)}
+                      placeholder="Search your course…"
+                      className="flex-1 bg-transparent text-[16px] text-[#0f1f0f] placeholder-[#5a7a5a] outline-none"
+                    />
+                  </div>
+                  {courseResults.length > 0 && (
+                    <div className="absolute left-0 right-0 top-full z-50 mt-2 overflow-hidden rounded-2xl border border-[#c8ddc8] bg-white shadow-[0_8px_32px_rgba(15,31,15,0.14)]">
+                      {courseResults.map((r, i) => (
+                        <button
+                          key={i}
+                          type="button"
+                          onClick={() => selectCourse(r)}
+                          className="w-full border-b border-[#e8f0e9] px-4 py-3.5 text-left text-[15px] text-[#0f1f0f] transition-colors last:border-b-0 hover:bg-[#f0f7f1]"
+                        >
+                          {r.name}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                  {isSearchingCourse && <p className="mt-2 text-[13px] text-[#5a7a5a]">Searching…</p>}
+                  {courseRequired && (
+                    <p className="mt-2 text-[12px] text-[#5a7a5a]">
+                      Pick a course from the list to start — this loads GPS &amp; hole tips on the next page.
+                    </p>
+                  )}
+                </div>
+              )}
             </div>
 
             {/* Today's Goal (Optional) */}
@@ -521,11 +637,17 @@ const RoundSetup = () => {
             <div className="pt-4">
               <Button
                 onClick={handleBeginRound}
-                disabled={isCreating || Boolean(activeRound)}
+                disabled={isCreating || Boolean(activeRound) || (courseRequired && !selectedCourse)}
                 className="w-full py-8 text-lg font-medium rounded-3xl shadow-lg shadow-primary/15 hover:shadow-xl hover:shadow-primary/20 transition-all duration-300 btn-press"
                 size="lg"
               >
-                {isCreating ? "Starting..." : activeRound ? "End current round to start new" : "Begin Round"}
+                {isCreating
+                  ? "Starting..."
+                  : activeRound
+                  ? "End current round to start new"
+                  : courseRequired && !selectedCourse
+                  ? "Select a course to begin"
+                  : "Begin Round"}
               </Button>
             </div>
           </div>

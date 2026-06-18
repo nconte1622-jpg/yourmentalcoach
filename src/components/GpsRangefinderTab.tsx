@@ -28,6 +28,9 @@ import {
   fetchHoleAimCue,
   setActiveHole,
   clearActiveHole,
+  getRoundCourse,
+  setRoundCourse,
+  clearRoundCourse,
   type HoleGeometry,
   type HoleNote,
   type MissTendency,
@@ -181,24 +184,44 @@ export function GpsRangefinderTab() {
     }, 500);
   }, []);
 
-  const selectCourse = useCallback(async (course: CourseResult) => {
+  const loadCourse = useCallback(async (course: CourseResult, openPicker: boolean) => {
     setSelectedCourse(course.name);
     setCoursePos({ lat: course.lat, lng: course.lng });
     setCourseSearch("");
     setCourseResults([]);
-    triggerHaptic("medium");
-    setShowHolePicker(true);
+    if (openPicker) setShowHolePicker(true);
 
     // Pull live conditions + download the course layout for every hole.
     void fetchCourseWeather(course.lat, course.lng).then(setWeather);
     const downloaded = await fetchCourseHoles(course.name, course.lat, course.lng);
     setHoles(downloaded);
-    if (downloaded.length) {
-      toast.success(`${course.name} — ${downloaded.length} holes loaded`);
-    } else {
-      toast.success(`Course: ${course.name}`);
+    if (openPicker) {
+      toast.success(
+        downloaded.length ? `${course.name} — ${downloaded.length} holes loaded` : `Course: ${course.name}`
+      );
     }
   }, []);
+
+  const selectCourse = useCallback(
+    (course: CourseResult) => {
+      triggerHaptic("medium");
+      // Persist so a tab switch (which remounts this tab) keeps the chosen course.
+      setRoundCourse(course);
+      void loadCourse(course, true);
+    },
+    [loadCourse]
+  );
+
+  // Auto-load the course chosen at round setup — no second search needed.
+  const autoloadedRef = useRef(false);
+  useEffect(() => {
+    if (autoloadedRef.current) return;
+    autoloadedRef.current = true;
+    const rc = getRoundCourse();
+    if (rc) {
+      void loadCourse({ name: rc.name, lat: rc.lat, lng: rc.lng }, false);
+    }
+  }, [loadCourse]);
 
   const confirmStartingHole = (hole: number) => {
     triggerHaptic("medium");
@@ -390,6 +413,7 @@ export function GpsRangefinderTab() {
                   setHoles([]);
                   setWeather(null);
                   clearActiveHole();
+                  clearRoundCourse();
                 }}
                 className="rounded-full border border-[#c8ddc8] px-3 py-1.5 text-[13px] font-medium text-[#1a5c2e] hover:bg-[#f0f7f1]"
               >

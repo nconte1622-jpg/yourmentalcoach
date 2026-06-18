@@ -39,8 +39,10 @@ export interface HoleNote {
 const GEO_PREFIX = "hole-geo-v1";
 const NOTE_PREFIX = "hole-notes-v1";
 const ACTIVE_HOLE_KEY = "gps-active-hole-v1";
+const ROUND_COURSE_KEY = "round-course-v1";
 const GEO_TTL_MS = 30 * 24 * 60 * 60 * 1000; // 30 days
 const ACTIVE_HOLE_TTL_MS = 6 * 60 * 60 * 1000; // 6h — so a stale hole never leaks into a new round
+const ROUND_COURSE_TTL_MS = 12 * 60 * 60 * 1000; // 12h — covers a full round, then expires
 
 export function courseIdFromName(name: string): string {
   return name.toLowerCase().trim().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
@@ -172,6 +174,47 @@ export function getActiveHole(): ActiveHole | null {
 export function clearActiveHole(): void {
   try {
     localStorage.removeItem(ACTIVE_HOLE_KEY);
+  } catch {
+    /* best-effort */
+  }
+}
+
+// ─── Round course pointer ───────────────────────────────────────────────────
+// Set at round setup (the searched + selected course) so the GPS tab on the
+// round page auto-loads that exact course — no second search needed.
+
+export interface RoundCourse {
+  name: string;
+  lat: number;
+  lng: number;
+  at: string;
+}
+
+export function setRoundCourse(c: { name: string; lat: number; lng: number }): void {
+  try {
+    const payload: RoundCourse = { ...c, at: new Date().toISOString() };
+    localStorage.setItem(ROUND_COURSE_KEY, JSON.stringify(payload));
+  } catch {
+    /* best-effort */
+  }
+}
+
+export function getRoundCourse(): RoundCourse | null {
+  try {
+    const raw = localStorage.getItem(ROUND_COURSE_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as RoundCourse;
+    if (Date.now() - new Date(parsed.at).getTime() > ROUND_COURSE_TTL_MS) return null;
+    if (typeof parsed.lat !== "number" || typeof parsed.lng !== "number") return null;
+    return parsed;
+  } catch {
+    return null;
+  }
+}
+
+export function clearRoundCourse(): void {
+  try {
+    localStorage.removeItem(ROUND_COURSE_KEY);
   } catch {
     /* best-effort */
   }
