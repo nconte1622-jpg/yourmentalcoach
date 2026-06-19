@@ -221,6 +221,9 @@ const RoundSetup = () => {
           roundType: round.round_type,
           environment: round.environment,
         });
+        // Schedule a 24h "you left a round open" reminder (auto-cancelled when
+        // the round ends). Fire-and-forget — never block starting the round.
+        void import("@/lib/notifications").then((m) => m.scheduleStaleRoundReminder(new Date()));
         toast.success("Round started");
         navigate(`/round?roundId=${round.id}`);
       } else {

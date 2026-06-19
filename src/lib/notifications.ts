@@ -141,6 +141,42 @@ async function scheduleNativeNotification(n: LocalNotification): Promise<void> {
   }
 }
 
+async function cancelNativeNotification(id: number): Promise<void> {
+  if (!Capacitor.isNativePlatform()) return;
+  try {
+    const { LocalNotifications } = (await import("@capacitor/local-notifications" as string)) as {
+      LocalNotifications: {
+        cancel: (opts: { notifications: Array<{ id: number }> }) => Promise<void>;
+      };
+    };
+    await LocalNotifications.cancel({ notifications: [{ id }] });
+  } catch {
+    // Plugin not installed — nothing to cancel
+  }
+}
+
+/* ─── Stale round reminder ───────────────────────────────── */
+// Fires 24h after a round starts if it was never ended, drawing the golfer
+// back to finish / reflect / end. Auto-cancelled when the round closes.
+
+const STALE_ROUND_NOTIF_ID = 3001;
+
+export async function scheduleStaleRoundReminder(startedAt?: Date): Promise<void> {
+  const base = startedAt ?? new Date();
+  const at = new Date(base.getTime() + 24 * 60 * 60 * 1000);
+  if (at.getTime() <= Date.now()) return; // already past — nothing to schedule
+  await scheduleNativeNotification({
+    id: STALE_ROUND_NOTIF_ID,
+    title: "You left a round open ⛳",
+    body: "Your round has been running 24h. Tap to finish it, reflect, or end it.",
+    scheduleAt: at,
+  });
+}
+
+export async function cancelStaleRoundReminder(): Promise<void> {
+  await cancelNativeNotification(STALE_ROUND_NOTIF_ID);
+}
+
 /* ─── Permission request (call from settings or onboarding) */
 
 export async function requestNotificationPermission(): Promise<boolean> {

@@ -84,6 +84,9 @@ export function clearActiveRoundSession() {
   } catch {
     // Ignore local storage failures.
   }
+  // The round is no longer active — cancel its 24h "still open" reminder.
+  // Dynamic + best-effort so this storage module stays free of Capacitor deps.
+  void import("./notifications").then((m) => m.cancelStaleRoundReminder()).catch(() => {});
 }
 
 export function savePendingPreGameTalk(talk: string) {

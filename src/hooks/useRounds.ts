@@ -429,6 +429,8 @@ export function useRounds() {
 
     if (round) {
       clearRoundMessages(round.id);
+      // Abandoned round — cancel its 24h "still open" reminder.
+      void import("@/lib/notifications").then((m) => m.cancelStaleRoundReminder()).catch(() => {});
       const currentFocus = getDailyFocus();
       if (currentFocus?.round_id === round.id) {
         setDailyFocus({
