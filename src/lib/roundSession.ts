@@ -31,6 +31,22 @@ export type PersistedRoundMessage = {
 const ACTIVE_ROUND_KEY = "active-round-session";
 const PENDING_PRE_GAME_KEY = "pending-pre-game-talk";
 const ROUND_MESSAGES_PREFIX = "round-messages";
+const ENDED_ROUNDS_KEY = "ended-round-ids";
+
+/**
+ * Fired (in this document) whenever the active-round state is cleared. The home
+ * screen and resume chip listen for it so a round ended on one screen instantly
+ * disappears everywhere — no focus/visibility round-trip required.
+ */
+export const ACTIVE_ROUND_CHANGED_EVENT = "active-round-changed";
+
+function emitActiveRoundChanged() {
+  try {
+    window.dispatchEvent(new Event(ACTIVE_ROUND_CHANGED_EVENT));
+  } catch {
+    // Non-browser / SSR — nothing to notify.
+  }
+}
 
 function safeParseJson<T>(raw: string | null): T | null {
   if (!raw) return null;
@@ -87,6 +103,44 @@ export function clearActiveRoundSession() {
   // The round is no longer active — cancel its 24h "still open" reminder.
   // Dynamic + best-effort so this storage module stays free of Capacitor deps.
   void import("./notifications").then((m) => m.cancelStaleRoundReminder()).catch(() => {});
+  emitActiveRoundChanged();
+}
+
+/**
+ * Locally-ended rounds ledger.
+ *
+ * Ending a round used to depend on a Supabase write landing before the user
+ * returned Home; if that write was slow or failed, `getActiveRound()` would
+ * re-query the server, still see `ended_at IS NULL`, and resurrect the round —
+ * the "still says Resume Round no matter how many times I end it" bug.
+ *
+ * We now record ended round IDs locally as the source of truth. The home screen
+ * and resume chip trust this immediately, and `getActiveRound()` ignores (and
+ * best-effort re-closes) any server round that appears here.
+ */
+function readEndedRoundIds(): string[] {
+  const parsed = safeParseJson<unknown>(localStorage.getItem(ENDED_ROUNDS_KEY));
+  return Array.isArray(parsed) ? parsed.filter((id): id is string => typeof id === "string") : [];
+}
+
+export function markRoundEnded(roundId: string) {
+  if (!roundId) return;
+  try {
+    const ids = readEndedRoundIds();
+    if (!ids.includes(roundId)) {
+      ids.push(roundId);
+      // Cap the ledger so it can't grow unbounded — recent rounds are all we need.
+      const trimmed = ids.slice(-50);
+      localStorage.setItem(ENDED_ROUNDS_KEY, JSON.stringify(trimmed));
+    }
+  } catch {
+    // Ignore local storage failures — clearActiveRoundSession still hides it.
+  }
+}
+
+export function isRoundEnded(roundId: string | null | undefined): boolean {
+  if (!roundId) return false;
+  return readEndedRoundIds().includes(roundId);
 }
 
 export function savePendingPreGameTalk(talk: string) {

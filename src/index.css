@@ -396,6 +396,17 @@
     backdrop-filter: blur(8px);
   }
 
+  /* Chat (Round) shell — collapse height by the live keyboard inset (--kb) so
+     the sticky composer dock and messages stay above the on-screen keyboard on
+     iOS, where the layout viewport doesn't resize on its own. */
+  .app-shell.chat-shell {
+    min-height: calc(100dvh - var(--kb, 0px));
+  }
+
+  .app-shell-content.chat-shell-content {
+    min-height: calc(100dvh - var(--kb, 0px));
+  }
+
   .fluid-glow-backdrop {
     position: relative;
   }

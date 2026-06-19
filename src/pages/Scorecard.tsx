@@ -119,7 +119,7 @@ function HoleRow({ hole, onChangePar, onChangeScore, onClearScore }: HoleRowProp
     <div className="flex items-center gap-2 px-4 py-2.5 border-b border-[rgba(45,106,79,0.08)] last:border-b-0">
       {/* Hole number */}
       <div className="w-7 shrink-0 text-center">
-        <span className="text-[11px] text-[rgba(26,26,26,0.4)] font-medium tracking-wide">{hole.hole}</span>
+        <span className="text-xs text-[rgba(26,26,26,0.55)] font-semibold tracking-wide">{hole.hole}</span>
       </div>
 
       {/* Par selector */}
@@ -133,10 +133,10 @@ function HoleRow({ hole, onChangePar, onChangeScore, onClearScore }: HoleRowProp
               onChangePar(hole.hole, p);
             }}
             className={cn(
-              "w-7 h-7 rounded-lg text-[11px] font-medium transition-all duration-150",
+              "w-8 h-8 rounded-lg text-[13px] font-semibold transition-all duration-150",
               hole.par === p
-                ? "bg-[rgba(45,106,79,0.12)] text-[#2d6a4f] border border-[rgba(45,106,79,0.2)]"
-                : "bg-[rgba(0,0,0,0.03)] text-[rgba(26,26,26,0.4)] border border-[rgba(45,106,79,0.1)] hover:bg-[rgba(0,0,0,0.05)]"
+                ? "bg-[#1a5c2e] text-white border border-[#1a5c2e] shadow-[0_1px_4px_rgba(26,92,46,0.3)]"
+                : "bg-white text-[rgba(26,26,26,0.55)] border border-[rgba(45,106,79,0.18)] hover:bg-[rgba(0,0,0,0.04)]"
             )}
           >
             {p}
@@ -151,7 +151,7 @@ function HoleRow({ hole, onChangePar, onChangeScore, onClearScore }: HoleRowProp
           type="button"
           onPointerDown={() => triggerHaptic("soft")}
           onClick={() => onChangeScore(hole.hole, -1)}
-          className="w-9 h-9 rounded-xl border border-[rgba(45,106,79,0.12)] bg-[rgba(0,0,0,0.03)] text-[rgba(26,26,26,0.6)] text-lg font-light hover:bg-[rgba(0,0,0,0.06)] active:scale-95 transition-all duration-100 flex items-center justify-center"
+          className="w-9 h-9 rounded-xl border border-[rgba(45,106,79,0.18)] bg-white text-[#1a5c2e] text-xl font-medium hover:bg-[rgba(0,0,0,0.04)] active:scale-95 transition-all duration-100 flex items-center justify-center"
         >
           −
         </button>
@@ -165,15 +165,15 @@ function HoleRow({ hole, onChangePar, onChangeScore, onClearScore }: HoleRowProp
           onPointerCancel={cancelLongPress}
           onClick={handleScoreClick}
           className={cn(
-            "min-w-[52px] h-9 rounded-xl border text-center transition-all duration-200 flex flex-col items-center justify-center",
+            "min-w-[56px] h-10 rounded-xl border-2 text-center transition-all duration-200 flex flex-col items-center justify-center",
             scoreBg(hole.score, hole.par)
           )}
         >
-          <span className={cn("text-sm font-semibold leading-none", scoreColor(hole.score, hole.par))}>
+          <span className={cn("text-base font-bold leading-none", scoreColor(hole.score, hole.par))}>
             {hole.score ?? "—"}
           </span>
           {hole.score !== null && (
-            <span className={cn("text-[9px] leading-none mt-0.5 opacity-80", scoreColor(hole.score, hole.par))}>
+            <span className={cn("text-[10px] font-medium leading-none mt-0.5", scoreColor(hole.score, hole.par))}>
               {scoreLabel(hole.score, hole.par)}
             </span>
           )}
@@ -184,7 +184,7 @@ function HoleRow({ hole, onChangePar, onChangeScore, onClearScore }: HoleRowProp
           type="button"
           onPointerDown={() => triggerHaptic("soft")}
           onClick={() => onChangeScore(hole.hole, 1)}
-          className="w-9 h-9 rounded-xl border border-[rgba(45,106,79,0.12)] bg-[rgba(0,0,0,0.03)] text-[rgba(26,26,26,0.6)] text-lg font-light hover:bg-[rgba(0,0,0,0.06)] active:scale-95 transition-all duration-100 flex items-center justify-center"
+          className="w-9 h-9 rounded-xl border border-[rgba(45,106,79,0.18)] bg-white text-[#1a5c2e] text-xl font-medium hover:bg-[rgba(0,0,0,0.04)] active:scale-95 transition-all duration-100 flex items-center justify-center"
         >
           +
         </button>
@@ -192,7 +192,7 @@ function HoleRow({ hole, onChangePar, onChangeScore, onClearScore }: HoleRowProp
 
       {/* Score vs par pill */}
       <div className="w-9 text-right shrink-0">
-        <span className={cn("text-[11px] font-medium", diff !== null ? scoreColor(hole.score, hole.par) : "text-[rgba(26,26,26,0.4)]")}>
+        <span className={cn("text-xs font-semibold", diff !== null ? scoreColor(hole.score, hole.par) : "text-[rgba(26,26,26,0.4)]")}>
           {diff !== null ? formatScoreToPar(diff) : ""}
         </span>
       </div>
@@ -406,16 +406,16 @@ const Scorecard = () => {
           {/* Column headers */}
           <div className="flex items-center gap-2 px-4 py-2">
             <div className="w-7 text-center">
-              <span className="text-[10px] text-[rgba(26,26,26,0.4)] uppercase tracking-wider">Hole</span>
+              <span className="text-[10px] font-semibold text-[rgba(26,26,26,0.55)] uppercase tracking-wider">Hole</span>
             </div>
             <div className="flex gap-1 shrink-0">
-              <span className="text-[10px] text-[rgba(26,26,26,0.4)] uppercase tracking-wider w-[73px] text-center">Par</span>
+              <span className="text-[10px] font-semibold text-[rgba(26,26,26,0.55)] uppercase tracking-wider w-[104px] text-center">Par</span>
             </div>
             <div className="ml-auto flex items-center gap-2">
-              <span className="text-[10px] text-[rgba(26,26,26,0.4)] uppercase tracking-wider w-[122px] text-center">Score</span>
+              <span className="text-[10px] font-semibold text-[rgba(26,26,26,0.55)] uppercase tracking-wider w-[144px] text-center">Score</span>
             </div>
             <div className="w-9 text-right">
-              <span className="text-[10px] text-[rgba(26,26,26,0.4)] uppercase tracking-wider">±</span>
+              <span className="text-[10px] font-semibold text-[rgba(26,26,26,0.55)] uppercase tracking-wider">±</span>
             </div>
           </div>
 

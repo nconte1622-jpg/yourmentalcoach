@@ -106,7 +106,7 @@ function todayLabel() {
    ═══════════════════════════════════════════════════════════ */
 const Home = () => {
   const navigate = useNavigate();
-  const { isPro } = useProStatus();
+  const { isPro, isLoading: proLoading } = useProStatus();
   const { features } = useFeatureFlags();
   const { summary: patternSummary, eligibleRoundCount, hasPatternAccess } = usePatternInsights();
   const { getActiveRound, createRoundEvent, attachDailyFocusToActiveRound } = useRounds();
@@ -308,13 +308,13 @@ const Home = () => {
                 }
                 subrow={
                   <div className="flex items-center gap-2">
-                    <div className="inline-flex min-h-11 items-center gap-1.5 rounded-full border border-[rgba(45,106,79,0.12)] bg-[rgba(45,106,79,0.06)] px-3.5 py-1 text-xs font-medium text-[#2d6a4f]">
+                    <div className="inline-flex min-h-11 items-center gap-1.5 rounded-full border border-[rgba(45,106,79,0.14)] bg-[rgba(45,106,79,0.07)] px-4 py-1 text-[13px] font-semibold tracking-wide text-[#2d6a4f]">
                       <span className="inline-block h-1.5 w-1.5 rounded-full bg-[#2d6a4f] opacity-70" />
                       {todayLabel()}
                     </div>
                     {streak.currentStreak >= 2 && (
-                      <div className="inline-flex min-h-11 items-center gap-1 rounded-full border border-[rgba(255,160,50,0.3)] bg-[rgba(255,120,20,0.12)] px-3 py-1 text-xs font-medium text-[rgba(255,160,80,0.9)]">
-                        <Flame className="h-3 w-3" />
+                      <div className="streak-pill inline-flex min-h-11 items-center gap-1.5 rounded-full px-3.5 py-1 text-[13px] font-semibold tracking-wide text-white">
+                        <Flame className="h-3.5 w-3.5" />
                         {streakLabel(streak)}
                       </div>
                     )}
@@ -483,7 +483,7 @@ const Home = () => {
                 <div className="calm-pro-mount grid grid-cols-2 gap-3">
                   <button
                     onClick={() => withTap("/round-setup")}
-                    className="calm-pro-focus calm-pro-press group flex flex-col items-start gap-2 rounded-2xl bg-[#1a5c2e] p-5 text-left text-white shadow-[0_8px_24px_rgba(26,92,46,0.28)]"
+                    className="calm-pro-focus calm-pro-press group flex flex-col items-start gap-2 rounded-2xl bg-[linear-gradient(135deg,#1a5c2e_0%,#2d7a4a_100%)] p-5 text-left text-white shadow-[0_8px_24px_rgba(26,92,46,0.32)]"
                   >
                     <Flag className="h-6 w-6 text-[#e8a84c]" />
                     <span className="font-serif text-xl leading-tight">Start a Round</span>
@@ -558,12 +558,44 @@ const Home = () => {
         </section>
 
         {/* ════════════════════════════════════════════════
-            SLIDE 3 — INTEL  (Daily Golf News)
+            SLIDE 3 — INTEL  (Daily Golf News) — Pro only
             ════════════════════════════════════════════════ */}
         <section className="relative h-full w-screen shrink-0 snap-center overflow-hidden">
           <div className="calm-pro-bg absolute inset-0" />
           <div className="relative z-10 h-full">
-            <GolfNewsView />
+            {isPro || proLoading ? (
+              <GolfNewsView />
+            ) : (
+              <div className="relative h-full overflow-hidden">
+                {/* Blurred live preview */}
+                <div className="pointer-events-none h-full select-none opacity-40 blur-[6px]">
+                  <GolfNewsView />
+                </div>
+                {/* Lock overlay */}
+                <div className="absolute inset-0 flex flex-col items-center justify-center gap-5 px-8 text-center">
+                  <div className="flex h-16 w-16 items-center justify-center rounded-3xl border border-[#c8ddc8] bg-white/90 shadow-[0_8px_24px_rgba(26,92,46,0.18)]">
+                    <Lock className="h-7 w-7 text-[#1a5c2e]" />
+                  </div>
+                  <div className="space-y-2">
+                    <h2 className="font-serif text-[28px] font-semibold leading-tight text-[#0f1f0f]">
+                      Daily Caddie Intel
+                    </h2>
+                    <p className="mx-auto max-w-[280px] text-sm leading-6 text-[#2d4d2d]">
+                      Personalized golf intelligence, tuned to your game and refreshed daily. Unlock with The Caddie Pro.
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => {
+                      triggerHaptic("medium");
+                      setShowUpgradeModal(true);
+                    }}
+                    className="calm-pro-press rounded-2xl bg-[#1a5c2e] px-8 py-4 text-base font-semibold text-white shadow-[0_8px_24px_rgba(26,92,46,0.28)]"
+                  >
+                    Unlock with Pro
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         </section>
 

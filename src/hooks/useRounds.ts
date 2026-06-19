@@ -6,7 +6,9 @@ import {
   clearActiveRoundSession,
   clearRoundMessages,
   consumePendingPreGameTalk,
+  isRoundEnded,
   loadActiveRoundSession,
+  markRoundEnded,
   saveActiveRoundSession,
   updateActiveRoundSession,
 } from "@/lib/roundSession";
@@ -298,6 +300,7 @@ export function useRounds() {
     const round = data as Round;
 
     if (round.ended_at || round.status === "completed" || round.status === "abandoned") {
+      markRoundEnded(round.id);
       clearActiveRoundSession();
       clearRoundMessages(round.id);
     } else {
@@ -330,11 +333,17 @@ export function useRounds() {
 
     const persisted = loadActiveRoundSession();
     if (persisted?.roundId) {
-      const persistedRound = await getRound(persisted.roundId);
-      if (persistedRound && !persistedRound.ended_at && persistedRound.status !== "completed") {
-        return persistedRound;
+      // Locally ended already — never resurrect it, even if the server write
+      // hasn't landed yet.
+      if (isRoundEnded(persisted.roundId)) {
+        clearActiveRoundSession();
+      } else {
+        const persistedRound = await getRound(persisted.roundId);
+        if (persistedRound && !persistedRound.ended_at && persistedRound.status !== "completed") {
+          return persistedRound;
+        }
+        clearActiveRoundSession();
       }
-      clearActiveRoundSession();
     }
 
     const { data, error } = await supabase
@@ -352,6 +361,23 @@ export function useRounds() {
     }
 
     const round = data as Round | null;
+
+    // The server still thinks this round is open, but we ended it locally and
+    // the completing write must have failed/raced. Don't show it — and quietly
+    // re-issue the close so the server eventually agrees.
+    if (round && isRoundEnded(round.id)) {
+      void supabase
+        .from("rounds")
+        .update({ ended_at: new Date().toISOString(), status: "completed" })
+        .eq("id", round.id)
+        .eq("user_id", user.id)
+        .then(undefined, () => {
+          // Best-effort self-heal — the local ledger keeps the UI correct regardless.
+        });
+      clearActiveRoundSession();
+      return null;
+    }
+
     if (round) {
       saveActiveRoundSession(buildActiveRoundSnapshot(round));
     }

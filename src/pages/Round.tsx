@@ -22,7 +22,8 @@ import { AppShell } from "@/components/ui/AppShell";
 import { Lock, Wind, ClipboardList, Flag, Zap, Navigation } from "lucide-react";
 import { ProUpgradeModal } from "@/components/ProUpgradeModal";
 import { useFeatureFlags } from "@/hooks/useFeatureFlags";
-import { loadActiveRoundSession, clearActiveRoundSession, clearRoundMessages } from "@/lib/roundSession";
+import { loadActiveRoundSession, clearActiveRoundSession, clearRoundMessages, markRoundEnded } from "@/lib/roundSession";
+import { scoreBreathingSessionsForRound } from "@/lib/breathingLog";
 import { extractAndSaveQuickEndData } from "@/lib/quickEndRound";
 import { recordCompletedRound } from "@/lib/streakStorage";
 import { loadScorecard } from "@/lib/scorecardStorage";
@@ -87,6 +88,10 @@ const Round = () => {
   const [endRoundStep, setEndRoundStep] = useState<"actions" | "rating">("actions");
   const [postRoundFeeling, setPostRoundFeeling] = useState<number | null>(null);
   const [isEndingRound, setIsEndingRound] = useState(false);
+  // Height (px) the on-screen keyboard covers. iOS WKWebView doesn't honor
+  // `interactive-widget=resizes-content`, so the chat must shrink itself using
+  // the visualViewport API — otherwise the keyboard hides the conversation.
+  const [keyboardInset, setKeyboardInset] = useState(0);
   const [holeTipInfo, setHoleTipInfo] = useState<{ hole: number; course: string } | null>(null);
   const [preShotOpen, setPreShotOpen] = useState(false);
   const [revealData, setRevealData] = useState<{ moods: HoleMood[]; roundId: string } | null>(null);
@@ -192,6 +197,34 @@ const Round = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, isTyping]);
 
+  // Track the keyboard via visualViewport and expose it as a px inset.
+  useEffect(() => {
+    const vv = window.visualViewport;
+    if (!vv) return;
+    const update = () => {
+      // Space between the visual viewport's bottom and the layout viewport's
+      // bottom = the keyboard. Threshold avoids jitter from minor UI chrome.
+      const inset = Math.max(0, window.innerHeight - vv.height - vv.offsetTop);
+      setKeyboardInset(inset > 80 ? Math.round(inset) : 0);
+    };
+    update();
+    vv.addEventListener("resize", update);
+    vv.addEventListener("scroll", update);
+    return () => {
+      vv.removeEventListener("resize", update);
+      vv.removeEventListener("scroll", update);
+    };
+  }, []);
+
+  // When the keyboard opens, keep the latest message in view above the dock.
+  useEffect(() => {
+    if (keyboardInset > 0) {
+      requestAnimationFrame(() => {
+        messagesEndRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
+      });
+    }
+  }, [keyboardInset]);
+
   // Re-derive current hole when user navigates back from Scorecard
   useEffect(() => {
     const onFocus = () => {
@@ -287,11 +320,22 @@ const Round = () => {
     extractAndSaveQuickEndData(activeRoundId);
     recordCompletedRound();
 
+    // Mark the round ended locally FIRST. This is the source of truth the home
+    // screen and resume chip trust, so a slow or failed Supabase write can never
+    // resurrect it as "Resume Round".
+    markRoundEnded(capturedRoundId);
+    clearActiveRoundSession();
+    clearRoundMessages(capturedRoundId);
+
+    // Score any breathing sessions taken during this round, calibrated by how the
+    // round actually left the golfer feeling (1-10). Best-effort, never blocks.
+    void scoreBreathingSessionsForRound(capturedRoundId, postRoundFeeling).catch(() => { /* non-critical */ });
+
     // Post-round feeling is non-critical telemetry — fire and forget so it can
     // never block (or hang) the "End Round" flow.
     if (postRoundFeeling !== null) {
       void createRoundEvent({
-        round_id: activeRoundId,
+        round_id: capturedRoundId,
         event_type: "note",
         label: "post_round_feeling",
         notes: JSON.stringify({
@@ -301,26 +345,23 @@ const Round = () => {
       }).catch(() => { /* non-critical */ });
     }
 
-    // Persist the closed round to the DB, but never let a slow/failed request
-    // trap the user behind an "Ending..." spinner. Race against a hard timeout;
-    // whatever happens, we complete the round locally and show the reveal.
-    const ENDED_TIMEOUT_MS = 6000;
-    try {
-      await Promise.race([
-        updateRound(activeRoundId, {
-          ended_at: new Date().toISOString(),
-          status: "completed",
-        }),
-        new Promise((resolve) => setTimeout(resolve, ENDED_TIMEOUT_MS)),
-      ]);
-    } catch (error) {
-      console.error("Failed to end active round:", error);
-    }
-
-    // Guarantee the round is gone from the local "active" state regardless of
-    // whether the DB write landed, so the home screen / resume chip clear.
-    clearActiveRoundSession();
-    clearRoundMessages(capturedRoundId);
+    // Persist the completion to Supabase in the BACKGROUND. The round is already
+    // ended locally, so we never trap the user behind an "Ending..." spinner.
+    // One retry covers transient failures; the local ledger covers the rest.
+    void (async () => {
+      for (let attempt = 0; attempt < 2; attempt++) {
+        try {
+          const r = await updateRound(capturedRoundId, {
+            ended_at: new Date().toISOString(),
+            status: "completed",
+          });
+          if (r) return;
+        } catch (error) {
+          console.error("Failed to persist ended round:", error);
+        }
+        await new Promise((resolve) => setTimeout(resolve, 2500));
+      }
+    })();
 
     setIsEndingRound(false);
     setEndRoundDialogOpen(false);
@@ -385,8 +426,15 @@ const Round = () => {
 
   return (
     <PageShell backgroundVariant={isFrustrationMode ? "frustration" : "default"}>
-      {/* h-[100dvh] gives flex children a real upper bound so overflow-y-auto works */}
-      <div className="relative h-[100dvh] w-full overflow-hidden">
+      {/* Height collapses by the keyboard inset so the composer dock and messages
+          stay above the keyboard (--kb cascades to the shell min-heights). */}
+      <div
+        className="relative w-full overflow-hidden"
+        style={{
+          height: `calc(100dvh - ${keyboardInset}px)`,
+          ["--kb" as string]: `${keyboardInset}px`,
+        }}
+      >
 
       {/* Close Strong Transition Overlay */}
       {closeStrongTransition && (
@@ -402,10 +450,10 @@ const Round = () => {
 
       <AppShell
         className={cn(
-          "relative z-10",
+          "relative z-10 chat-shell",
           closeStrongTransition && "opacity-0 scale-105 transition-all duration-500"
         )}
-        contentClassName="flex flex-col"
+        contentClassName="flex flex-col chat-shell-content"
         header={
           <AppHeader
             left={
@@ -422,13 +470,13 @@ const Round = () => {
             }
             center={
               activeRoundSummary ? (
-                <p className="text-[10px] text-muted-foreground/60 text-center truncate pointer-events-auto">
+                <p className="mx-auto max-w-[180px] truncate text-center text-[13px] font-medium capitalize tracking-wide text-muted-foreground/80 pointer-events-auto">
                   {activeRoundSummary.roundType.replace("-", " ")} · {activeRoundSummary.environment}
                 </p>
               ) : null
             }
             right={
-              <div className="flex items-center gap-0">
+              <div className="flex items-center gap-1">
                 <button
                   type="button"
                   onClick={() => {
@@ -481,7 +529,7 @@ const Round = () => {
                     setEndRoundStep("actions");
                     setEndRoundDialogOpen(true);
                   }}
-                  className="flex h-9 items-center justify-center rounded-full px-2.5 text-[10px] uppercase tracking-[0.14em] font-semibold text-[#2d6a4f] hover:bg-[rgba(0,0,0,0.03)] transition-all"
+                  className="flex h-9 items-center justify-center rounded-full px-3 text-[12px] uppercase tracking-[0.14em] font-semibold text-[#2d6a4f] hover:bg-[rgba(0,0,0,0.03)] transition-all"
                 >
                   End
                 </button>

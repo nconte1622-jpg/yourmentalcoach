@@ -19,8 +19,9 @@ export function GlassCard({ children, className, glow, variant = "default", ...p
         variant === "sand"
           ? "border-[rgba(45,106,79,0.1)] bg-white/90"
           : "border-[rgba(45,106,79,0.06)] bg-white/85",
-        "shadow-[0_1px_0_rgba(255,255,255,0.5)_inset,_0_2px_16px_rgba(0,0,0,0.05)]",
-        glow && "shadow-[0_1px_0_rgba(255,255,255,0.5)_inset,_0_2px_16px_rgba(0,0,0,0.05),_0_0_24px_rgba(45,106,79,0.06)]",
+        // Soft green-tinted depth so cards feel grounded and premium, not flat.
+        "shadow-[0_1px_0_rgba(255,255,255,0.6)_inset,_0_4px_16px_rgba(26,92,46,0.08),_0_2px_6px_rgba(0,0,0,0.04)]",
+        glow && "shadow-[0_1px_0_rgba(255,255,255,0.6)_inset,_0_4px_16px_rgba(26,92,46,0.08),_0_2px_6px_rgba(0,0,0,0.04),_0_0_28px_rgba(45,106,79,0.10)]",
         className,
       )}
       {...props}

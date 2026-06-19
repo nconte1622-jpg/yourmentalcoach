@@ -16,7 +16,7 @@ import {
 import { cn } from "@/lib/utils";
 import { triggerHaptic } from "@/lib/haptics";
 import { toast } from "sonner";
-import { MapContainer, TileLayer, Marker, Polyline, useMap } from "react-leaflet";
+import { MapContainer, TileLayer, Marker, Polyline, useMap, useMapEvents } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { fetchCourseWeather, calcYardageAdjustment, type CourseWeather } from "@/lib/weather";
@@ -36,12 +36,36 @@ import {
   type MissTendency,
 } from "@/lib/holeIntel";
 
-/** Recenters the map whenever the focus point changes (player, hole, or course). */
-function MapController({ lat, lng }: { lat: number; lng: number }) {
+/**
+ * Recenters the map when the focus *reason* changes (course loaded, hole
+ * changed, pin set, or "follow me" toggled) — applying that reason's zoom only
+ * on the change. Routine GPS position ticks and the user's own panning/zooming
+ * are left untouched, so selecting a course frames the course instead of
+ * snapping back to where the golfer is standing.
+ */
+function MapController({
+  lat,
+  lng,
+  zoom,
+  focusKey,
+  onUserDrag,
+}: {
+  lat: number;
+  lng: number;
+  zoom: number;
+  focusKey: string;
+  onUserDrag: () => void;
+}) {
   const map = useMap();
+  const lastKey = useRef<string | null>(null);
   useEffect(() => {
-    map.setView([lat, lng], map.getZoom(), { animate: true });
-  }, [lat, lng, map]);
+    const keyChanged = lastKey.current !== focusKey;
+    lastKey.current = focusKey;
+    map.setView([lat, lng], keyChanged ? zoom : map.getZoom(), { animate: true });
+  }, [lat, lng, zoom, focusKey, map]);
+  useMapEvents({
+    dragstart: () => onUserDrag(),
+  });
   return null;
 }
 
@@ -142,6 +166,10 @@ export function GpsRangefinderTab() {
   const [coursePos, setCoursePos] = useState<{ lat: number; lng: number } | null>(null);
   const [isSearching, setIsSearching] = useState(false);
   const searchTimeoutRef = useRef<ReturnType<typeof setTimeout>>();
+  // The map follows the player only when explicitly enabled (the recenter
+  // button). Default off so a freshly-selected course frames the course.
+  const [followPlayer, setFollowPlayer] = useState(false);
+  const [mapInstance, setMapInstance] = useState<L.Map | null>(null);
 
   // New: course download, hole picker, weather, per-hole intel
   const [holes, setHoles] = useState<HoleGeometry[]>([]);
@@ -187,6 +215,9 @@ export function GpsRangefinderTab() {
   const loadCourse = useCallback(async (course: CourseResult, openPicker: boolean) => {
     setSelectedCourse(course.name);
     setCoursePos({ lat: course.lat, lng: course.lng });
+    // Frame the course the moment it's chosen — stop following the player so
+    // the map flies to the course rather than the golfer's current location.
+    setFollowPlayer(false);
     setCourseSearch("");
     setCourseResults([]);
     if (openPicker) setShowHolePicker(true);
@@ -236,15 +267,22 @@ export function GpsRangefinderTab() {
 
   const currentPin = pinCoords[currentHole];
 
-  // Map focus: follow the player while tracking, otherwise center the selected hole.
+  // Map focus + the zoom/key for each "reason" we'd recenter. Player-follow only
+  // wins when the golfer explicitly turns it on; otherwise we frame the pin, the
+  // selected hole, then the course — so a chosen course is always visible.
   const focusPoint = useMemo(() => {
-    if (watching && coords) return coords;
-    if (currentPin) return currentPin;
-    if (currentHoleGeo) return { lat: currentHoleGeo.green[0], lng: currentHoleGeo.green[1] };
-    if (coursePos) return coursePos;
-    if (coords) return coords;
-    return { lat: 33.45, lng: -111.94 };
-  }, [watching, coords, currentPin, currentHoleGeo, coursePos]);
+    if (followPlayer && coords)
+      return { lat: coords.lat, lng: coords.lng, zoom: 18, key: "player" };
+    if (currentPin)
+      return { lat: currentPin.lat, lng: currentPin.lng, zoom: 17, key: `pin-${currentHole}` };
+    if (currentHoleGeo)
+      return { lat: currentHoleGeo.green[0], lng: currentHoleGeo.green[1], zoom: 17, key: `hole-${currentHole}` };
+    if (coursePos)
+      return { lat: coursePos.lat, lng: coursePos.lng, zoom: 16, key: "course" };
+    if (coords)
+      return { lat: coords.lat, lng: coords.lng, zoom: 17, key: "player" };
+    return { lat: 33.45, lng: -111.94, zoom: 15, key: "default" };
+  }, [followPlayer, coords, currentPin, currentHole, currentHoleGeo, coursePos]);
 
   const gpsDistanceToPin = useCallback((): number | null => {
     const pin = pinCoords[currentHole];
@@ -373,13 +411,24 @@ export function GpsRangefinderTab() {
   };
 
   const handleSetPin = () => {
-    if (!coords) {
-      toast.error("Walk to the pin and tap Set Pin");
+    // Drop the pin at the CENTER of the current map view (the green you've framed
+    // under the crosshair) — not where the golfer is standing. This lets you set
+    // a pin while looking at the course, even before/without GPS. Falls back to
+    // the live GPS position if the map isn't ready.
+    const center = mapInstance?.getCenter();
+    const target = center ? { lat: center.lat, lng: center.lng } : coords;
+    if (!target) {
+      toast.error("Move the map over the pin, then tap Set Pin");
       return;
     }
     triggerHaptic("medium");
-    setPinCoords((prev) => ({ ...prev, [currentHole]: coords }));
+    setPinCoords((prev) => ({ ...prev, [currentHole]: { lat: target.lat, lng: target.lng } }));
     toast.success(`Pin set for hole ${currentHole}`);
+  };
+
+  const toggleFollowPlayer = () => {
+    triggerHaptic("light");
+    setFollowPlayer((prev) => !prev);
   };
 
   const handleHoleChange = (delta: number) => {
@@ -548,17 +597,24 @@ export function GpsRangefinderTab() {
       {/* Satellite map */}
       <div className="px-5 pb-4">
         <div className="relative overflow-hidden rounded-[20px] border border-[#c8ddc8] shadow-[0_2px_12px_rgba(15,31,15,0.06)]">
-          <div className="h-[220px] w-full">
+          <div className="relative h-[220px] w-full">
             <MapContainer
               center={[focusPoint.lat, focusPoint.lng]}
-              zoom={17}
+              zoom={focusPoint.zoom}
               zoomControl={false}
               attributionControl={false}
               className="h-full w-full"
               style={{ borderRadius: "20px" }}
+              ref={setMapInstance}
             >
               <TileLayer url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}" />
-              <MapController lat={focusPoint.lat} lng={focusPoint.lng} />
+              <MapController
+                lat={focusPoint.lat}
+                lng={focusPoint.lng}
+                zoom={focusPoint.zoom}
+                focusKey={focusPoint.key}
+                onUserDrag={() => setFollowPlayer(false)}
+              />
               {coords && <Marker position={[coords.lat, coords.lng]} icon={playerIcon} />}
               {currentHoleGeo && (
                 <>
@@ -577,6 +633,34 @@ export function GpsRangefinderTab() {
                 />
               )}
             </MapContainer>
+
+            {/* Center crosshair — marks where "Set Pin Here" will drop the pin. */}
+            <div className="pointer-events-none absolute inset-0 z-[900] flex items-center justify-center">
+              <div className="relative h-7 w-7">
+                <span className="absolute left-1/2 top-0 h-7 w-px -translate-x-1/2 bg-white/80 shadow-[0_0_4px_rgba(0,0,0,0.5)]" />
+                <span className="absolute top-1/2 left-0 h-px w-7 -translate-y-1/2 bg-white/80 shadow-[0_0_4px_rgba(0,0,0,0.5)]" />
+                <span className="absolute left-1/2 top-1/2 h-2 w-2 -translate-x-1/2 -translate-y-1/2 rounded-full border border-white/90 bg-[#dc2626]/70" />
+              </div>
+            </div>
+
+            {/* Recenter / follow-me toggle — lets the golfer jump the map to their
+                own position (and follow), or back to the framed course/hole. */}
+            {coords && (
+              <button
+                type="button"
+                onClick={toggleFollowPlayer}
+                className={cn(
+                  "absolute right-3 top-3 z-[1000] flex h-10 w-10 items-center justify-center rounded-full border shadow-[0_2px_10px_rgba(0,0,0,0.25)] transition-all",
+                  followPlayer
+                    ? "border-[#1a5c2e] bg-[#1a5c2e] text-white"
+                    : "border-[#c8ddc8] bg-white/95 text-[#1a5c2e] hover:bg-white"
+                )}
+                aria-label={followPlayer ? "Stop following my location" : "Center on my location"}
+              >
+                <Locate className="h-5 w-5" />
+              </button>
+            )}
+
             {!watching && !coords && (
               <div className="absolute inset-0 z-[1000] flex items-center justify-center bg-[rgba(232,240,233,0.7)] backdrop-blur-sm">
                 <div className="text-center">
@@ -702,7 +786,7 @@ export function GpsRangefinderTab() {
         {!watching && (
           <button
             onClick={startWatching}
-            className="flex w-full items-center justify-center gap-3 rounded-2xl bg-[#1a5c2e] px-6 py-4 text-[16px] font-semibold text-white shadow-[0_2px_12px_rgba(26,92,46,0.28)] transition-all hover:bg-[#2d7a4a]"
+            className="flex w-full items-center justify-center gap-3 rounded-2xl bg-[linear-gradient(135deg,#1a5c2e_0%,#2d7a4a_100%)] px-6 py-4 text-[16px] font-semibold text-white shadow-[0_4px_16px_rgba(26,92,46,0.32)] transition-all active:scale-[0.98]"
           >
             <Navigation className="h-5 w-5" />
             Start GPS Tracking
@@ -710,11 +794,11 @@ export function GpsRangefinderTab() {
         )}
         <button
           onClick={handleSetPin}
-          disabled={!coords}
+          disabled={!mapInstance && !coords}
           className="flex w-full items-center justify-center gap-3 rounded-2xl border border-[#1a5c2e]/40 bg-white px-6 py-4 text-[16px] font-semibold text-[#1a5c2e] shadow-[0_1px_6px_rgba(15,31,15,0.05)] transition-all hover:bg-[#f0f7f1] disabled:opacity-40"
         >
           <MapPin className="h-5 w-5" />
-          {pinCoords[currentHole] ? "Move Pin Location" : "Set Pin Here"}
+          {pinCoords[currentHole] ? "Move Pin to Crosshair" : "Set Pin at Crosshair"}
         </button>
         {watching && (
           <div className="flex items-center justify-center gap-2 text-[13px] text-[#1a5c2e]">
@@ -729,7 +813,7 @@ export function GpsRangefinderTab() {
         )}
         {gpsError && <p className="text-center text-[13px] text-red-600">{gpsError}</p>}
         <p className="text-center text-[12px] text-[#5a7a5a]">
-          Walk to the pin and tap Set Pin. GPS distance updates as you move.
+          Drag the map so the crosshair sits on the pin, then tap Set Pin. GPS distance updates as you move.
         </p>
       </div>
 

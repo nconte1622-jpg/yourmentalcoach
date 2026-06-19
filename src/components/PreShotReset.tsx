@@ -11,6 +11,7 @@ import { X } from "lucide-react";
 import { loadPreferredWords } from "@/lib/memoryStorage";
 import { loadGolferProfile } from "@/lib/golferProfile";
 import { triggerHaptic } from "@/lib/haptics";
+import { logBreathingSession } from "@/lib/breathingLog";
 
 const BREATH_IN_MS = 3000;
 const BREATH_OUT_MS = 3000;
@@ -27,8 +28,12 @@ export function PreShotReset({ open, onClose }: PreShotResetProps) {
   const [phase, setPhase] = useState<"in" | "out">("in");
   const [cycleCount, setCycleCount] = useState(0);
   const [cueWord, setCueWord] = useState("commit");
-  const intervalRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const onCloseRef = useRef(onClose);
+  // Session tracking for the breathing log. cycleCountRef mirrors cycleCount so
+  // the (stable) finish handler always reads the latest count, never a stale one.
+  const sessionStartRef = useRef<number | null>(null);
+  const loggedRef = useRef(false);
+  const cycleCountRef = useRef(0);
 
   const autoCloseCycles = mode === "quick" ? 1 : 2;
 
@@ -36,6 +41,23 @@ export function PreShotReset({ open, onClose }: PreShotResetProps) {
   useEffect(() => {
     onCloseRef.current = onClose;
   }, [onClose]);
+
+  useEffect(() => {
+    cycleCountRef.current = cycleCount;
+  }, [cycleCount]);
+
+  // Record the completed session exactly once (on close or natural completion).
+  const finishSession = useCallback(() => {
+    if (loggedRef.current) return;
+    const start = sessionStartRef.current;
+    if (start == null) return; // user closed before choosing a mode
+    loggedRef.current = true;
+    logBreathingSession({
+      startedAt: new Date(start).toISOString(),
+      cyclesCompleted: cycleCountRef.current,
+      durationSeconds: Math.round((Date.now() - start) / 1000),
+    });
+  }, []);
 
   // Load golfer's top cue word when opened; reset mode
   useEffect(() => {
@@ -54,62 +76,58 @@ export function PreShotReset({ open, onClose }: PreShotResetProps) {
     setMode("choose");
     setPhase("in");
     setCycleCount(0);
+    sessionStartRef.current = null;
+    loggedRef.current = false;
+    cycleCountRef.current = 0;
   }, [open]);
 
-  // Breathing cycle using chained timeouts (not setInterval) to handle
-  // alternating durations correctly and avoid stale closure issues.
-  // Only runs once the user has chosen a mode.
+  const beginSession = useCallback((m: "quick" | "full") => {
+    triggerHaptic("medium");
+    setMode(m);
+    setPhase("in");
+    setCycleCount(0);
+    cycleCountRef.current = 0;
+    sessionStartRef.current = Date.now();
+    loggedRef.current = false;
+  }, []);
+
+  // Breathing engine — a single self-rescheduling timeout keyed to the current
+  // phase. The effect body is pure (no state mutated inside an updater), so it
+  // behaves correctly under StrictMode double-invocation and always cleans up
+  // its pending timeout. This replaces the old nested-updater version that
+  // could double-schedule and freeze after a few cycles.
   useEffect(() => {
-    if (!open || mode === "choose") {
-      if (intervalRef.current) {
-        clearTimeout(intervalRef.current);
-        intervalRef.current = null;
-      }
-      return;
-    }
+    if (!open || mode === "choose") return;
+    if (cycleCount >= autoCloseCycles) return; // engine stops once complete
 
-    function tick() {
-      setPhase((prev) => {
-        const nextPhase = prev === "in" ? "out" : "in";
+    const duration = phase === "in" ? BREATH_IN_MS : BREATH_OUT_MS;
+    const id = setTimeout(() => {
+      // A full cycle completes when we leave the "out" phase back to "in".
+      if (phase === "out") setCycleCount((c) => c + 1);
+      setPhase((p) => (p === "in" ? "out" : "in"));
+    }, duration);
 
-        // A full cycle completes when transitioning from "out" back to "in"
-        if (prev === "out") {
-          setCycleCount((c) => c + 1);
-        }
-
-        // Schedule next tick based on the NEXT phase's duration
-        const nextDuration = nextPhase === "in" ? BREATH_IN_MS : BREATH_OUT_MS;
-        intervalRef.current = setTimeout(tick, nextDuration);
-
-        return nextPhase;
-      });
-    }
-
-    // Start first transition after the initial "in" phase
-    intervalRef.current = setTimeout(tick, BREATH_IN_MS);
-
-    return () => {
-      if (intervalRef.current) {
-        clearTimeout(intervalRef.current);
-        intervalRef.current = null;
-      }
-    };
-  }, [open, mode]);
+    return () => clearTimeout(id);
+  }, [open, mode, phase, cycleCount, autoCloseCycles]);
 
   // Auto-close after cycles complete
   useEffect(() => {
     if (!open || mode === "choose") return;
     if (cycleCount >= autoCloseCycles) {
       triggerHaptic("light");
-      const timer = setTimeout(() => onCloseRef.current(), 500);
+      const timer = setTimeout(() => {
+        finishSession();
+        onCloseRef.current();
+      }, 500);
       return () => clearTimeout(timer);
     }
-  }, [cycleCount, open, mode, autoCloseCycles]);
+  }, [cycleCount, open, mode, autoCloseCycles, finishSession]);
 
   const handleClose = useCallback(() => {
     triggerHaptic("light");
+    finishSession();
     onCloseRef.current();
-  }, []);
+  }, [finishSession]);
 
   if (!open) return null;
 
@@ -131,7 +149,7 @@ export function PreShotReset({ open, onClose }: PreShotResetProps) {
           <div className="flex flex-col gap-3 w-full">
             <button
               type="button"
-              onClick={() => { triggerHaptic("medium"); setMode("quick"); setPhase("in"); setCycleCount(0); }}
+              onClick={() => beginSession("quick")}
               className="flex items-center justify-between rounded-2xl border border-white/12 bg-white/6 px-5 py-4 text-left hover:bg-white/10 transition-colors"
             >
               <div>
@@ -142,7 +160,7 @@ export function PreShotReset({ open, onClose }: PreShotResetProps) {
             </button>
             <button
               type="button"
-              onClick={() => { triggerHaptic("medium"); setMode("full"); setPhase("in"); setCycleCount(0); }}
+              onClick={() => beginSession("full")}
               className="flex items-center justify-between rounded-2xl border border-white/12 bg-white/6 px-5 py-4 text-left hover:bg-white/10 transition-colors"
             >
               <div>

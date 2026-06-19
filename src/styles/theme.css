@@ -117,6 +117,13 @@
   to { opacity: 1; transform: translateY(0); }
 }
 
+/* ── Streak pill — warm gold gradient, premium feel ─────── */
+.streak-pill {
+  background: linear-gradient(135deg, #e8a84c 0%, #d4813a 100%);
+  border: 1px solid rgba(212, 129, 58, 0.5);
+  box-shadow: 0 4px 14px rgba(212, 129, 58, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.22);
+}
+
 /* ── LRM badge ──────────────────────────────────────────── */
 .lrm-active-badge {
   position: relative;

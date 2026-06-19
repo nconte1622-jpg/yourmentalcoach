@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { CircleDot, Flag } from "lucide-react";
-import { loadActiveRoundSession } from "@/lib/roundSession";
+import { loadActiveRoundSession, ACTIVE_ROUND_CHANGED_EVENT } from "@/lib/roundSession";
 import { useRounds } from "@/hooks/useRounds";
 import { triggerHaptic } from "@/lib/haptics";
 
@@ -57,11 +57,14 @@ export function ActiveRoundResumeChip() {
     syncActiveRound();
     window.addEventListener("focus", syncActiveRound);
     document.addEventListener("visibilitychange", syncActiveRound);
+    // Ending a round dispatches this in-document — clears the chip immediately.
+    window.addEventListener(ACTIVE_ROUND_CHANGED_EVENT, syncActiveRound);
 
     return () => {
       cancelled = true;
       window.removeEventListener("focus", syncActiveRound);
       document.removeEventListener("visibilitychange", syncActiveRound);
+      window.removeEventListener(ACTIVE_ROUND_CHANGED_EVENT, syncActiveRound);
     };
   }, [getActiveRound]);
 

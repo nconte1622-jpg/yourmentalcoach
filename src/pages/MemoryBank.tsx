@@ -6,7 +6,8 @@ import { useProStatus } from "@/hooks/useProStatus";
 import { useRounds, Round } from "@/hooks/useRounds";
 import { useMemories, Memory, MemoryCategory } from "@/hooks/useMemories";
 import { ProUpgradeModal } from "@/components/ProUpgradeModal";
-import { ChevronLeft, Brain, Sparkles, TrendingUp, Lock } from "lucide-react";
+import { ChevronLeft, Brain, Sparkles, TrendingUp, Lock, Wind } from "lucide-react";
+import { loadBreathingSessions, type BreathingSession } from "@/lib/breathingLog";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { AppShell } from "@/components/ui/AppShell";
@@ -50,6 +51,7 @@ const MemoryBank = () => {
   const { getRecentRounds } = useRounds();
   const [memories, setMemories] = useState<Memory[]>([]);
   const [rounds, setRounds] = useState<Round[]>([]);
+  const [breathing, setBreathing] = useState<BreathingSession[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
@@ -67,6 +69,12 @@ const MemoryBank = () => {
         const [memoryData, roundData] = await Promise.all([getMemories(), getRecentRounds(12)]);
         setMemories(memoryData);
         setRounds(roundData.filter((round) => Boolean(round.ended_at)));
+        // Breathing history is stored locally — newest first.
+        setBreathing(
+          [...loadBreathingSessions()].sort(
+            (a, b) => new Date(b.startedAt).getTime() - new Date(a.startedAt).getTime()
+          )
+        );
       } catch (error) {
         console.error("Failed to fetch memories:", error);
       } finally {
@@ -401,6 +409,65 @@ const MemoryBank = () => {
                 );
               })}
             </div>
+
+            {/* Breathing Sessions */}
+            {breathing.length > 0 && (
+              <div className="space-y-4 animate-fade-in">
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2">
+                    <Wind className="h-4 w-4 text-[#1a5c2e]" />
+                    <h2
+                      className="text-[32px] font-serif font-medium tracking-[0.5px]"
+                      style={{ color: "#1a1a1a" }}
+                    >
+                      Breathing Sessions
+                    </h2>
+                  </div>
+                  <p className="text-sm font-light tracking-wide" style={{ color: "rgba(26,26,26,0.6)" }}>
+                    Each reset, scored 1-10 for how helpful it appeared — calibrated after the round.
+                  </p>
+                </div>
+
+                {breathing.slice(0, 20).map((session) => {
+                  const label = new Date(session.startedAt).toLocaleDateString("en-US", {
+                    month: "short",
+                    day: "numeric",
+                    year:
+                      new Date(session.startedAt).getFullYear() !== new Date().getFullYear()
+                        ? "numeric"
+                        : undefined,
+                  });
+                  const mins = Math.max(1, Math.round(session.durationSeconds / 60));
+                  return (
+                    <FrostedSandCard key={session.id} className="space-y-3">
+                      <div className="flex items-center justify-between gap-3">
+                        <div>
+                          <p className="text-xs uppercase tracking-[0.18em] text-primary/70">Breathing</p>
+                          <p className="text-base font-medium readable-on-sand">{label}</p>
+                        </div>
+                        {session.aiScore != null ? (
+                          <span className="rounded-full bg-primary/10 px-3 py-1 text-sm font-semibold text-primary">
+                            {session.aiScore}/10
+                          </span>
+                        ) : (
+                          <span className="rounded-full bg-[rgba(26,26,26,0.06)] px-3 py-1 text-xs text-[rgba(26,26,26,0.5)]">
+                            Scores after round
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-sm readable-on-sand">
+                        {session.cyclesCompleted} cycle{session.cyclesCompleted !== 1 ? "s" : ""} · {mins} min
+                      </p>
+                      {session.aiNotes && (
+                        <p className="text-sm leading-relaxed" style={{ color: "rgba(26,26,26,0.7)" }}>
+                          {session.aiNotes}
+                        </p>
+                      )}
+                    </FrostedSandCard>
+                  );
+                })}
+              </div>
+            )}
 
             {/* Memory categories */}
             {categoryOrder.map((category) => {
