@@ -1,11 +1,11 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Search, MapPin, X } from "lucide-react";
+import { Search, MapPin, X, Pencil, Info } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { PageShell } from "@/components/PageShell";
 import { triggerHaptic } from "@/lib/haptics";
-import { setRoundCourse } from "@/lib/holeIntel";
+import { setRoundCourse, clearRoundCourse } from "@/lib/holeIntel";
 import { saveRoundContext } from "@/lib/roundContext";
 import { usePreRoundRecall } from "@/hooks/usePreRoundRecall";
 import { useRounds, RoundType, RoundEnvironment } from "@/hooks/useRounds";
@@ -29,8 +29,12 @@ const RoundSetup = () => {
   // on-course / simulator rounds) so the GPS tab can load it on the next page.
   const [courseQuery, setCourseQuery] = useState("");
   const [courseResults, setCourseResults] = useState<{ name: string; lat: number; lng: number }[]>([]);
-  const [selectedCourse, setSelectedCourse] = useState<{ name: string; lat: number; lng: number } | null>(null);
+  const [selectedCourse, setSelectedCourse] = useState<
+    { name: string; lat: number; lng: number; manual?: boolean } | null
+  >(null);
   const [isSearchingCourse, setIsSearchingCourse] = useState(false);
+  const [manualMode, setManualMode] = useState(false);
+  const [manualName, setManualName] = useState("");
   const courseSearchTimeout = useRef<ReturnType<typeof setTimeout>>();
   const [isCreating, setIsCreating] = useState(false);
   const [activeRound, setActiveRound] = useState<{
@@ -107,7 +111,21 @@ const RoundSetup = () => {
 
   const selectCourse = (c: { name: string; lat: number; lng: number }) => {
     triggerHaptic("light");
-    setSelectedCourse(c);
+    setSelectedCourse({ ...c, manual: false });
+    setCourseQuery("");
+    setCourseResults([]);
+  };
+
+  // Escape hatch: course not in OpenStreetMap → let the golfer type it. No
+  // coords means no GPS layout / weather, and the AI can't do detailed
+  // hole-by-hole analysis (it falls back to course-level knowledge).
+  const confirmManual = () => {
+    const name = manualName.trim();
+    if (name.length < 2) return;
+    triggerHaptic("light");
+    setSelectedCourse({ name, lat: 0, lng: 0, manual: true });
+    setManualMode(false);
+    setManualName("");
     setCourseQuery("");
     setCourseResults([]);
   };
@@ -158,9 +176,12 @@ const RoundSetup = () => {
     };
 
     // Hand the selected course (with coords) to the round page's GPS tab so it
-    // loads automatically — no second search needed.
-    if (selectedCourse) {
-      setRoundCourse(selectedCourse);
+    // loads automatically — no second search needed. Manually-typed courses
+    // have no coords, so there's nothing for GPS to load; clear any stale one.
+    if (selectedCourse && !selectedCourse.manual) {
+      setRoundCourse({ name: selectedCourse.name, lat: selectedCourse.lat, lng: selectedCourse.lng });
+    } else {
+      clearRoundCourse();
     }
 
     // Persist the round context so the mid-round coach is aware of the course,
@@ -517,21 +538,76 @@ const RoundSetup = () => {
               </label>
 
               {selectedCourse ? (
-                <div className="flex items-center justify-between gap-3 rounded-2xl border border-[#1a5c2e]/40 bg-white p-4">
-                  <div className="flex min-w-0 items-center gap-3">
-                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#1a5c2e]/10 text-[#1a5c2e]">
-                      <MapPin className="h-5 w-5" />
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between gap-3 rounded-2xl border border-[#1a5c2e]/40 bg-white p-4">
+                    <div className="flex min-w-0 items-center gap-3">
+                      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#1a5c2e]/10 text-[#1a5c2e]">
+                        {selectedCourse.manual ? <Pencil className="h-5 w-5" /> : <MapPin className="h-5 w-5" />}
+                      </div>
+                      <div className="min-w-0">
+                        <p className="truncate text-[15px] font-medium text-[#0f1f0f]">{selectedCourse.name}</p>
+                        {selectedCourse.manual && (
+                          <p className="text-[12px] text-[#5a7a5a]">Entered manually · no GPS map</p>
+                        )}
+                      </div>
                     </div>
-                    <p className="truncate text-[15px] font-medium text-[#0f1f0f]">{selectedCourse.name}</p>
+                    <button
+                      type="button"
+                      onClick={() => { setSelectedCourse(null); setCourseQuery(""); }}
+                      className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-[#5a7a5a] transition-colors hover:bg-[#f0f7f1]"
+                      aria-label="Change course"
+                    >
+                      <X className="h-4 w-4" />
+                    </button>
                   </div>
-                  <button
-                    type="button"
-                    onClick={() => { setSelectedCourse(null); setCourseQuery(""); }}
-                    className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-[#5a7a5a] transition-colors hover:bg-[#f0f7f1]"
-                    aria-label="Change course"
-                  >
-                    <X className="h-4 w-4" />
-                  </button>
+                  {selectedCourse.manual && (
+                    <div className="flex items-start gap-2 rounded-xl border border-[#e8a84c]/45 bg-[#fbf3e3] p-3">
+                      <Info className="mt-0.5 h-4 w-4 shrink-0 text-[#d4813a]" />
+                      <p className="text-[12px] leading-5 text-[#0f1f0f]">
+                        We couldn’t find this course in our maps, so GPS yardages and detailed
+                        hole-by-hole analysis won’t be available. Your coach still gives course-level
+                        mental guidance from what it knows.
+                      </p>
+                    </div>
+                  )}
+                </div>
+              ) : manualMode ? (
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2 rounded-2xl border border-[#c8ddc8] bg-white px-4 py-3.5">
+                    <Pencil className="h-4 w-4 text-[#5a7a5a]" />
+                    <input
+                      type="text"
+                      value={manualName}
+                      onChange={(e) => setManualName(e.target.value)}
+                      placeholder="Type your course name"
+                      maxLength={80}
+                      className="flex-1 bg-transparent text-[16px] text-[#0f1f0f] placeholder-[#5a7a5a] outline-none"
+                    />
+                  </div>
+                  <div className="flex items-start gap-2 rounded-xl border border-[#e8a84c]/45 bg-[#fbf3e3] p-3">
+                    <Info className="mt-0.5 h-4 w-4 shrink-0 text-[#d4813a]" />
+                    <p className="text-[12px] leading-5 text-[#0f1f0f]">
+                      Manually-entered courses aren’t in OpenStreetMap, so there’s no GPS map and the
+                      AI won’t give complex hole-by-hole analysis — just course-level mental coaching.
+                    </p>
+                  </div>
+                  <div className="flex gap-2">
+                    <button
+                      type="button"
+                      onClick={confirmManual}
+                      disabled={manualName.trim().length < 2}
+                      className="flex-1 rounded-2xl bg-[#1a5c2e] py-3 text-[15px] font-medium text-white transition-all disabled:opacity-50"
+                    >
+                      Use this course
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => { setManualMode(false); setManualName(""); }}
+                      className="rounded-2xl border border-[#c8ddc8] px-4 py-3 text-[15px] font-medium text-[#2d4d2d] transition-all hover:bg-[#f0f7f1]"
+                    >
+                      Back to search
+                    </button>
+                  </div>
                 </div>
               ) : (
                 <div className="relative">
@@ -565,6 +641,13 @@ const RoundSetup = () => {
                       Pick a course from the list to start — this loads GPS &amp; hole tips on the next page.
                     </p>
                   )}
+                  <button
+                    type="button"
+                    onClick={() => { setManualMode(true); setManualName(courseQuery.trim()); }}
+                    className="mt-2 text-[13px] font-medium text-[#1a5c2e] underline underline-offset-2"
+                  >
+                    Can’t find your course? Enter it manually
+                  </button>
                 </div>
               )}
             </div>
