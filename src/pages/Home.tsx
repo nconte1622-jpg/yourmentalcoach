@@ -45,6 +45,7 @@ import { loadPreferredWords as loadCueWords } from "@/lib/memoryStorage";
 import { InAppAlertBanner } from "@/components/InAppAlertBanner";
 import { AccountSlide } from "@/components/AccountSlide";
 import { GolfNewsView } from "@/components/GolfNewsView";
+import { StaleRoundPrompt } from "@/components/StaleRoundPrompt";
 
 // Daily focus rotates through a curated 30-item library keyed to day-of-year.
 // This keeps the habit loop alive — same phrase every day kills engagement.
@@ -753,6 +754,7 @@ const Home = () => {
       </div>
 
       <ActiveRoundResumeChip />
+      <StaleRoundPrompt />
       <BottomDock highlightDot={hasHighlights} />
       <ProUpgradeModal open={showUpgradeModal} onOpenChange={setShowUpgradeModal} />
 
