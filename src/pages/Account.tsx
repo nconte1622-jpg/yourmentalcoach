@@ -66,7 +66,7 @@ const Account = () => {
   }, [restorePurchases]);
 
   const handleDeleteAccount = useCallback(async () => {
-    // window.confirm() is disabled in iOS WKWebView — use state-based confirmation instead
+    // window.confirm() is disabled in iOS WKWebView â use state-based confirmation instead
     if (!isConfirmingDelete) {
       setIsConfirmingDelete(true);
       return;
@@ -355,7 +355,7 @@ const Account = () => {
                     </span>
                     <span className="flex items-center gap-2" style={{ color: "rgba(26,26,26,0.6)" }}>
                       <FileText className="h-4 w-4" />
-                      <span className="text-sm">↗</span>
+                      <span className="text-sm">â</span>
                     </span>
                   </button>
                   <button
@@ -369,7 +369,7 @@ const Account = () => {
                     </span>
                     <span className="flex items-center gap-2" style={{ color: "rgba(26,26,26,0.6)" }}>
                       <FileText className="h-4 w-4" />
-                      <span className="text-sm">↗</span>
+                      <span className="text-sm">â</span>
                     </span>
                   </button>
                   {isConfirmingDelete ? (
@@ -497,6 +497,10 @@ const Account = () => {
                 Need help? Contact support@thecaddie.app
               </p>
             </div>
+
+            <p style={{ color: '#8E8E93', fontSize: 11, textAlign: 'center', marginTop: 24, marginBottom: 8 }}>
+              Powered by Whetstone
+            </p>
           </div>
         </main>
       </AppShell>
